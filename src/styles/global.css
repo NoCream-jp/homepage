@@ -1,1 +1,100 @@
+/* Tailwind v4 のコアエンジンを読み込み */
 @import "tailwindcss";
+
+/* =========================================
+   1. ベースカラーの設定（ライト/ダーク対応）
+   ========================================= */
+@layer base {
+  :root {
+    /* =================================
+       カラーパレットの定義（ライトモード）
+       ================================= */
+    /* テキスト */
+    --theme-text-black: #000000;
+    --theme-text-white: #ffffff;
+    --theme-text-label: #626264;
+    --theme-text-link: #5e26b5;
+
+    /* 背景 */
+    --theme-bg-standard: #f8f7fa;
+    --theme-bg-highlight: #4a148c;
+    --theme-bg-control: #f2f1f4;
+
+    /* チャート＆ベース（紫） */
+    --theme-purple-1200: #260a47;
+    --theme-purple-900: #4a148c;
+    --theme-purple-600: #7b1fa2;
+    --theme-purple-400: #ab47bc;
+    --theme-purple-200: #e1bee7;
+    --theme-purple-50: #f5eaf8;
+
+    /* セマンティック */
+    --theme-primary: var(--theme-purple-600);
+    --theme-success: #197a4b;
+    --theme-error: #ce0000;
+
+    /* =================================
+       変数への割り当て（システム用）
+       ================================= */
+    --color-text-black: var(--theme-text-black);
+    --color-text-white: var(--theme-text-white);
+    --color-text-label: var(--theme-text-label);
+    --color-text-link: var(--theme-text-link);
+
+    --color-bg-standard: var(--theme-bg-standard);
+    --color-bg-highlight: var(--theme-bg-highlight);
+    --color-bg-control: var(--theme-bg-control);
+
+    --color-primary: var(--theme-primary);
+    --color-success: var(--theme-success);
+    --color-error: var(--theme-error);
+
+    /* フォント設定 */
+    --font-sans:
+      "elms-sans", "Noto Sans JP", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* 将来ダークモードを実装したくなった時のための準備 */
+  .dark {
+    /* 背景を暗く、文字を明るく反転させる例 */
+    --theme-bg-standard: #111827;
+    --theme-text-black: #f8f7fa;
+    /* 必要に応じて他の色もここに追記します */
+  }
+}
+
+/* =========================================
+   2. カスタムユーティリティ
+   ========================================= */
+@layer utilities {
+  /* テキストカラーのクラス */
+  .text-primary {
+    color: var(--color-primary);
+  }
+  .text-black {
+    color: var(--color-text-black);
+  }
+  .text-white {
+    color: var(--color-text-white);
+  }
+  .text-label {
+    color: var(--color-text-label);
+  }
+  .text-link {
+    color: var(--color-text-link);
+  }
+
+  /* 背景カラーのクラス */
+  .bg-standard {
+    background-color: var(--color-bg-standard);
+  }
+  .bg-highlight {
+    background-color: var(--color-bg-highlight);
+  }
+  .bg-control {
+    background-color: var(--color-bg-control);
+  }
+  .bg-primary {
+    background-color: var(--color-primary);
+  }
+}
