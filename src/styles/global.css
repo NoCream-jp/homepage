@@ -47,8 +47,7 @@
    ========================================= */
 @theme {
   /* フォントの登録（ font-sans クラスが生成されます ）*/
-  --font-sans:
-    "elms-sans", "Noto Sans JP", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Google Sans Flex", ui-sans-serif, system-ui, sans-serif;
 
   /* 
     カラーの登録 
