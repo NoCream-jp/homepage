@@ -1,38 +1,17 @@
 ---
-// 親から渡される値
+// src/components/NavLink.astro
 interface Props {
-  href: string;
+  href: string; // 例: "/#news"
+  targetId: string; // 例: "news" (セクションのIDと一致させる)
 }
 
-const { href } = Astro.props;
-
-/* 現在のパスと一致していれば装飾する。currentPathが親から渡された文字列と
- * 同じ場合のみisActiveがtrueとし、特別にスタイルをあてる
- */
-const currentPath = Astro.url.pathname;
-const isActive = currentPath == href;
+const { href, targetId } = Astro.props;
 ---
 
 <a
   href={href}
-  aria-current={isActive ? "page" : undefined}
-  class:list={[
-    // 【モバイル共通】
-    // 画面に収めるため、余白を極小(px-1.5)、文字を小さく(text-[11px])、字送りを弱め(tracking-wide)に設定
-    "relative inline-flex items-center justify-center px-1.5 py-4 text-[11px] font-bold tracking-wide uppercase transition-all duration-300 sm:px-2 sm:text-xs",
-    // 【PC (lg以上)】
-    // 元のゆったりとしたサイズ感と強いトラッキングに戻す
-    "lg:px-6 lg:py-3 lg:text-base lg:tracking-widest",
-    {
-      // true時のスタイル
-      "text-primary opacity-100": isActive,
-      "lg:before:absolute lg:before:left-0 lg:before:content-['・'] lg:after:absolute lg:after:right-0 lg:after:content-['・']":
-        isActive,
-      // false時のスタイル
-      "opacity-70 hover:opacity-100 lg:hover:translate-x-1": !isActive,
-    },
-  ]}
+  data-nav-target={targetId}
+  class="data-[active=true]:text-primary relative inline-flex items-center justify-center px-1.5 py-4 text-[11px] font-bold tracking-wide uppercase opacity-70 transition-all duration-300 hover:opacity-100 data-[active=true]:opacity-100 sm:px-2 sm:text-xs lg:px-6 lg:py-3 lg:text-base lg:tracking-widest lg:hover:translate-x-1 lg:data-[active=true]:before:absolute lg:data-[active=true]:before:left-0 lg:data-[active=true]:before:content-['・'] lg:data-[active=true]:after:absolute lg:data-[active=true]:after:right-0 lg:data-[active=true]:after:content-['・'] lg:data-[active=true]:hover:translate-x-0"
 >
-  <!-- コンテンツ部分(WorkやBlogなど)をslotから受け取る -->
   <slot />
 </a>

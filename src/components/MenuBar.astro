@@ -3,22 +3,56 @@
 import NavLink from "./NavLink.astro";
 ---
 
-<!-- 
-  [レイアウト制御の要件]
-  - モバイル: ロゴを廃止し、justify-centerで中央揃え
-  - PC (lg幅以上): h-screen と justify-evenly を用い、上下とリンク間の余白を完全に均等化
--->
 <header
   class="fixed top-0 left-0 z-50 flex h-14 w-full items-center justify-center bg-white/80 px-2 backdrop-blur-md lg:top-0 lg:right-0 lg:left-auto lg:h-screen lg:w-48 lg:flex-col lg:bg-transparent lg:p-0 lg:backdrop-blur-none"
 >
-  <!-- ナビゲーション領域 -->
   <nav
-    class="flex w-full flex-row items-center justify-evenly gap-0.5 sm:gap-2 lg:h-full lg:flex-col lg:justify-evenly"
+    class="flex w-full flex-row items-center justify-evenly gap-0.5 sm:gap-2 lg:h-full lg:flex-col lg:py-16"
   >
-    <NavLink href="/">Home</NavLink>
-    <NavLink href="/news">News</NavLink>
-    <NavLink href="/profile">Profile</NavLink>
-    <NavLink href="/blog">Blog</NavLink>
-    <NavLink href="/work">Work</NavLink>
+    <!-- href は全て /#〜 に固定し、targetId を指定する -->
+    <NavLink href="/#home" targetId="home">Home</NavLink>
+    <NavLink href="/#news" targetId="news">News</NavLink>
+    <NavLink href="/#profile" targetId="profile">Profile</NavLink>
+    <NavLink href="/#blog" targetId="blog">Blog</NavLink>
+    <NavLink href="/#work" targetId="work">Work</NavLink>
   </nav>
 </header>
+
+<script>
+  // ページ読み込み時に実行されるスクロール監視ロジック
+  function initScrollSpy() {
+    // 監視対象となるトップページの各セクションを取得
+    const sections = document.querySelectorAll("section[id]");
+    // メニューバーの各リンクを取得
+    const navLinks = document.querySelectorAll("[data-nav-target]");
+
+    // 画面の「中央」にセクションが来たときに発火させる設定
+    const observerOptions = {
+      root: null,
+      rootMargin: "-50% 0px -50% 0px", // 画面の上下50%を無視し、中央の1本の線を通過したかで判定
+      threshold: 0,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const currentId = entry.target.getAttribute("id");
+
+          // 一致するIDを持つリンクのみdata-activeをセットする
+          navLinks.forEach((link) => {
+            if (link.getAttribute("data-nav-target") === currentId) {
+              link.setAttribute("data-active", "true");
+            } else {
+              link.removeAttribute("data-active");
+            }
+          });
+        }
+      });
+    }, observerOptions);
+
+    sections.forEach((section) => observer.observe(section));
+  }
+
+  // 初回読み込み時
+  initScrollSpy();
+</script>
