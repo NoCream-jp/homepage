@@ -71,4 +71,13 @@
   --color-standard: var(--theme-bg-standard); /* bg-standard を生成 */
   --color-highlight: var(--theme-bg-highlight); /* bg-highlight を生成 */
   --color-control: var(--theme-bg-control); /* bg-control を生成 */
+
+  /* 
+    サイドバーの幅をグローバル定義します。
+    これで w-sidebar や pr-sidebar などのクラスが自動生成されます。
+  */
+  --spacing-sidebar: 16rem; /* 約256px（お好みの幅に調整してください） */
+
+  /* モバイル時のヘッダーの高さも定義しておくと便利です */
+  --spacing-header: 3.5rem; /* h-14相当 */
 }
