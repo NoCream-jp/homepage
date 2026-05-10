@@ -1,0 +1,33 @@
+---
+
+// 親から渡される値
+interface Props {
+    href: string;
+}
+
+const { href } = Astro.props;
+
+/* 現在のパスと一致していれば装飾する。currentPathが親から渡された文字列と
+ * 同じ場合のみisActiveがtrueとし、特別にスタイルをあてる 
+ */
+const currentPath = Astro.url.pathname;
+const isActive = currentPath == href;
+---
+
+<a
+  href = {href}
+  aria-current = {isActive ? "page" : undefined}
+  class:list = {[
+    "relative inline-flex items-center justify-center px-6 py-3 font-bold \
+    uppercase tracking-widest transition-all duration-300",
+    {
+      // true時のスタイル
+      "opacity-100 text-primary before:content-['●'] before:absolute before:left-0 \
+      after:content-['●'] after:absolute after:right-0": isActive,
+      // false時のスタイル
+      "opacity-70 hover:opacity-100 hover-translate-x-1": !isActive,
+    }
+  ]}
+>
+  
+</a>
