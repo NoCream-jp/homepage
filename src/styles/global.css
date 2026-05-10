@@ -32,31 +32,10 @@
     --theme-primary: var(--theme-purple-600);
     --theme-success: #197a4b;
     --theme-error: #ce0000;
-
-    /* =================================
-       変数への割り当て（システム用）
-       ================================= */
-    --color-text-black: var(--theme-text-black);
-    --color-text-white: var(--theme-text-white);
-    --color-text-label: var(--theme-text-label);
-    --color-text-link: var(--theme-text-link);
-
-    --color-bg-standard: var(--theme-bg-standard);
-    --color-bg-highlight: var(--theme-bg-highlight);
-    --color-bg-control: var(--theme-bg-control);
-
-    --color-primary: var(--theme-primary);
-    --color-success: var(--theme-success);
-    --color-error: var(--theme-error);
-
-    /* フォント設定 */
-    --font-sans:
-      "elms-sans", "Noto Sans JP", ui-sans-serif, system-ui, sans-serif;
   }
 
-  /* 将来ダークモードを実装したくなった時のための準備 */
+  /* ダークモード時の変数上書き */
   .dark {
-    /* 背景を暗く、文字を明るく反転させる例 */
     --theme-bg-standard: #111827;
     --theme-text-black: #f8f7fa;
     /* 必要に応じて他の色もここに追記します */
@@ -64,37 +43,32 @@
 }
 
 /* =========================================
-   2. カスタムユーティリティ
+   2. Tailwind へのテーマ登録（v4 の要）
    ========================================= */
-@layer utilities {
-  /* テキストカラーのクラス */
-  .text-primary {
-    color: var(--color-primary);
-  }
-  .text-black {
-    color: var(--color-text-black);
-  }
-  .text-white {
-    color: var(--color-text-white);
-  }
-  .text-label {
-    color: var(--color-text-label);
-  }
-  .text-link {
-    color: var(--color-text-link);
-  }
+@theme {
+  /* フォントの登録（ font-sans クラスが生成されます ）*/
+  --font-sans:
+    "elms-sans", "Noto Sans JP", ui-sans-serif, system-ui, sans-serif;
 
-  /* 背景カラーのクラス */
-  .bg-standard {
-    background-color: var(--color-bg-standard);
-  }
-  .bg-highlight {
-    background-color: var(--color-bg-highlight);
-  }
-  .bg-control {
-    background-color: var(--color-bg-control);
-  }
-  .bg-primary {
-    background-color: var(--color-primary);
-  }
+  /* 
+    カラーの登録 
+    --color-{name} と定義することで、text-{name}, bg-{name}, border-{name} 等の
+    ユーティリティクラスが「すべて自動生成」されます。
+  */
+
+  /* セマンティック */
+  --color-primary: var(--theme-primary); /* text-primary, bg-primary を生成 */
+  --color-success: var(--theme-success);
+  --color-error: var(--theme-error);
+
+  /* テキスト系 */
+  --color-black: var(--theme-text-black); /* text-black, bg-black を生成 */
+  --color-white: var(--theme-text-white);
+  --color-label: var(--theme-text-label); /* text-label を生成 */
+  --color-link: var(--theme-text-link); /* text-link を生成 */
+
+  /* 背景系 */
+  --color-standard: var(--theme-bg-standard); /* bg-standard を生成 */
+  --color-highlight: var(--theme-bg-highlight); /* bg-highlight を生成 */
+  --color-control: var(--theme-bg-control); /* bg-control を生成 */
 }
