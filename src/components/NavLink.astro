@@ -1,8 +1,8 @@
 ---
 // src/components/NavLink.astro
 interface Props {
-  href: string; // 例: "/#news"
-  targetId: string; // 例: "news" (セクションのIDと一致させる)
+  href: string;
+  targetId: string;
 }
 
 const { href, targetId } = Astro.props;
@@ -11,7 +11,7 @@ const { href, targetId } = Astro.props;
 <a
   href={href}
   data-nav-target={targetId}
-  class="hover:text-primary relative inline-flex items-center justify-center px-1.5 py-4 text-[11px] font-bold tracking-wide uppercase opacity-100 transition-all data-[active=true]:opacity-100 sm:px-2 sm:text-xs lg:px-6 lg:py-3 lg:text-base lg:tracking-widest lg:data-[active=true]:before:absolute lg:data-[active=true]:before:left-0 lg:data-[active=true]:before:content-['・'] lg:data-[active=true]:after:absolute lg:data-[active=true]:after:right-0 lg:data-[active=true]:after:content-['・']"
+  class="hover:text-primary relative inline-flex items-center justify-center px-1.5 py-4 text-[11px] tracking-wide uppercase opacity-100 transition-all data-[active=true]:opacity-100 sm:px-2 sm:text-xs lg:border-l lg:border-transparent lg:px-6 lg:py-3 lg:text-base lg:tracking-widest lg:data-[active=true]:border-black"
 >
   <slot />
 </a>
