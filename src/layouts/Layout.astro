@@ -21,8 +21,8 @@ import MenuBar from "../components/MenuBar.astro";
   </head>
   <body class="bg-gray-50 text-gray-900">
     <MenuBar />
-    <!-- lg時はサイドバーの分pr-48をつける -->
-    <main class="min-h-screen pt-16 lg:pt-0 lg:pr-48">
+    <!-- lg時はサイドバーの分pr-sidebarをつける -->
+    <main class="pt-header lg:pr-sidebar min-h-screen lg:pt-0">
       <slot />
     </main>
   </body>
