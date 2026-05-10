@@ -1,0 +1,56 @@
+---
+// src/components/NewsItem.astro
+interface Props {
+  date: string;
+  title: string;
+  href?: string; // 任意（渡されなかった場合はリンクなしになる）
+}
+
+const { date, title, href } = Astro.props;
+
+// hrefが存在するかどうかで、<a>タグにするか<div>にするかを動的に切り替え
+const Element = href ? "a" : "div";
+---
+
+<Element
+  href={href}
+  class:list={[
+    "group flex flex-col gap-2 bg-gray-100 py-8 transition-opacity sm:flex-row sm:items-start sm:gap-12",
+    href ? "cursor-pointer hover:opacity-60" : "",
+  ]}
+>
+  <!-- 日付 -->
+  <time class="text-label shrink-0 text-sm tracking-widest sm:w-32 sm:pt-1">
+    {date}
+  </time>
+
+  <!-- タイトル -->
+  <h3
+    class="flex-1 text-base leading-relaxed font-medium text-black sm:text-lg"
+  >
+    {title}
+  </h3>
+
+  <!-- リンクがある場合のみ、右端に「右向き矢印」を表示 -->
+  {
+    href && (
+      <div class="text-primary ml-4 hidden shrink-0 items-center justify-center pt-1 sm:flex">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="transition-transform duration-300 group-hover:translate-x-2"
+        >
+          <path d="M5 12h14" />
+          <path d="m12 5 7 7-7 7" />
+        </svg>
+      </div>
+    )
+  }
+</Element>

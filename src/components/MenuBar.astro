@@ -1,5 +1,4 @@
 ---
-// src/components/MenuBar.astro
 import NavLink from "./NavLink.astro";
 ---
 
@@ -9,7 +8,6 @@ import NavLink from "./NavLink.astro";
   <nav
     class="flex w-full flex-row items-start justify-evenly gap-0.5 sm:gap-2 lg:h-full lg:flex-col"
   >
-    <!-- href は全て /#〜 に固定し、targetId を指定する -->
     <NavLink href="/#top" targetId="top">Top</NavLink>
     <NavLink href="/#news" targetId="news">News</NavLink>
     <NavLink href="/#about" targetId="about">About</NavLink>
