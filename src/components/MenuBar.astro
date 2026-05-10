@@ -1,0 +1,24 @@
+---
+import NavLink from './NavLink.astro';
+---
+
+<header
+  class="
+		fixed z-50 flex items-center jusfity-between
+		top-0 left-0 w-full h-16 px-4 bg-white/80 backdrop-blur-md
+		lg:top-0 lg:right-0 lg:left-auto lg:w-48 lg:h-screen lg:flex-col lg:justify-center lg:py-12
+		lg:bg-transparent lg:backdrop-blur-none
+	"
+>
+	<nav class="
+	flex gap-2 overflow-x-auto whitespace-nowrap 
+	lg:flex-col lg:gap-6 lg:overflow-visible lg:whitespace-normal 
+	items-center
+	">
+		<NavLink href="/">Home</NavLink>
+		<NavLink href="/news">News</NavLink>
+		<NavLink href="/about">About</NavLink>
+		<NavLink href="/blog">Blog</NavLink>
+		<NavLink href="/work">Work</NavLink>
+	</nav>
+</header>
