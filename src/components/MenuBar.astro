@@ -1,24 +1,24 @@
 ---
-import NavLink from './NavLink.astro';
+// src/components/MenuBar.astro
+import NavLink from "./NavLink.astro";
 ---
 
+<!-- 
+  [レイアウト制御の要件]
+  - モバイル: ロゴを廃止し、justify-centerで中央揃え
+  - PC (lg幅以上): h-screen と justify-evenly を用い、上下とリンク間の余白を完全に均等化
+-->
 <header
-  class="
-		fixed z-50 flex items-center jusfity-between
-		top-0 left-0 w-full h-16 px-4 bg-white/80 backdrop-blur-md
-		lg:top-0 lg:right-0 lg:left-auto lg:w-48 lg:h-screen lg:flex-col lg:justify-center lg:py-12
-		lg:bg-transparent lg:backdrop-blur-none
-	"
+  class="fixed top-0 left-0 z-50 flex h-14 w-full items-center justify-center bg-white/80 px-2 backdrop-blur-md lg:top-0 lg:right-0 lg:left-auto lg:h-screen lg:w-48 lg:flex-col lg:bg-transparent lg:p-0 lg:backdrop-blur-none"
 >
-	<nav class="
-	flex gap-2 overflow-x-auto whitespace-nowrap 
-	lg:flex-col lg:gap-6 lg:overflow-visible lg:whitespace-normal 
-	items-center
-	">
-		<NavLink href="/">Home</NavLink>
-		<NavLink href="/news">News</NavLink>
-		<NavLink href="/about">About</NavLink>
-		<NavLink href="/blog">Blog</NavLink>
-		<NavLink href="/work">Work</NavLink>
-	</nav>
+  <!-- ナビゲーション領域 -->
+  <nav
+    class="flex w-full flex-row items-center justify-evenly gap-0.5 sm:gap-2 lg:h-full lg:flex-col lg:justify-evenly"
+  >
+    <NavLink href="/">Home</NavLink>
+    <NavLink href="/news">News</NavLink>
+    <NavLink href="/profile">Profile</NavLink>
+    <NavLink href="/blog">Blog</NavLink>
+    <NavLink href="/work">Work</NavLink>
+  </nav>
 </header>

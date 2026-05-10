@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-import MenuBar from '../components/MenuBar.astro';
+import MenuBar from "../components/MenuBar.astro";
 ---
 
 <!doctype html>
@@ -19,10 +19,10 @@ import MenuBar from '../components/MenuBar.astro';
     <meta name="generator" content={Astro.generator} />
     <title>mi-nato</title>
   </head>
-  <body class="text-gray-900 bg-gray-50">
+  <body class="bg-gray-50 text-gray-900">
     <MenuBar />
     <!-- lg時はサイドバーの分pr-48をつける -->
-    <main class="pt-16 lg:pt-0 lg:pr-48 min-h-screen"> 
+    <main class="min-h-screen pt-16 lg:pt-0 lg:pr-48">
       <slot />
     </main>
   </body>
