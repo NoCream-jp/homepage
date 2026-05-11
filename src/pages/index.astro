@@ -13,46 +13,60 @@ import ViewMore from "../components/ViewMore.astro";
 
   <section
     id="news"
-    class="scroll-mt-header mb-40 h-screen bg-white sm:p-5 md:scroll-mt-0 md:p-10 lg:p-15"
+    class="scroll-mt-header mb-40 h-auto bg-white p-10 md:scroll-mt-0 lg:p-15"
   >
-    <div class="mb-7">
+    <div class="sectoin-header mb-20">
       <h2 class="font-sans text-5xl font-bold">News</h2>
     </div>
-    <div class="md:mr-20 md:px-10 lg:px-20 lg:pr-50">
+    <div class="main-container md:mr-20 md:px-10 lg:px-20 lg:pr-50">
       <NewsItem
         date={"2026/05/11"}
         title={"サイトのデザインが新しくなりました"}
       />
       <NewsItem date={"2026/05/10"} title={"temp"} href="/" />
-      <div class="mt-8 flex justify-start">
-        <ViewMore href="/news" />
-      </div>
+    </div>
+    <div class="section-footer mt-8 flex justify-start md:px-10 lg:px-20">
+      <!-- 現時点でsectionfotterはcontainerと手動で横幅をそろえている -->
+      <ViewMore href="/about" />
     </div>
   </section>
 
   <section
     id="about"
-    class="scroll-mt-header mb-40 h-screen bg-white sm:p-5 md:scroll-mt-0 md:p-10 lg:p-15"
+    class="scroll-mt-header mb-40 h-auto bg-white p-10 md:scroll-mt-0 lg:p-15"
   >
-    <div class="">
+    <div class="section-header mb-20">
       <h2 class="text-5xl font-bold">About</h2>
+    </div>
+    <div class="main-container text-center text-3xl md:px-10 lg:px-20">
+      Hi, I'm Minato. I'm a student at Wakayama University, where I'm
+      researching machine learning. In my free time, I like building web apps
+      and joining competitive programming contests. Lately, I've been really
+      focusing on studying English!
+    </div>
+    <div class="section-footer mt-8 flex justify-start md:px-10 lg:px-20">
+      <ViewMore href="/about" />
     </div>
   </section>
 
   <section
     id="blog"
-    class="scroll-mt-header mb-40 h-screen bg-white sm:p-5 md:scroll-mt-0 md:p-10 lg:p-15"
+    class="scroll-mt-header mb-40 h-auto bg-white sm:p-5 md:scroll-mt-0 md:p-10 lg:p-15"
   >
-    <div class="">
+    <div class="section-header mb-20">
       <h2 class="text-5xl font-bold">Blog</h2>
+    </div>
+    <div class="main-container md:px-10 lg:px-20"></div>
+    <div class="section-footer mt-8 flex justify-start md:px-10 lg:px-20">
+      <ViewMore href="/about" />
     </div>
   </section>
 
   <section
     id="work"
-    class="scroll-mt-header mb-40 h-screen bg-white sm:p-5 md:scroll-mt-0 md:p-10 lg:p-15"
+    class="scroll-mt-header mb-40 h-auto bg-white sm:p-5 md:scroll-mt-0 md:p-10 lg:p-15"
   >
-    <div class="">
+    <div class="sectoin-header mb-20">
       <h2 class="text-5xl font-bold">Work</h2>
     </div>
   </section>
