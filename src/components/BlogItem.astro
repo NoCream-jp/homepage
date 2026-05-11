@@ -1,0 +1,33 @@
+---
+interface Props {
+  date: Date;
+  title: string;
+  category?: string; // 現時点では利用しない
+  href: string;
+}
+
+const { date, title, href } = Astro.props;
+
+// 日付を "2026.05.12" のフォーマットに変換
+const formattedDate = date
+  .toLocaleDateString("ja-JP", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  })
+  .replace(/\//g, ".");
+---
+
+<a
+  href={href}
+  class="group flex cursor-pointer flex-col gap-2 py-8 transition-opacity sm:flex-row sm:items-center sm:gap-12"
+>
+  <time class="text-label shrink-0 tracking-widest sm:w-32">
+    {formattedDate}
+  </time>
+  <div
+    class="group-hover:text-primary min-w-0 flex-1 text-base text-black transition-colors sm:text-lg"
+  >
+    {title}
+  </div>
+</a>
