@@ -4,10 +4,11 @@ import NewsItem from "../components/NewsItem.astro";
 import ViewMore from "../components/ViewMore.astro";
 import BlogItem from "../components/BlogItem.astro";
 import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 
 const allPosts = await getCollection("blog");
 const sortedPosts = allPosts.sort(
-  (a: { data: { date: Date } }, b: { data: { date: Date } }) =>
+  (a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) =>
     b.data.date.valueOf() - a.data.date.valueOf()
 );
 ---
@@ -23,7 +24,7 @@ const sortedPosts = allPosts.sort(
     id="news"
     class="scroll-mt-header mb-40 h-auto bg-white p-10 md:scroll-mt-0 lg:p-15"
   >
-    <div class="sectoin-header mb-20">
+    <div class="section-header mb-20">
       <h2 class="font-sans text-5xl font-bold">News</h2>
     </div>
     <div class="main-container md:mr-20 md:px-10 lg:px-20 lg:pr-50">
@@ -66,11 +67,11 @@ const sortedPosts = allPosts.sort(
     </div>
     <div class="main-container md:px-10 lg:px-20">
       {
-        sortedPosts.map((post: { data: { date: Date; title: string } }) => (
+        sortedPosts.map((post) => (
           <BlogItem
             date={post.data.date}
             title={post.data.title}
-            href={"/blog/${post.slug}"}
+            href={`/blog/${post.id}`}
           />
         ))
       }
@@ -84,7 +85,7 @@ const sortedPosts = allPosts.sort(
     id="work"
     class="scroll-mt-header mb-40 h-screen bg-white p-10 md:scroll-mt-0 lg:p-15"
   >
-    <div class="sectoin-header mb-20">
+    <div class="section-header mb-20">
       <h2 class="text-5xl font-bold">Work</h2>
     </div>
   </section>
