@@ -5,6 +5,7 @@ import ViewMore from "../components/ViewMore.astro";
 import BlogItem from "../components/BlogItem.astro";
 import ActionAccordion from "../components/ActionAccordion.astro";
 import NavLink from "../components/NavLink.astro";
+import ExternalLink from "../components/ExternalLink.astro";
 
 import { getCollection, render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
@@ -130,22 +131,32 @@ const sortedActions = allActions.sort(
   </section>
   <footer
     id="footer"
-    class="pt-header mt-header flex h-screen flex-col justify-between bg-blue-100 px-10 pb-14"
+    class="pt-header flex h-screen flex-col justify-between bg-white px-10 pb-14"
   >
-    <div>
+    <div class="sm:mt-10 md:mt-0 lg:mt-0">
       <div class="flex flex-col">
-        <a href="">link</a>
-        <a href="">link</a>
-        <a href="">link</a>
-        <a href="">link</a>
+        <ExternalLink href="https://github.com/NoCream-jp" text="GitHub" />
+        <ExternalLink href="https://x.com/sXMN1au45a68174" text="X(Twitter)" />
+        <ExternalLink
+          href="https://atcoder.jp/users/Caffeineholic"
+          text="AtCoder"
+        />
+        <ExternalLink
+          href="https://www.instagram.com/?hl=ja"
+          text="Instagram"
+        />
       </div>
     </div>
-    <div class="items-center justify-between md:flex lg:justify-between">
-      <div class="">©2026 mi-nato.com</div>
-      <div class="flex lg:gap-16">
-        <NavLink href="/" targetId="footer" text="SHARE" />
-        <NavLink href="/" targetId="footer" text="CONTACT" />
+    <div>
+      <div>
+        <div class="items-center justify-between md:flex lg:justify-between">
+          <div class="">©2026 mi-nato.com</div>
+          <div class="flex lg:gap-16">
+            <NavLink href="/" targetId="footer" text="SHARE" />
+            <NavLink href="/" targetId="footer" text="CONTACT" />
+          </div>
+        </div>
       </div>
     </div>
-  </footer>
-</Layout>
+  </footer></Layout
+>
