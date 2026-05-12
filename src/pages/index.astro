@@ -3,7 +3,9 @@ import Layout from "../layouts/Layout.astro";
 import NewsItem from "../components/NewsItem.astro";
 import ViewMore from "../components/ViewMore.astro";
 import BlogItem from "../components/BlogItem.astro";
-import { getCollection } from "astro:content";
+import ActionAccordion from "../components/ActionAccordion.astro";
+
+import { getCollection, render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 
 const allPosts = await getCollection("blog");
@@ -15,6 +17,12 @@ const sortedPosts = allPosts.sort(
 const allNews = await getCollection("news");
 const sortedNews = allNews.sort(
   (a: CollectionEntry<"news">, b: CollectionEntry<"news">) =>
+    b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const allActions = await getCollection("action");
+const sortedActions = allActions.sort(
+  (a: CollectionEntry<"action">, b: CollectionEntry<"action">) =>
     b.data.date.valueOf() - a.data.date.valueOf()
 );
 ---
@@ -45,7 +53,7 @@ const sortedNews = allNews.sort(
       }
     </div>
     <div class="section-footer mt-8 flex justify-start md:px-10 lg:px-20">
-      <!-- 現時点でsectionfotterはcontainerと手動で横幅をそろえている -->
+      <!-- 現時点でsection-fotterはmain-containerと手動で横幅をそろえている -->
       <ViewMore href="/about" />
     </div>
   </section>
@@ -92,15 +100,31 @@ const sortedNews = allNews.sort(
   </section>
 
   <section
-    id="work"
+    id="action"
     class="scroll-mt-header mb-40 h-screen bg-white p-10 md:scroll-mt-0 lg:p-15"
   >
     <div class="section-header mb-20">
-      <h2 class="text-5xl font-bold">Work</h2>
+      <h2 class="text-5xl font-bold">Action</h2>
     </div>
-    <div class="main-container md:px-10 lg:px-20"></div>
+    <div class="main-container md:px-10 lg:px-20">
+      <div class="border-t border-black/10">
+        {
+          sortedActions.map(async (action) => {
+            const { Content } = await render(action);
+            return (
+              <ActionAccordion
+                date={action.data.date}
+                title={action.data.title}
+              >
+                <Content />
+              </ActionAccordion>
+            );
+          })
+        }
+      </div>
+    </div>
     <div class="section-footer mt-8 flex justify-start md:px-10 lg:px-20">
-      <ViewMore href="/work" />
+      <ViewMore href="/action" />
     </div>
   </section>
 </Layout>
