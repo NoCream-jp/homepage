@@ -11,6 +11,12 @@ const sortedPosts = allPosts.sort(
   (a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) =>
     b.data.date.valueOf() - a.data.date.valueOf()
 );
+
+const allNews = await getCollection("news");
+const sortedNews = allNews.sort(
+  (a: CollectionEntry<"news">, b: CollectionEntry<"news">) =>
+    b.data.date.valueOf() - a.data.date.valueOf()
+);
 ---
 
 <Layout title="Home">
@@ -28,11 +34,15 @@ const sortedPosts = allPosts.sort(
       <h2 class="font-sans text-5xl font-bold">News</h2>
     </div>
     <div class="main-container md:mr-20 md:px-10 lg:px-20 lg:pr-50">
-      <NewsItem
-        date={"2026/05/11"}
-        title={"サイトのデザインが新しくなりました"}
-      />
-      <NewsItem date={"2026/05/10"} title={"temp"} href="/" />
+      {
+        sortedNews.map((item) => (
+          <NewsItem
+            date={item.data.date}
+            title={item.data.title}
+            href={item.data.href}
+          />
+        ))
+      }
     </div>
     <div class="section-footer mt-8 flex justify-start md:px-10 lg:px-20">
       <!-- 現時点でsectionfotterはcontainerと手動で横幅をそろえている -->
@@ -65,7 +75,7 @@ const sortedPosts = allPosts.sort(
     <div class="section-header mb-20">
       <h2 class="text-5xl font-bold">Blog</h2>
     </div>
-    <div class="main-container md:px-10 lg:px-20">
+    <div class="main-container sm:px-5 md:px-10 lg:px-20">
       {
         sortedPosts.map((post) => (
           <BlogItem

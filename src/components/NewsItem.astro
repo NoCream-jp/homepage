@@ -1,49 +1,53 @@
 ---
 interface Props {
-  date: string;
+  date: Date;
   title: string;
   href?: string;
 }
 
 const { date, title, href } = Astro.props;
 
-const Element = href ? "a" : "div";
+const formattedDate = new Date(date).toLocaleDateString("ja-JP", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
 ---
 
-<Element
-  href={href}
-  class:list={[
-    "group flex gap-5 py-1 text-black",
-    href ? "hover:text-primary cursor-pointer" : "",
-  ]}
->
-  <time class="text-label shrink-0 tracking-widest">
-    {date}
-  </time>
-
-  <div class="flex-1">
-    {title}
-  </div>
-
+<>
   {
-    href && (
-      <div class="ml-4 flex shrink-0 items-center justify-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="hover:text-primary"
-        >
-          <path d="M5 12h14" />
-          <path d="m12 5 7 7-7 7" />
-        </svg>
+    href ? (
+      <a href={href} class="group flex cursor-pointer gap-5 py-1 text-black">
+        <time class="text-label shrink-0 tracking-widest">{formattedDate}</time>
+
+        <div class="group-hover:text-primary min-w-0 transition-colors">
+          {title}
+        </div>
+
+        <div class="ml-4 flex shrink-0 items-center justify-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="group-hover:text-primary transition-colors"
+          >
+            <path d="M5 12h14" />
+            <path d="m12 5 7 7-7 7" />
+          </svg>
+        </div>
+      </a>
+    ) : (
+      <div class="group flex gap-5 py-1 text-black">
+        <time class="text-label shrink-0 tracking-widest">{formattedDate}</time>
+
+        <div class="min-w-0 flex-1">{title}</div>
       </div>
     )
   }
-</Element>
+</>
