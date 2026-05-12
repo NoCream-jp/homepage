@@ -40,7 +40,7 @@ const sortedActions = allActions.sort(
     id="news"
     class="scroll-mt-header mb-40 h-auto bg-white p-10 md:scroll-mt-0 lg:p-15"
   >
-    <div class="section-header mb-20">
+    <div class="section-header mb-20 lg:ml-10">
       <h2 class="font-sans text-5xl font-bold">News</h2>
     </div>
     <div class="main-container md:mr-20 md:px-10 lg:px-20 lg:pr-50">
@@ -64,14 +64,14 @@ const sortedActions = allActions.sort(
     id="about"
     class="scroll-mt-header mb-40 h-auto bg-white p-10 md:scroll-mt-0 lg:p-15"
   >
-    <div class="section-header mb-20">
+    <div class="section-header mb-20 lg:ml-10">
       <h2 class="text-5xl font-bold">About</h2>
     </div>
-    <div class="main-container mb-2 text-center text-3xl md:px-10 lg:px-20">
+    <div class="main-container mb-2 text-center text-xl md:px-10 lg:px-20">
       こんにちは、みなとです。和歌山大学で機械学習について研究しています。趣味でwebアプリを作ったり、
       競技プログラミングのコンテストに参加したりしています。最近は英語の学習に力を入れています。
     </div>
-    <div class="main-container text-center text-3xl md:px-10 lg:px-20">
+    <div class="main-container text-center text-2xl md:px-10 lg:px-20">
       Hi, I'm Minato. I'm a student at Wakayama University, where I'm
       researching machine learning. In my free time, I like building web apps
       and joining competitive programming contests. Lately, I've been really
@@ -86,7 +86,7 @@ const sortedActions = allActions.sort(
     id="blog"
     class="scroll-mt-header mb-40 h-auto bg-white p-10 md:scroll-mt-0 lg:p-15"
   >
-    <div class="section-header mb-20">
+    <div class="section-header mb-20 lg:ml-10">
       <h2 class="text-5xl font-bold">Blog</h2>
     </div>
     <div class="main-container sm:px-5 md:px-10 lg:px-20">
@@ -109,7 +109,7 @@ const sortedActions = allActions.sort(
     id="action"
     class="scroll-mt-header mb-40 h-screen bg-white p-10 md:scroll-mt-0 lg:p-15"
   >
-    <div class="section-header mb-20">
+    <div class="section-header mb-20 lg:ml-10">
       <h2 class="text-5xl font-bold">Action</h2>
     </div>
     <div class="main-container md:px-10 lg:px-20">
@@ -133,11 +133,12 @@ const sortedActions = allActions.sort(
       <ViewMore href="/action" />
     </div>
   </section>
+
   <footer
     id="footer"
-    class="pt-header flex h-screen flex-col justify-between bg-white px-10 pb-14"
+    class="flex flex-col justify-between bg-white px-10 pt-17 pb-14 sm:mt-10"
   >
-    <div class="sm:mt-10 md:mt-0 lg:mt-0">
+    <div class="">
       <div class="flex flex-col">
         <ExternalLink href="https://github.com/NoCream-jp" text="GitHub" />
         <ExternalLink href="https://x.com/sXMN1au45a68174" text="X(Twitter)" />
@@ -153,9 +154,9 @@ const sortedActions = allActions.sort(
     </div>
     <div>
       <div>
-        <div class="items-center justify-between md:flex lg:justify-between">
+        <div class="flex items-center justify-between lg:justify-between">
           <div class="">©2026 mi-nato.com</div>
-          <div class="flex lg:gap-16">
+          <div class="flex gap-2 lg:gap-16">
             <NavLink href="/" targetId="footer" text="SHARE" />
             <NavLink href="/" targetId="footer" text="CONTACT" />
           </div>
