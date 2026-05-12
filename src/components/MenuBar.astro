@@ -19,36 +19,60 @@ import NavLink from "./NavLink.astro";
 <script>
   // ページ読み込み時に実行されるスクロール監視ロジック
   function initScrollSpy() {
-    // 監視対象となるトップページの各セクションを取得
+    // 監視対象となるトップページの各セクションとフッターを取得
     const sections = document.querySelectorAll("section[id]");
-    // メニューバーの各リンクを取得
     const navLinks = document.querySelectorAll("[data-nav-target]");
+    const footer = document.querySelector("#footer");
 
-    // 画面の「中央」にセクションが来たときに発火させる設定
-    const observerOptions = {
-      root: null,
-      rootMargin: "-50% 0px -50% 0px", // 画面の上下50%を無視し、中央の1本の線を通過したかで判定
-      threshold: 0,
-    };
+    // 現在の状態を保持する変数
+    let currentActiveId = "";
+    let isFooterVisible = false;
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const currentId = entry.target.getAttribute("id");
-
-          // 一致するIDを持つリンクのみdata-activeをセットする
-          navLinks.forEach((link) => {
-            if (link.getAttribute("data-nav-target") === currentId) {
-              link.setAttribute("data-active", "true");
-            } else {
-              link.removeAttribute("data-active");
-            }
-          });
+    // メニューのハイライト状態を更新する関数
+    function updateNav() {
+      navLinks.forEach((link) => {
+        if (isFooterVisible) {
+          // フッターが見えている時は全解除
+          link.removeAttribute("data-active");
+        } else {
+          // そうでない時は現在の中央セクションをハイライト
+          if (link.getAttribute("data-nav-target") === currentActiveId) {
+            link.setAttribute("data-active", "true");
+          } else {
+            link.removeAttribute("data-active");
+          }
         }
       });
-    }, observerOptions);
+    }
 
-    sections.forEach((section) => observer.observe(section));
+    // セクション監視用（画面の「中央」にセクションが来たときに発火）
+    const sectionObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            currentActiveId = entry.target.getAttribute("id") || "";
+            updateNav();
+          }
+        });
+      },
+      { rootMargin: "-50% 0px -50% 0px", threshold: 0 }
+    );
+
+    sections.forEach((section) => sectionObserver.observe(section));
+
+    // フッター監視用（画面に少しでもフッターが見えたら発火）
+    if (footer) {
+      const footerObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            isFooterVisible = entry.isIntersecting;
+            updateNav();
+          });
+        },
+        { rootMargin: "0px", threshold: 0.1 }
+      );
+      footerObserver.observe(footer);
+    }
   }
 
   // 初回読み込み時
