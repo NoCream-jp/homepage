@@ -1,6 +1,6 @@
 ---
-title: "SvelteとBunを使った小さなSNSの設計について"
-date: 2026-05-12
+title: "サイトのデザイン一新について"
+date: 2026-05-11
 category: "Tech"
 ---
 
