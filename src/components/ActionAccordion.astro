@@ -6,18 +6,17 @@ interface Props {
 
 const { date, title } = Astro.props;
 
-// "2026.02" のような「年.月」フォーマットに変換
+// 「年」のみフォーマットに変換
 const formattedDate = date
   .toLocaleDateString("ja-JP", {
     year: "numeric",
-    month: "2-digit",
   })
   .replace(/\//g, ".");
 ---
 
-<div class="accordion-item group border-b border-black/10 last:border-b-0">
+<div class="accordion-item group">
   <button
-    class="hover:text-primary flex w-full cursor-pointer items-center gap-4 py-8 text-left text-black transition-colors"
+    class="hover:text-primary flex w-full cursor-pointer items-center gap-4 py-3 text-left text-black transition-colors"
   >
     <time class="text-label shrink-0 tracking-widest sm:w-32">
       {formattedDate}
@@ -52,11 +51,11 @@ const formattedDate = date
     class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-in-out group-[.is-open]:grid-rows-[1fr]"
   >
     <div class="overflow-hidden">
-      <p
-        class="pt-2 pb-8 text-sm leading-relaxed text-black sm:ml-36 sm:text-base"
+      <div
+        class="pt-2 pb-5 pl-5 text-sm leading-relaxed text-black sm:ml-36 sm:text-base [&>p]:ml-5"
       >
         <slot />
-      </p>
+      </div>
     </div>
   </div>
 </div>

@@ -107,7 +107,7 @@ const sortedActions = allActions.sort(
       <h2 class="text-5xl font-bold">Action</h2>
     </div>
     <div class="main-container md:px-10 lg:px-20">
-      <div class="border-t border-black/10">
+      <div class="">
         {
           sortedActions.map(async (action) => {
             const { Content } = await render(action);
