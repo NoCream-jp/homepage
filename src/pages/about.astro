@@ -1,13 +1,20 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import QuiltContainer from "../components/QuiltContainer.astro";
+
+import { getCollection } from "astro:content";
+
+const allAchievements = await getCollection("achievement");
+const sortedAchievements = allAchievements.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
 ---
 
 <Layout>
   <section
-    id="news"
     class="mt-header h-auto bg-white p-10 md:mt-0 md:scroll-mt-0 lg:mt-0 lg:p-15"
   >
-    <div class="section-header mb-20 lg:ml-10">
+    <div class="section-header mb-10 lg:ml-10">
       <h2 class="text-5xl font-bold">bio</h2>
     </div>
     <div class="main-container mb-2 text-center text-xl md:px-10 lg:px-20">
@@ -22,7 +29,6 @@ import Layout from "../layouts/Layout.astro";
     </div>
   </section>
   <section
-    id="news"
     class="mt-header h-auto bg-white p-10 md:mt-0 md:scroll-mt-0 lg:mt-0 lg:p-15"
   >
     <div class="section-header mb-10 lg:ml-10">
@@ -84,7 +90,6 @@ import Layout from "../layouts/Layout.astro";
     </div>
   </section>
   <section
-    id="news"
     class="mt-header h-auto bg-white p-10 md:mt-0 md:scroll-mt-0 lg:mt-0 lg:p-15"
   >
     <div class="section-header mb-10 lg:ml-10">
@@ -141,11 +146,11 @@ import Layout from "../layouts/Layout.astro";
     </div>
   </section>
   <section
-    id="news"
     class="mt-header h-auto bg-white p-10 md:mt-0 md:scroll-mt-0 lg:mt-0 lg:p-15"
   >
     <div class="section-header mb-20 lg:ml-10">
       <h2 class="text-5xl font-bold">archivement</h2>
     </div>
+    <QuiltContainer achievements={sortedAchievements} />
   </section>
 </Layout>

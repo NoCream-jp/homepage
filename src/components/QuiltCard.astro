@@ -1,0 +1,103 @@
+---
+import { render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  achievement: CollectionEntry<"achievement">;
+  isBig?: boolean;
+}
+
+const { achievement, isBig = false } = Astro.props;
+const { title, date } = achievement.data;
+const modalId = `modal-${achievement.id}`;
+
+const formattedDate = date.toLocaleDateString("ja-JP", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+const { Content } = await render(achievement);
+const preview =
+  "body" in achievement && typeof achievement.body === "string"
+    ? achievement.body.trim()
+    : "";
+---
+
+<div
+  class={`group hover:bg-gray-50 relative flex flex-col p-1 transition-all cursor-pointer ${isBig ? "col-span-2 row-span-2" : "col-span-1 row-span-1"}`}
+  onclick={`document.getElementById('${modalId}').showModal()`}
+>
+  <time
+    class="mb-2 font-mono text-xs tracking-widest text-black/50 tabular-nums"
+  >
+    {formattedDate}
+  </time>
+
+  <h4
+    class={`font-bold tracking-tight text-black group-hover:text-primary transition-colors ${isBig ? "text-lg mb-2" : "text-base mb-1 line-clamp-2"}`}
+  >
+    {title}
+  </h4>
+
+  <p
+    class={`text-xs leading-relaxed text-gray-600 overflow-hidden text-ellipsis ${isBig ? "line-clamp-6" : "line-clamp-3"}`}
+  >
+    {preview}
+  </p>
+</div>
+
+<dialog
+  id={modalId}
+  class="m-auto w-full max-w-2xl overflow-visible border-none bg-transparent p-4 backdrop:bg-black/60 backdrop:backdrop-blur-sm"
+>
+  <div
+    class="relative max-h-[85vh] overflow-y-auto rounded-2xl border border-black bg-white p-8 md:p-12"
+  >
+    <button
+      onclick={`document.getElementById('${modalId}').close()`}
+      class="hover:text-primary absolute top-4 right-4 rounded-full transition-colors"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        ><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg
+      >
+    </button>
+
+    <time
+      class="mb-4 block font-mono text-sm tracking-widest text-black/50 tabular-nums"
+      >{formattedDate}</time
+    >
+    <h2 class="mb-8 border-b border-black pb-4 text-3xl font-bold">{title}</h2>
+
+    <div
+      class="prose prose-sm prose-headings:font-bold prose-p:leading-relaxed max-w-none"
+    >
+      <Content />
+    </div>
+  </div>
+</dialog>
+
+<style>
+  dialog[open] {
+    animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

@@ -27,8 +27,17 @@ const actionCollection = defineCollection({
   }),
 });
 
+const achievementCollection = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/achievement" }),
+  schema: z.object({
+    title: z.string(),
+    date: z.date(),
+  }),
+});
+
 export const collections = {
   blog: blogCollection,
   news: newsCollection,
   action: actionCollection,
+  achievement: achievementCollection,
 };
