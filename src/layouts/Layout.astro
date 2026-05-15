@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import MenuBar from "../components/MenuBar.astro";
+import ExternalLink from "../components/ExternalLink.astro";
 ---
 
 <!doctype html>
@@ -29,6 +30,21 @@ import MenuBar from "../components/MenuBar.astro";
       <slot />
     </main>
   </body>
+  <footer
+    id="footer"
+    class="flex flex-col justify-around bg-white p-10 sm:mt-10 lg:ml-10 lg:p-15"
+  >
+    <div class="ml-2 flex flex-col">
+      <ExternalLink href="https://github.com/NoCream-jp" text="GitHub" />
+      <ExternalLink href="https://x.com/sXMN1au45a68174" text="X(Twitter)" />
+      <ExternalLink
+        href="https://atcoder.jp/users/Caffeineholic"
+        text="AtCoder"
+      />
+      <ExternalLink href="https://www.instagram.com/?hl=ja" text="Instagram" />
+    </div>
+    ©2026 mi-nato.com
+  </footer>
 </html>
 
 <style>
