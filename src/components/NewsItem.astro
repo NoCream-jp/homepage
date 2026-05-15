@@ -18,8 +18,9 @@ const formattedDate = new Date(date).toLocaleDateString("ja-JP", {
   {
     href ? (
       <a href={href} class="group flex cursor-pointer gap-5 py-1 text-black">
-        <time class="text-label shrink-0 tracking-widest">{formattedDate}</time>
-
+        <time class="text-label w-28 shrink-0 tracking-widest tabular-nums">
+          {formattedDate}
+        </time>
         <div class="group-hover:text-primary min-w-0 transition-colors">
           {title}
         </div>
@@ -44,8 +45,9 @@ const formattedDate = new Date(date).toLocaleDateString("ja-JP", {
       </a>
     ) : (
       <div class="group flex gap-5 py-1 text-black">
-        <time class="text-label shrink-0 tracking-widest">{formattedDate}</time>
-
+        <time class="text-label w-28 shrink-0 tracking-widest tabular-nums">
+          {formattedDate}
+        </time>
         <div class="min-w-0 flex-1">{title}</div>
       </div>
     )
