@@ -31,8 +31,8 @@ const sortedActions = allActions.sort(
 
 <Layout title="Home">
   <section id="top" class="mb-60 flex h-screen flex-col justify-end bg-white">
-    <div class="">
-      <h1 class="font-sans text-9xl font-bold">I'm <br />Minato</h1>
+    <div class="ml-2">
+      <h1 class="font-sans text-8xl font-bold">I'm <br />Minato</h1>
     </div>
   </section>
 
@@ -56,7 +56,7 @@ const sortedActions = allActions.sort(
     </div>
     <div class="section-footer mt-8 flex justify-start md:px-10 lg:px-20">
       <!-- 現時点でsection-fotterはmain-containerと手動で横幅をそろえている -->
-      <ViewMore href="/about" />
+      <ViewMore href="/allnews" />
     </div>
   </section>
 
@@ -132,36 +132,5 @@ const sortedActions = allActions.sort(
     <div class="section-footer mt-8 flex justify-start md:px-10 lg:px-20">
       <ViewMore href="/action" />
     </div>
-  </section>
-
-  <footer
-    id="footer"
-    class="flex flex-col justify-between bg-white px-10 pt-17 pb-14 sm:mt-10"
-  >
-    <div class="">
-      <div class="flex flex-col">
-        <ExternalLink href="https://github.com/NoCream-jp" text="GitHub" />
-        <ExternalLink href="https://x.com/sXMN1au45a68174" text="X(Twitter)" />
-        <ExternalLink
-          href="https://atcoder.jp/users/Caffeineholic"
-          text="AtCoder"
-        />
-        <ExternalLink
-          href="https://www.instagram.com/?hl=ja"
-          text="Instagram"
-        />
-      </div>
-    </div>
-    <div>
-      <div>
-        <div class="flex items-center justify-between lg:justify-between">
-          <div class="">©2026 mi-nato.com</div>
-          <div class="flex gap-2 lg:gap-16">
-            <NavLink href="/" targetId="footer" text="SHARE" />
-            <NavLink href="/" targetId="footer" text="CONTACT" />
-          </div>
-        </div>
-      </div>
-    </div>
-  </footer></Layout
+  </section></Layout
 >
