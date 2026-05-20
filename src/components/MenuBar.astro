@@ -17,8 +17,16 @@ import NavLink from "./NavLink.astro";
 </header>
 
 <script>
+  // グローバルにObserverを保持して重複を防止する
+  let sectionObserver: IntersectionObserver;
+  let footerObserver: IntersectionObserver;
+
   // ページ読み込み時に実行されるスクロール監視ロジック
   function initScrollSpy() {
+    // 既存のObserverがあれば解除する
+    if (sectionObserver) sectionObserver.disconnect();
+    if (footerObserver) footerObserver.disconnect();
+
     // 監視対象となるトップページの各セクションとフッターを取得
     const sections = document.querySelectorAll("section[id]");
     const navLinks = document.querySelectorAll("[data-nav-target]");
@@ -46,7 +54,7 @@ import NavLink from "./NavLink.astro";
     }
 
     // セクション監視用（画面の「中央」にセクションが来たときに発火）
-    const sectionObserver = new IntersectionObserver(
+    sectionObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -62,7 +70,7 @@ import NavLink from "./NavLink.astro";
 
     // フッター監視用（画面に少しでもフッターが見えたら発火）
     if (footer) {
-      const footerObserver = new IntersectionObserver(
+      footerObserver = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             isFooterVisible = entry.isIntersecting;
@@ -75,6 +83,6 @@ import NavLink from "./NavLink.astro";
     }
   }
 
-  // 初回読み込み時
-  initScrollSpy();
+  // 初回およびページ遷移（View Transitions）ごとに実行
+  document.addEventListener("astro:page-load", initScrollSpy);
 </script>

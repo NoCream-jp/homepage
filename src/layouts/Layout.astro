@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from "astro:transitions";
 import "../styles/global.css";
 import MenuBar from "../components/MenuBar.astro";
 import ExternalLink from "../components/ExternalLink.astro";
@@ -13,12 +14,41 @@ import ExternalLink from "../components/ExternalLink.astro";
     <link rel="icon" href="/favicon.ico" />
 
     <!-- google fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
 
     <meta name="generator" content={Astro.generator} />
     <title>mi-nato</title>
+    <ClientRouter />
+
+    <script>
+      // 遷移先がトップページかどうかを判定し、現在のhtml要素にクラスを付与する
+      document.addEventListener("astro:before-preparation", (ev) => {
+        const isToTop = ev.to.pathname === "/";
+        const isFromTop = new URL(ev.from).pathname === "/";
+
+        if (isToTop && !isFromTop) {
+          document.documentElement.classList.add("transition-to-top");
+        } else {
+          document.documentElement.classList.remove("transition-to-top");
+        }
+      });
+
+      // Astroがページの中身を新しいものに置き換える直前に、
+      // 新しいページのhtml要素にもクラスを引き継がせる（これが無いとアニメーションが発火しない）
+      document.addEventListener("astro:before-swap", (ev) => {
+        const isToTop = ev.to.pathname === "/";
+        const isFromTop = new URL(ev.from).pathname === "/";
+
+        if (isToTop && !isFromTop) {
+          ev.newDocument.documentElement.classList.add("transition-to-top");
+        }
+      });
+    </script>
   </head>
   <body class="bg-white text-gray-900">
     <MenuBar />
@@ -26,8 +56,7 @@ import ExternalLink from "../components/ExternalLink.astro";
     <main class="md:pr-sidebar min-h-screen md:pt-0">
       <slot />
     </main>
-  </body>
-  <footer
+  </body><footer
     id="footer"
     class="flex flex-col justify-around bg-white p-10 sm:mt-10 lg:ml-10 lg:p-15"
   >
@@ -44,11 +73,48 @@ import ExternalLink from "../components/ExternalLink.astro";
   </footer>
 </html>
 
-<style>
+<style is:global>
   html,
   body {
     margin: 0;
     width: 100%;
     height: 100%;
+  }
+
+  /* 
+   * Topページ遷移時専用のアニメーション 
+   * Astroのデフォルトのフェードや移動を完全に無効化する
+   */
+  html.transition-to-top::view-transition-group(root),
+  html.transition-to-top::view-transition-image-pair(root),
+  html.transition-to-top::view-transition-old(root),
+  html.transition-to-top::view-transition-new(root) {
+    animation: none !important;
+    mix-blend-mode: normal !important;
+  }
+
+  /* 現在のページ（元の画面）はその場に完全に静止して残る */
+  html.transition-to-top::view-transition-old(root) {
+    z-index: 1;
+    /* フェードアウトしないよう不透明度を固定 */
+    opacity: 1 !important;
+  }
+
+  /* トップページ（新しい画面）が下から100%覆いかぶさるようにせり上がってくる */
+  html.transition-to-top::view-transition-new(root) {
+    animation: slide-up-panel 1s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+    z-index: 100;
+    /* 下から上がってくるパネルであることを強調するため、上方向に影をつける */
+    box-shadow: 0px -30px 60px rgba(0, 0, 0, 0.6);
+    opacity: 1 !important;
+  }
+
+  @keyframes slide-up-panel {
+    0% {
+      transform: translateY(100%);
+    }
+    100% {
+      transform: translateY(0);
+    }
   }
 </style>
