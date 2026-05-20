@@ -26,9 +26,10 @@ import ExternalLink from "../components/ExternalLink.astro";
     <ClientRouter />
 
     <script>
-      // 遷移先がトップページかどうかを判定し、現在のhtml要素にクラスを付与する
+      // 遷移先がトップページの #top かどうかを判定し、現在のhtml要素にクラスを付与する
       document.addEventListener("astro:before-preparation", (ev) => {
-        const isToTop = ev.to.pathname === "/";
+        // href="/#top" のリンクを踏んだ時だけ発動させるため、hashもチェックする
+        const isToTop = ev.to.pathname === "/#top";
         const isFromTop = new URL(ev.from).pathname === "/";
 
         if (isToTop && !isFromTop) {
@@ -39,9 +40,9 @@ import ExternalLink from "../components/ExternalLink.astro";
       });
 
       // Astroがページの中身を新しいものに置き換える直前に、
-      // 新しいページのhtml要素にもクラスを引き継がせる（これが無いとアニメーションが発火しない）
+      // 新しいページのhtml要素にもクラスを引き継がせる
       document.addEventListener("astro:before-swap", (ev) => {
-        const isToTop = ev.to.pathname === "/";
+        const isToTop = ev.to.pathname === "/" && ev.to.hash === "#top";
         const isFromTop = new URL(ev.from).pathname === "/";
 
         if (isToTop && !isFromTop) {
@@ -104,8 +105,6 @@ import ExternalLink from "../components/ExternalLink.astro";
   html.transition-to-top::view-transition-new(root) {
     animation: slide-up-panel 1s cubic-bezier(0.16, 1, 0.3, 1) both !important;
     z-index: 100;
-    /* 下から上がってくるパネルであることを強調するため、上方向に影をつける */
-    box-shadow: 0px -30px 60px rgba(0, 0, 0, 0.6);
     opacity: 1 !important;
   }
 
