@@ -26,10 +26,23 @@ import ExternalLink from "../components/ExternalLink.astro";
     <ClientRouter />
 
     <script>
+      function getPathname(url: URL | string) {
+        return typeof url === "string" ? new URL(url).pathname : url.pathname;
+      }
+
+      function isTopPage(pathname: string) {
+        return pathname === "/";
+      }
+
       function isCrossPageToTopHash(to: URL, from: URL | string) {
-        const fromPath =
-          typeof from === "string" ? new URL(from).pathname : from.pathname;
-        return to.pathname === "/" && to.hash !== "" && fromPath !== "/";
+        return (
+          to.pathname === "/" && to.hash !== "" && !isTopPage(getPathname(from))
+        );
+      }
+
+      /** / または /# から /blog など専用ページへ */
+      function isFromTopToDedicatedPage(to: URL, from: URL | string) {
+        return isTopPage(getPathname(from)) && to.pathname !== "/";
       }
 
       /** クロスページ遷移中だけ instant。トップ内ハッシュは html.scroll-smooth に任せる */
@@ -137,26 +150,51 @@ import ExternalLink from "../components/ExternalLink.astro";
         disableScrollGuard();
       }
 
+      let pendingFromTop = false;
+
+      function stabilizeFromTopTransition() {
+        pendingFromTop = false;
+        document.documentElement.classList.remove("transition-from-top");
+      }
+
+      function armFromTopTransition(viewTransition?: ViewTransition) {
+        pendingFromTop = true;
+        document.documentElement.classList.add("transition-from-top");
+        viewTransition?.finished.then(() => stabilizeFromTopTransition());
+      }
+
+      function cancelFromTopTransition() {
+        pendingFromTop = false;
+        document.documentElement.classList.remove("transition-from-top");
+      }
+
       document.addEventListener("astro:before-preparation", (ev) => {
+        cancelCrossPageTopTransition();
+        cancelFromTopTransition();
+
         if (isCrossPageToTopHash(ev.to, ev.from)) {
           armCrossPageTopTransition(ev.to.hash);
-        } else {
-          cancelCrossPageTopTransition();
+        } else if (isFromTopToDedicatedPage(ev.to, ev.from)) {
+          armFromTopTransition();
         }
       });
 
       document.addEventListener("astro:before-swap", (ev) => {
-        if (!isCrossPageToTopHash(ev.to, ev.from)) return;
+        if (isCrossPageToTopHash(ev.to, ev.from)) {
+          const html = ev.newDocument.documentElement;
+          html.classList.add("transition-to-top");
+          scrollDocumentToHashInstant(ev.newDocument, ev.to.hash);
 
-        const html = ev.newDocument.documentElement;
-        html.classList.add("transition-to-top");
-        scrollDocumentToHashInstant(ev.newDocument, ev.to.hash);
-
-        if (ev.viewTransition) {
-          ev.viewTransition.finished.then(() =>
+          ev.viewTransition?.finished.then(() =>
             stabilizeCrossPageTopScroll(ev.to.hash)
           );
+          return;
         }
+
+        if (!isFromTopToDedicatedPage(ev.to, ev.from)) return;
+
+        ev.newDocument.documentElement.classList.add("transition-from-top");
+        ev.viewTransition?.finished.then(() => stabilizeFromTopTransition());
       });
 
       // moveToLocation（scrollRestoration=auto → location.href）の直後に復元を上書き
@@ -169,9 +207,13 @@ import ExternalLink from "../components/ExternalLink.astro";
 
       // updateCallbackDone はアニメより先に走るため、ここでは触らない
       document.addEventListener("astro:page-load", () => {
-        if (!pendingCrossTopHash) return;
         if (!document.startViewTransition) {
-          stabilizeCrossPageTopScroll(pendingCrossTopHash);
+          if (pendingCrossTopHash) {
+            stabilizeCrossPageTopScroll(pendingCrossTopHash);
+          }
+          if (pendingFromTop) {
+            stabilizeFromTopTransition();
+          }
         }
       });
     </script>
@@ -218,7 +260,11 @@ import ExternalLink from "../components/ExternalLink.astro";
   html.transition-to-top::view-transition-group(root),
   html.transition-to-top::view-transition-image-pair(root),
   html.transition-to-top::view-transition-old(root),
-  html.transition-to-top::view-transition-new(root) {
+  html.transition-to-top::view-transition-new(root),
+  html.transition-from-top::view-transition-group(root),
+  html.transition-from-top::view-transition-image-pair(root),
+  html.transition-from-top::view-transition-old(root),
+  html.transition-from-top::view-transition-new(root) {
     animation: none !important;
     mix-blend-mode: normal !important;
   }
@@ -243,6 +289,30 @@ import ExternalLink from "../components/ExternalLink.astro";
     }
     100% {
       transform: translateY(0);
+    }
+  }
+
+  /*
+   * トップ（/ ・ /#）から専用ページへ遷移するとき
+   * トップを静止させ、新ページを右から横スライドで表示
+   */
+  html.transition-from-top::view-transition-old(root) {
+    z-index: 1;
+    opacity: 1 !important;
+  }
+
+  html.transition-from-top::view-transition-new(root) {
+    animation: slide-in-panel-horizontal 1s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+    z-index: 100;
+    opacity: 1 !important;
+  }
+
+  @keyframes slide-in-panel-horizontal {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(0);
     }
   }
 </style>
