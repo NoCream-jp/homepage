@@ -85,10 +85,6 @@ import ExternalLink from "../components/ExternalLink.astro";
    * Topページ遷移時専用のアニメーション 
    * Astroのデフォルトのフェードや移動を完全に無効化する
    */
-  html.transition-to-top {
-    scroll-behavior: auto !important;
-  }
-
   html.transition-to-top::view-transition-group(root),
   html.transition-to-top::view-transition-image-pair(root),
   html.transition-to-top::view-transition-old(root),
