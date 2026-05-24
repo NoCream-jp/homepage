@@ -24,199 +24,6 @@ import ExternalLink from "../components/ExternalLink.astro";
     <meta name="generator" content={Astro.generator} />
     <title>mi-nato</title>
     <ClientRouter />
-
-    <script>
-      function getPathname(url: URL | string) {
-        return typeof url === "string" ? new URL(url).pathname : url.pathname;
-      }
-
-      function isTopPage(pathname: string) {
-        return pathname === "/";
-      }
-
-      function isCrossPageToTopHash(to: URL, from: URL | string) {
-        return (
-          to.pathname === "/" && to.hash !== "" && !isTopPage(getPathname(from))
-        );
-      }
-
-      /** / または /# から /blog など専用ページへ */
-      function isFromTopToDedicatedPage(to: URL, from: URL | string) {
-        return isTopPage(getPathname(from)) && to.pathname !== "/";
-      }
-
-      /** クロスページ遷移中だけ instant。トップ内ハッシュは html.scroll-smooth に任せる */
-      function scrollDocumentToHashInstant(doc: Document, hash: string) {
-        if (!hash) return;
-        const html = doc.documentElement;
-        const prev = html.style.scrollBehavior;
-        html.style.scrollBehavior = "auto";
-        doc
-          .querySelector(hash)
-          ?.scrollIntoView({ behavior: "instant", block: "start" });
-        html.style.scrollBehavior = prev;
-      }
-
-      function syncHistoryScrollPosition() {
-        if (!history.state) return;
-        history.replaceState({ ...history.state, scrollX, scrollY }, "");
-      }
-
-      let pendingCrossTopHash = "";
-      let lockedHash = "";
-      let restoreScrollTo: (() => void) | null = null;
-      let removeScrollGuard: (() => void) | null = null;
-
-      function disableTopHashScrollLock() {
-        restoreScrollTo?.();
-        lockedHash = "";
-      }
-
-      function disableScrollGuard() {
-        removeScrollGuard?.();
-        removeScrollGuard = null;
-      }
-
-      /** moveToLocation の scrollTo(0) とスクロール復元のズレを抑止 */
-      function enableTopHashScrollLock(hash: string) {
-        disableTopHashScrollLock();
-        lockedHash = hash;
-        const nativeScrollTo = window.scrollTo.bind(window);
-
-        window.scrollTo = ((
-          optionsOrX?: ScrollToOptions | number,
-          y?: number
-        ) => {
-          if (lockedHash && pendingCrossTopHash) {
-            scrollDocumentToHashInstant(document, lockedHash);
-            return;
-          }
-          if (typeof optionsOrX === "object") {
-            nativeScrollTo(optionsOrX);
-            return;
-          }
-          nativeScrollTo(optionsOrX ?? 0, y ?? 0);
-        }) as typeof window.scrollTo;
-
-        restoreScrollTo = () => {
-          window.scrollTo = nativeScrollTo;
-          restoreScrollTo = null;
-        };
-      }
-
-      function enableScrollGuard(hash: string) {
-        disableScrollGuard();
-        const onScroll = () => {
-          if (!pendingCrossTopHash) return;
-          scrollDocumentToHashInstant(document, hash);
-          syncHistoryScrollPosition();
-        };
-        window.addEventListener("scroll", onScroll, { capture: true });
-        removeScrollGuard = () =>
-          window.removeEventListener("scroll", onScroll, { capture: true });
-      }
-
-      function stabilizeCrossPageTopScroll(hash: string) {
-        if (!hash || pendingCrossTopHash !== hash) return;
-
-        pendingCrossTopHash = "";
-        history.scrollRestoration = "manual";
-        scrollDocumentToHashInstant(document, hash);
-        syncHistoryScrollPosition();
-        document.documentElement.classList.remove("transition-to-top");
-        disableTopHashScrollLock();
-        disableScrollGuard();
-      }
-
-      function armCrossPageTopTransition(
-        hash: string,
-        viewTransition?: ViewTransition
-      ) {
-        pendingCrossTopHash = hash;
-        document.documentElement.classList.add("transition-to-top");
-        history.scrollRestoration = "manual";
-        enableTopHashScrollLock(hash);
-        enableScrollGuard(hash);
-
-        if (viewTransition) {
-          viewTransition.finished.then(() => stabilizeCrossPageTopScroll(hash));
-        }
-      }
-
-      function cancelCrossPageTopTransition() {
-        pendingCrossTopHash = "";
-        document.documentElement.classList.remove("transition-to-top");
-        disableTopHashScrollLock();
-        disableScrollGuard();
-      }
-
-      let pendingFromTop = false;
-
-      function stabilizeFromTopTransition() {
-        pendingFromTop = false;
-        document.documentElement.classList.remove("transition-from-top");
-      }
-
-      function armFromTopTransition(viewTransition?: ViewTransition) {
-        pendingFromTop = true;
-        document.documentElement.classList.add("transition-from-top");
-        viewTransition?.finished.then(() => stabilizeFromTopTransition());
-      }
-
-      function cancelFromTopTransition() {
-        pendingFromTop = false;
-        document.documentElement.classList.remove("transition-from-top");
-      }
-
-      document.addEventListener("astro:before-preparation", (ev) => {
-        cancelCrossPageTopTransition();
-        cancelFromTopTransition();
-
-        if (isCrossPageToTopHash(ev.to, ev.from)) {
-          armCrossPageTopTransition(ev.to.hash);
-        } else if (isFromTopToDedicatedPage(ev.to, ev.from)) {
-          armFromTopTransition();
-        }
-      });
-
-      document.addEventListener("astro:before-swap", (ev) => {
-        if (isCrossPageToTopHash(ev.to, ev.from)) {
-          const html = ev.newDocument.documentElement;
-          html.classList.add("transition-to-top");
-          scrollDocumentToHashInstant(ev.newDocument, ev.to.hash);
-
-          ev.viewTransition?.finished.then(() =>
-            stabilizeCrossPageTopScroll(ev.to.hash)
-          );
-          return;
-        }
-
-        if (!isFromTopToDedicatedPage(ev.to, ev.from)) return;
-
-        ev.newDocument.documentElement.classList.add("transition-from-top");
-        ev.viewTransition?.finished.then(() => stabilizeFromTopTransition());
-      });
-
-      // moveToLocation（scrollRestoration=auto → location.href）の直後に復元を上書き
-      document.addEventListener("astro:after-swap", () => {
-        if (!pendingCrossTopHash) return;
-        history.scrollRestoration = "manual";
-        scrollDocumentToHashInstant(document, pendingCrossTopHash);
-        syncHistoryScrollPosition();
-      });
-
-      // updateCallbackDone はアニメより先に走るため、ここでは触らない
-      document.addEventListener("astro:page-load", () => {
-        if (!document.startViewTransition) {
-          if (pendingCrossTopHash) {
-            stabilizeCrossPageTopScroll(pendingCrossTopHash);
-          }
-          if (pendingFromTop) {
-            stabilizeFromTopTransition();
-          }
-        }
-      });
-    </script>
   </head>
   <body class="bg-white text-gray-900">
     <MenuBar />
@@ -228,7 +35,7 @@ import ExternalLink from "../components/ExternalLink.astro";
     id="footer"
     class="flex flex-col justify-around bg-white p-5 sm:mt-10 md:p-10 lg:ml-8 lg:p-10"
   >
-    <div class="ml-2 flex flex-col">
+    <div class="ml-2 flex flex-col gap-3">
       <ExternalLink href="https://github.com/NoCream-jp" text="GitHub" />
       <ExternalLink href="https://x.com/sXMN1au45a68174" text="X(Twitter)" />
       <ExternalLink
@@ -236,8 +43,8 @@ import ExternalLink from "../components/ExternalLink.astro";
         text="AtCoder"
       />
       <ExternalLink href="https://www.instagram.com/?hl=ja" text="Instagram" />
+      ©2026 mi-nato.com
     </div>
-    ©2026 mi-nato.com
   </footer>
 </html>
 
@@ -316,3 +123,193 @@ import ExternalLink from "../components/ExternalLink.astro";
     }
   }
 </style>
+
+<script>
+  function getPathname(url: URL | string) {
+    return typeof url === "string" ? new URL(url).pathname : url.pathname;
+  }
+
+  function isTopPage(pathname: string) {
+    return pathname === "/";
+  }
+
+  function isCrossPageToTopHash(to: URL, from: URL | string) {
+    return (
+      to.pathname === "/" && to.hash !== "" && !isTopPage(getPathname(from))
+    );
+  }
+
+  /** / または /# から /blog など専用ページへ */
+  function isFromTopToDedicatedPage(to: URL, from: URL | string) {
+    return isTopPage(getPathname(from)) && to.pathname !== "/";
+  }
+
+  /** クロスページ遷移中だけ instant。トップ内ハッシュは html.scroll-smooth に任せる */
+  function scrollDocumentToHashInstant(doc: Document, hash: string) {
+    if (!hash) return;
+    const html = doc.documentElement;
+    const prev = html.style.scrollBehavior;
+    html.style.scrollBehavior = "auto";
+    doc
+      .querySelector(hash)
+      ?.scrollIntoView({ behavior: "instant", block: "start" });
+    html.style.scrollBehavior = prev;
+  }
+
+  function syncHistoryScrollPosition() {
+    if (!history.state) return;
+    history.replaceState({ ...history.state, scrollX, scrollY }, "");
+  }
+
+  let pendingCrossTopHash = "";
+  let lockedHash = "";
+  let restoreScrollTo: (() => void) | null = null;
+  let removeScrollGuard: (() => void) | null = null;
+
+  function disableTopHashScrollLock() {
+    restoreScrollTo?.();
+    lockedHash = "";
+  }
+
+  function disableScrollGuard() {
+    removeScrollGuard?.();
+    removeScrollGuard = null;
+  }
+
+  /** moveToLocation の scrollTo(0) とスクロール復元のズレを抑止 */
+  function enableTopHashScrollLock(hash: string) {
+    disableTopHashScrollLock();
+    lockedHash = hash;
+    const nativeScrollTo = window.scrollTo.bind(window);
+
+    window.scrollTo = ((optionsOrX?: ScrollToOptions | number, y?: number) => {
+      if (lockedHash && pendingCrossTopHash) {
+        scrollDocumentToHashInstant(document, lockedHash);
+        return;
+      }
+      if (typeof optionsOrX === "object") {
+        nativeScrollTo(optionsOrX);
+        return;
+      }
+      nativeScrollTo(optionsOrX ?? 0, y ?? 0);
+    }) as typeof window.scrollTo;
+
+    restoreScrollTo = () => {
+      window.scrollTo = nativeScrollTo;
+      restoreScrollTo = null;
+    };
+  }
+
+  function enableScrollGuard(hash: string) {
+    disableScrollGuard();
+    const onScroll = () => {
+      if (!pendingCrossTopHash) return;
+      scrollDocumentToHashInstant(document, hash);
+      syncHistoryScrollPosition();
+    };
+    window.addEventListener("scroll", onScroll, { capture: true });
+    removeScrollGuard = () =>
+      window.removeEventListener("scroll", onScroll, { capture: true });
+  }
+
+  function stabilizeCrossPageTopScroll(hash: string) {
+    if (!hash || pendingCrossTopHash !== hash) return;
+
+    pendingCrossTopHash = "";
+    history.scrollRestoration = "manual";
+    scrollDocumentToHashInstant(document, hash);
+    syncHistoryScrollPosition();
+    document.documentElement.classList.remove("transition-to-top");
+    disableTopHashScrollLock();
+    disableScrollGuard();
+  }
+
+  function armCrossPageTopTransition(
+    hash: string,
+    viewTransition?: ViewTransition
+  ) {
+    pendingCrossTopHash = hash;
+    document.documentElement.classList.add("transition-to-top");
+    history.scrollRestoration = "manual";
+    enableTopHashScrollLock(hash);
+    enableScrollGuard(hash);
+
+    if (viewTransition) {
+      viewTransition.finished.then(() => stabilizeCrossPageTopScroll(hash));
+    }
+  }
+
+  function cancelCrossPageTopTransition() {
+    pendingCrossTopHash = "";
+    document.documentElement.classList.remove("transition-to-top");
+    disableTopHashScrollLock();
+    disableScrollGuard();
+  }
+
+  let pendingFromTop = false;
+
+  function stabilizeFromTopTransition() {
+    pendingFromTop = false;
+    document.documentElement.classList.remove("transition-from-top");
+  }
+
+  function armFromTopTransition(viewTransition?: ViewTransition) {
+    pendingFromTop = true;
+    document.documentElement.classList.add("transition-from-top");
+    viewTransition?.finished.then(() => stabilizeFromTopTransition());
+  }
+
+  function cancelFromTopTransition() {
+    pendingFromTop = false;
+    document.documentElement.classList.remove("transition-from-top");
+  }
+
+  document.addEventListener("astro:before-preparation", (ev) => {
+    cancelCrossPageTopTransition();
+    cancelFromTopTransition();
+
+    if (isCrossPageToTopHash(ev.to, ev.from)) {
+      armCrossPageTopTransition(ev.to.hash);
+    } else if (isFromTopToDedicatedPage(ev.to, ev.from)) {
+      armFromTopTransition();
+    }
+  });
+
+  document.addEventListener("astro:before-swap", (ev) => {
+    if (isCrossPageToTopHash(ev.to, ev.from)) {
+      const html = ev.newDocument.documentElement;
+      html.classList.add("transition-to-top");
+      scrollDocumentToHashInstant(ev.newDocument, ev.to.hash);
+
+      ev.viewTransition?.finished.then(() =>
+        stabilizeCrossPageTopScroll(ev.to.hash)
+      );
+      return;
+    }
+
+    if (!isFromTopToDedicatedPage(ev.to, ev.from)) return;
+
+    ev.newDocument.documentElement.classList.add("transition-from-top");
+    ev.viewTransition?.finished.then(() => stabilizeFromTopTransition());
+  });
+
+  // moveToLocation（scrollRestoration=auto → location.href）の直後に復元を上書き
+  document.addEventListener("astro:after-swap", () => {
+    if (!pendingCrossTopHash) return;
+    history.scrollRestoration = "manual";
+    scrollDocumentToHashInstant(document, pendingCrossTopHash);
+    syncHistoryScrollPosition();
+  });
+
+  // updateCallbackDone はアニメより先に走るため、ここでは触らない
+  document.addEventListener("astro:page-load", () => {
+    if (!document.startViewTransition) {
+      if (pendingCrossTopHash) {
+        stabilizeCrossPageTopScroll(pendingCrossTopHash);
+      }
+      if (pendingFromTop) {
+        stabilizeFromTopTransition();
+      }
+    }
+  });
+</script>
