@@ -15,10 +15,12 @@ const sortedPosts = allPosts.sort(
 );
 
 const allNews = await getCollection("news");
-const sortedNews = allNews.sort(
-  (a: CollectionEntry<"news">, b: CollectionEntry<"news">) =>
-    b.data.date.valueOf() - a.data.date.valueOf()
-);
+const sortedNews = allNews
+  .sort(
+    (a: CollectionEntry<"news">, b: CollectionEntry<"news">) =>
+      b.data.date.valueOf() - a.data.date.valueOf()
+  )
+  .slice(0, 10);
 
 const allActions = await getCollection("action");
 const sortedActions = allActions.sort(
