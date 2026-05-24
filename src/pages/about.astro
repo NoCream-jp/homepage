@@ -36,8 +36,10 @@ const sortedAchievements = allAchievements.sort(
     <div class="section-header mb-10 lg:ml-10">
       <h2 class="text-5xl font-bold">language</h2>
     </div>
-    <div class="mb-20 pl-4 md:pl-10">
-      <div class="flex w-full flex-col gap-5 pr-8 pb-8">
+    <div
+      class="main-container mb-2 text-left text-xs sm:px-5 md:px-10 lg:px-20"
+    >
+      <div class="flex w-full flex-col gap-5">
         <div class="shrink-0">
           <pre
             aria-hidden="true"
@@ -97,7 +99,7 @@ const sortedAchievements = allAchievements.sort(
     <div class="section-header mb-10 lg:ml-10">
       <h2 class="text-5xl font-bold">framework</h2>
     </div>
-    <div class="mb-20 pl-4 md:pl-10">
+    <div class="main-container mb-2 sm:px-5 md:px-10 lg:px-20">
       <div class="flex w-full flex-col gap-5 pr-8 pb-8">
         <div class="shrink-0">
           <pre
@@ -153,6 +155,10 @@ const sortedAchievements = allAchievements.sort(
     <div class="section-header mb-20 lg:ml-10">
       <h2 class="text-5xl font-bold">archivement</h2>
     </div>
-    <QuiltContainer achievements={sortedAchievements} />
+    <div
+      class="main-container mb-2 text-left text-xs sm:px-5 md:px-10 lg:px-20"
+    >
+      <QuiltContainer achievements={sortedAchievements} />
+    </div>
   </section>
 </Layout>
