@@ -52,7 +52,7 @@ const preview =
   class="m-auto w-full max-w-2xl overflow-visible border-none bg-transparent p-4 backdrop:bg-black/60 backdrop:backdrop-blur-sm"
 >
   <div
-    class="relative max-h-[85vh] overflow-y-auto rounded-2xl border border-black bg-white p-8 md:p-12"
+    class="relative max-h-[85vh] overflow-y-auto rounded-2xl border border-black bg-white p-6 md:p-6"
   >
     <button
       onclick={`document.getElementById('${modalId}').close()`}
@@ -73,13 +73,13 @@ const preview =
     </button>
 
     <time
-      class="mb-4 block font-mono text-sm tracking-widest text-black/50 tabular-nums"
+      class="mb-1 block font-mono text-sm tracking-widest text-black/50 tabular-nums"
       >{formattedDate}</time
     >
-    <h2 class="mb-8 border-b border-black pb-4 text-3xl font-bold">{title}</h2>
+    <h2 class="mb-4 border-b border-black pb-4 text-2xl font-bold">{title}</h2>
 
     <div
-      class="prose prose-sm prose-headings:font-bold prose-p:leading-relaxed max-w-none"
+      class="prose prose-sm prose-headings:font-bold prose-p:leading-relaxed max-w-none text-base"
     >
       <Content />
     </div>
