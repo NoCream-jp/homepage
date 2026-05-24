@@ -26,10 +26,9 @@ import ExternalLink from "../components/ExternalLink.astro";
     <ClientRouter />
 
     <script>
-      // 遷移先がトップページの #top かどうかを判定し、現在のhtml要素にクラスを付与する
+      // 遷移先がトップページのハッシュリンクかどうかを判定し、現在のhtml要素にクラスを付与する
       document.addEventListener("astro:before-preparation", (ev) => {
-        // href="/#top" のリンクを踏んだ時だけ発動させるため、hashもチェックする
-        const isToTop = ev.to.pathname === "/#top";
+        const isToTop = ev.to.pathname === "/" && ev.to.hash !== "";
         const isFromTop = new URL(ev.from).pathname === "/";
 
         if (isToTop && !isFromTop) {
@@ -42,7 +41,7 @@ import ExternalLink from "../components/ExternalLink.astro";
       // Astroがページの中身を新しいものに置き換える直前に、
       // 新しいページのhtml要素にもクラスを引き継がせる
       document.addEventListener("astro:before-swap", (ev) => {
-        const isToTop = ev.to.pathname === "/" && ev.to.hash === "#top";
+        const isToTop = ev.to.pathname === "/" && ev.to.hash !== "";
         const isFromTop = new URL(ev.from).pathname === "/";
 
         if (isToTop && !isFromTop) {
@@ -86,6 +85,10 @@ import ExternalLink from "../components/ExternalLink.astro";
    * Topページ遷移時専用のアニメーション 
    * Astroのデフォルトのフェードや移動を完全に無効化する
    */
+  html.transition-to-top {
+    scroll-behavior: auto !important;
+  }
+
   html.transition-to-top::view-transition-group(root),
   html.transition-to-top::view-transition-image-pair(root),
   html.transition-to-top::view-transition-old(root),
