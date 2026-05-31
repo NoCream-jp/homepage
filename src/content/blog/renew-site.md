@@ -2,6 +2,7 @@
 title: "サイトのデザイン一新について"
 date: 2026-05-11
 category: "Tech"
+draft: false
 ---
 
 ## サイトを作り変えました

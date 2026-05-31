@@ -2,23 +2,22 @@
 import { getCollection, render } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 
-// 1. ビルド時に「どのURL（パス）を生成するか」をAstroに教える必須の関数
+// ビルド時に「どのURL（パス）を生成するか」をAstroに教える必須の関数
 export async function getStaticPaths() {
-  const posts = await getCollection("blog");
-
+  const posts = await getCollection("blog", ({ data }) => {
+    return !data.draft;
+  });
   return posts.map((post) => ({
-    params: { id: post.id }, // URLの一部になるID（Astro 5以降の仕様）
-    props: { post }, // ページに渡す記事データそのもの
+    params: { id: post.id },
+    props: { post },
   }));
 }
 
-// 2. 上の関数から渡された記事データを受け取る
+// 上の関数から渡された記事データを受け取る
 const { post } = Astro.props;
 
-// 3. Markdownの本文をHTMLに変換する（Astro 5の新しい書き方）
 const { Content } = await render(post);
 
-// 日付のフォーマット（BlogItemと同じく美しく）
 const formattedDate = post.data.date
   .toLocaleDateString("ja-JP", {
     year: "numeric",
