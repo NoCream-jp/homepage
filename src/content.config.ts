@@ -7,6 +7,7 @@ const blogCollection = defineCollection({
     title: z.string(),
     date: z.date(),
     category: z.string(),
+    draft: z.boolean().optional(),
   }),
 });
 
@@ -16,7 +17,6 @@ const newsCollection = defineCollection({
     title: z.string(),
     date: z.date(),
     href: z.string().optional(),
-    draft: z.boolean().optional(),
   }),
 });
 
