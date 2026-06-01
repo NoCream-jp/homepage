@@ -3,6 +3,23 @@ import { ClientRouter } from "astro:transitions";
 import "../styles/global.css";
 import MenuBar from "../components/MenuBar.astro";
 import ExternalLink from "../components/ExternalLink.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  type?: string;
+}
+
+const {
+  title,
+  description = "Minatoのポートフォリオ兼ブログです。",
+  image = "/images/ogp-default.png", // public/images/ogp-default.png を用意してください
+  type = "website",
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const imageURL = new URL(image, Astro.site);
 ---
 
 <!doctype html>

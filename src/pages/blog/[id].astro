@@ -25,6 +25,11 @@ const formattedDate = post.data.date
     day: "2-digit",
   })
   .replace(/\//g, ".");
+
+// OGP用
+const description =
+  post.data.description || `${post.data.title}についての記事です。`;
+const image = post.data.image || "/images/ogp-default.png";
 ---
 
 <!-- サイト全体のレイアウトで包む（タイトルには記事のタイトルを入れる） -->
@@ -50,8 +55,8 @@ const formattedDate = post.data.date
 </Layout>
 
 <style>
-  /* 
-   * Markdownコンテンツ用のスタイリング 
+  /*
+   * Markdownコンテンツ用のスタイリング
    * :global() を使うことで、Astroが生成した子要素（Content内）にもスタイルを当てられます
    */
 
