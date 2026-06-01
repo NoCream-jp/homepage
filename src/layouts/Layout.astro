@@ -37,6 +37,12 @@ const imageURL = new URL(image, Astro.site);
       rel="stylesheet"
     />
 
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={imageURL} />
+
     <meta name="generator" content={Astro.generator} />
     <title>mi-nato</title>
     <ClientRouter />
