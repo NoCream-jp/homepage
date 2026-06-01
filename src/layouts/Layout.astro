@@ -42,9 +42,11 @@ const imageURL = new URL(image, Astro.site);
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={imageURL} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={imageURL} />
 
     <meta name="generator" content={Astro.generator} />
-    <title>mi-nato</title>
+    <title>{title}</title>
     <ClientRouter />
   </head>
   <body class="bg-white text-gray-900">
