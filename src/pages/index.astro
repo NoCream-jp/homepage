@@ -8,7 +8,9 @@ import ActionAccordion from "../components/ActionAccordion.astro";
 import { getCollection, render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 
-const allPosts = await getCollection("blog");
+const allPosts = await getCollection("blog", ({ data }) => {
+  return !data.draft;
+});
 const sortedPosts = allPosts.sort(
   (a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) =>
     b.data.date.valueOf() - a.data.date.valueOf()
