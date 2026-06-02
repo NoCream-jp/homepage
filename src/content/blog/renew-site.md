@@ -1,7 +1,7 @@
 ---
 title: "サイトのデザイン一新について"
 date: 2026-05-11
-category: "Tech"
+category: "Developing"
 draft: false
 ---
 
