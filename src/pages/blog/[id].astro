@@ -63,14 +63,6 @@ const image = post.data.image || "/images/ogp-default.png";
   /* リンク（URL）: global.cssで定義されているテーマカラーを適用 */
   :global(.blog-content a) {
     color: var(--color-link);
-    text-decoration: underline;
-    text-underline-offset: 4px;
-    text-decoration-thickness: 1px;
-    text-decoration-color: color-mix(
-      in srgb,
-      var(--color-link) 40%,
-      transparent
-    );
     transition: all 0.2s ease;
   }
   :global(.blog-content a:hover) {
