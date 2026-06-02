@@ -2,7 +2,7 @@ import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
 
 const blogCollection = defineCollection({
-  loader: glob({ pattern: "**/*.md", base: "./src/content/blog" }),
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/blog" }),
   schema: z.object({
     title: z.string(),
     date: z.date(),
@@ -14,7 +14,7 @@ const blogCollection = defineCollection({
 });
 
 const newsCollection = defineCollection({
-  loader: glob({ pattern: "**/*.md", base: "./src/content/news" }),
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/news" }),
   schema: z.object({
     title: z.string(),
     date: z.date(),
@@ -23,7 +23,7 @@ const newsCollection = defineCollection({
 });
 
 const actionCollection = defineCollection({
-  loader: glob({ pattern: "**/*.md", base: "./src/content/action" }),
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/action" }),
   schema: z.object({
     title: z.string(),
     date: z.date(), // ソートのためにDate型で持ちます
@@ -31,7 +31,7 @@ const actionCollection = defineCollection({
 });
 
 const achievementCollection = defineCollection({
-  loader: glob({ pattern: "**/*.md", base: "./src/content/achievement" }),
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/achievement" }),
   schema: z.object({
     title: z.string(),
     date: z.date(),
