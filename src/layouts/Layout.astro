@@ -116,19 +116,20 @@ const imageURL = new URL(image, Astro.site);
     opacity: 1 !important;
   }
 
-  /* トップページ（新しい画面）が下から100%覆いかぶさるようにせり上がってくる */
+  /* トップページ（新しい画面）が右から左へ覆いかぶさるようにスライドしてくる */
   html.transition-to-top::view-transition-new(root) {
-    animation: slide-up-panel 1s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+    animation: slide-left-panel 1s cubic-bezier(0.16, 1, 0.3, 1) both !important;
     z-index: 100;
     opacity: 1 !important;
   }
 
-  @keyframes slide-up-panel {
+  /* to top page */
+  @keyframes slide-left-panel {
     0% {
-      transform: translateY(100%);
+      transform: translateX(-100%);
     }
     100% {
-      transform: translateY(0);
+      transform: translateX(0);
     }
   }
 
