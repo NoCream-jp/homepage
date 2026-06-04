@@ -46,11 +46,11 @@
    2. Tailwind へのテーマ登録（v4 の要）
    ========================================= */
 @theme {
-  /* フォントの登録（ font-sans クラスが生成されます ）*/
-  --font-sans: "Saira Condensed", ui-sans-serif, system-ui, sans-serif;
+  --font-saria: "Saira Condensed", ui-sans-serif, system-ui, sans-serif;
+  --font-manrope: "Manrope", ui-sans-serif, system-ui, sans-serif;
 
-  /* 
-    カラーの登録 
+  /*
+    カラーの登録
     --color-{name} と定義することで、text-{name}, bg-{name}, border-{name} 等の
     ユーティリティクラスが「すべて自動生成」されます。
   */
@@ -71,7 +71,7 @@
   --color-highlight: var(--theme-bg-highlight); /* bg-highlight を生成 */
   --color-control: var(--theme-bg-control); /* bg-control を生成 */
 
-  /* 
+  /*
     これで w-sidebar や pr-sidebar などのクラスが自動生成される
   */
   --spacing-sidebar: 10rem;
