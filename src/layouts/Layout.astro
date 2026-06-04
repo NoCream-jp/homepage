@@ -346,4 +346,32 @@ const imageURL = new URL(image, Astro.site);
       }
     }
   });
+
+  /* ==================要素がページにフェードインしてくる================== */
+  // ページが読み込まれた時（ページ遷移時含む）に実行
+  document.addEventListener("astro:page-load", () => {
+    // 画面内に要素が入った時の処理を定義
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // 要素が画面に交差（表示）したら
+          if (entry.isIntersecting) {
+            // 初期状態のクラスを削除し、表示状態のクラスを追加
+            entry.target.classList.remove("opacity-0", "translate-y-4");
+            entry.target.classList.add("opacity-100", "translate-y-0");
+
+            // 一度表示されたら監視を解除（毎回アニメーションさせたい場合はこの行を消す）
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        // オプション: 画面の20%（0.2）くらいまで要素が入ってきたら発火させる
+        threshold: 0.2,
+      }
+    );
+    // ページ内の "fade-target" クラスを持つ要素をすべて見つけて監視を開始
+    const targets = document.querySelectorAll(".fade-target");
+    targets.forEach((target) => observer.observe(target));
+  });
 </script>
