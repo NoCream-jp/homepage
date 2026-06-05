@@ -29,15 +29,12 @@ const imageURL = new URL(image, Astro.site);
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" href="/M.svg" />
 
-    <!-- google fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- saria -->
     <link
       href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@100;200;300;400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <!-- manrope -->
     <link
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap"
       rel="stylesheet"
@@ -57,7 +54,6 @@ const imageURL = new URL(image, Astro.site);
   </head>
   <body class="bg-white text-gray-900">
     <MenuBar />
-    <!-- 大画面時はサイドバーの分pr-sidebarをつける -->
     <main class="md:pr-sidebar min-h-screen md:pt-0">
       <slot />
     </main>
@@ -374,4 +370,23 @@ const imageURL = new URL(image, Astro.site);
     const targets = document.querySelectorAll(".fade-target");
     targets.forEach((target) => observer.observe(target));
   });
+
+  /* ==================/#topのハッシュリンクを消す関数================== */
+  function cleanUpHash() {
+    // もしURLのハッシュが "#top" だったら
+    if (window.location.hash === "#top") {
+      // 遷移やスムーズスクロールを邪魔しないように少しだけ待つ
+      setTimeout(() => {
+        // ハッシュ（#top）を除いたクリーンなURLを作成
+        const cleanUrl = window.location.pathname + window.location.search;
+
+        // 履歴を上書きしてURLバーを更新
+        window.history.replaceState(window.history.state, "", cleanUrl);
+      }, 500); // 500ミリ秒遅延（アニメーションやスクロールの時間に合わせて調整してください）
+    }
+  }
+
+  // 🌟追加：他のページから遷移してきた時や、同じページ内でクリックした時に関数を呼び出す
+  document.addEventListener("astro:page-load", cleanUpHash);
+  window.addEventListener("hashchange", cleanUpHash);
 </script>
