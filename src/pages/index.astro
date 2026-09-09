@@ -6,39 +6,45 @@ import ArticleCard from "../components/ArticleCard.astro";
 const posts = await getCollection("blog", ({ data }) => !data.draft);
 posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-const title = "Mi-nato — ポートフォリオ & ブログ";
-const description = "競プロ・Web開発・機械学習のメモや制作物を置いています。";
+const title = "Minato Hayashi";
+const description = "Minato Hayashi's portfolio and blog";
 ---
 
 <Layout title={title} description={description}>
-  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-    {posts.map((post) => <ArticleCard post={post} />)}
+  <!-- ティッカー・区切り線領域 -->
+  <div
+    class="flex h-10 w-full items-center overflow-hidden border-y px-4 text-xs text-zinc-600"
+  >
+    <span class="mr-4 text-zinc-400">blog</span>
+    <span class="mr-4">2026/09/09/08</span>
+    <span class="mr-8">ハッカソンに出場してきました →</span>
   </div>
-  <section>
-    <h1>こんにちは — Mi-nato（仮）</h1>
-    <p>競技プログラミング、Web、機械学習のメモや制作物を置いています。</p>
 
-    <div>
-      <a href="/about">About</a>
-      <a href="/projects">Projects</a>
-      <a href="/blog">Blog</a>
-    </div>
-  </section>
+  <div class="mx-auto max-w-5xl px-6 py-12">
+    <!-- blogセクション -->
+    <section class="mb-20 w-full">
+      <h2 class="mb-8 text-2xl font-normal">blog</h2>
+      <div
+        class="grid w-full grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4 lg:gap-6"
+      >
+        {posts.map((post) => <ArticleCard post={post} />)}
+      </div>
+    </section>
 
-  <section>
-    <h2>最近の更新</h2>
-    <p>
-      ※
-      コレクションやスタイルは使っていない最小構成です。記事は手動でページ（例: <code
-        >src/pages/blog/your-post.md</code
-      >）を作ってください。
-    </p>
-
-    <ul>
-      <li>
-        <a href="/blog/your-first-post">Your first post</a>
-        <small>(2026-09-09)</small>
-      </li>
-    </ul>
-  </section>
+    <!-- bioセクション -->
+    <section class="w-full">
+      <h2 class="mb-8 text-2xl font-normal">bio</h2>
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <p class="text-sm leading-relaxed text-zinc-900">
+          こんにちは。みなとといいます。大学4回生で、AIや機械学習、ネットワークについて学んでいます。webサイトを作ったり、競技プログラミングをしています。現在は、英語でアニメを見るのに熱中しています。寝ること、食べること、猫とお話しすることが好きです。どうぞよろしく。
+        </p>
+        <p class="text-sm leading-relaxed text-zinc-900">
+          Hi. I'm Minato Hayashi, a senior university student, in Japan. I'm
+          learning AI, machine learning, network, and more. I recently make
+          websites and articles, permit competitive programming. I love eating,
+          sleeping, and talking with cat. Have fun everything!
+        </p>
+      </div>
+    </section>
+  </div>
 </Layout>
