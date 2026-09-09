@@ -1,11 +1,19 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import ArticleCard from "../components/ArticleCard.astro";
+
+const posts = await getCollection("blog", ({ data }) => !data.draft);
+posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
 const title = "Mi-nato — ポートフォリオ & ブログ";
 const description = "競プロ・Web開発・機械学習のメモや制作物を置いています。";
 ---
 
 <Layout title={title} description={description}>
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {posts.map((post) => <ArticleCard post={post} />)}
+  </div>
   <section>
     <h1>こんにちは — Mi-nato（仮）</h1>
     <p>競技プログラミング、Web、機械学習のメモや制作物を置いています。</p>

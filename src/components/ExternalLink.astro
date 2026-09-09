@@ -1,6 +1,4 @@
 ---
-import RollText from "./RollText.astro";
-
 interface Props {
   href: string;
   text: string;
@@ -13,7 +11,7 @@ const { href, text } = Astro.props;
   href={href}
   class="hover:border-primary group inline-flex w-fit items-center gap-2 border-b text-base tracking-widest text-black"
 >
-  <RollText text={text} />
+  {text}
 
   <svg
     xmlns="http://www.w3.org/2000/svg"
