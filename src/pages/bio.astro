@@ -2,9 +2,18 @@
 import Layout from "../layouts/Layout.astro";
 import { getCollection } from "astro:content";
 import WordCloud from "../components/WordCloud.astro";
+import ImageStack from "../components/ImageStack.astro";
 
 const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
+
+// ImageStack用
+const sampleImages = [
+  "/images/cat.webp",
+  "/images/atcoder.png",
+  "/images/ra-men.webp",
+  "/images/spotify.webp",
+];
 ---
 
 <Layout title={title} description={description}>
@@ -12,8 +21,12 @@ const description = "Minato Hayashi's portfolio and blog";
     <section class="mb-20 w-full">
       <h1 class="mb-7 text-2xl">bio</h1>
       <div class="flex flex-col items-center">
-        <div class="mb-3">Who I am</div>
-        <div class="mb-5 grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-8">
+        <div class="my-5">What I saw</div>
+        <ImageStack images={sampleImages} />
+        <div class="h-20"></div>
+
+        <div class="mt-15 mb-3">Who I am</div>
+        <div class="mb-10 grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-8">
           <p class="text-sm leading-relaxed text-zinc-900">
             こんにちは。みなとといいます。大学4回生で、AIや機械学習、ネットワークについて学んでいます。webサイトを作ったり、競技プログラミングをしています。現在は、英語でアニメを見るのに熱中しています。寝ること、食べること、猫とお話することが好きです。どうぞよろしく。
           </p>
@@ -35,16 +48,20 @@ const description = "Minato Hayashi's portfolio and blog";
             "QuizKnock",
             "星街すいせい",
             "KALDI",
-            "ハリー/・ポッター",
+            "ハリー・ポッター",
             "ポケットモンスターチャンピオンズ",
             "Spotify",
             "Arena Breakout",
+            "Anker",
+            "ナナホシ管弦楽団",
+            "Orangestar",
+            "米津玄師",
             "",
           ]}
           width="80%"
           height="250px"
-          maxFont={100}
-          minFont={50}
+          maxFont={65}
+          minFont={35}
         />
 
         <div class="my-5">What I listen</div>

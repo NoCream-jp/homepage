@@ -1,0 +1,262 @@
+---
+// src/components/ImageStack.astro
+interface Props {
+  images: string[];
+  // optional: how many visible depth levels before hiding (default 3)
+  maxDepth?: number;
+  // enable debug logs
+  debug?: boolean;
+}
+
+const { images = [], maxDepth = 3, debug = false } = Astro.props;
+
+// filter out falsy / empty paths
+const safeImages = (images || []).filter(Boolean);
+---
+
+<style>
+  /* minimal styles — Tailwind projects can omit or convert these */
+  .image-stack-container {
+    position: relative;
+    margin-inline: auto;
+    width: 100%;
+    max-width: 20rem; /* same as max-w-sm */
+    aspect-ratio: 3 / 2;
+    user-select: none;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .image-stack-item {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    will-change: transform, opacity;
+    transition:
+      transform 500ms ease-out,
+      opacity 500ms ease-out;
+    display: block;
+  }
+
+  /* Depth styles (0..3) — adjust translate/rotate values to taste */
+  .image-stack-item[data-depth="0"] {
+    z-index: 30;
+    transform: translateX(0) translateY(0) rotate(0deg);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .image-stack-item[data-depth="1"] {
+    z-index: 20;
+    transform: translateX(0.75rem) translateY(0.5rem) rotate(2deg);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .image-stack-item[data-depth="2"] {
+    z-index: 10;
+    transform: translateX(1.5rem) translateY(1rem) rotate(4deg);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .image-stack-item[data-depth="3"] {
+    z-index: 0;
+    transform: translateX(2rem) translateY(1.5rem) rotate(6deg);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .image-stack-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0.5rem; /* rounded-xl */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    display: block;
+    pointer-events: none; /* let container capture clicks */
+  }
+
+  /* focus ring for accessibility */
+  .image-stack-container:focus {
+  }
+</style>
+
+<div
+  class="image-stack-container"
+  role="button"
+  tabindex="0"
+  aria-label="image stack"
+  data-max-depth={String(maxDepth)}
+  data-stack-init="false"
+>
+  {
+    safeImages.map((src, index) => {
+      const initialDepth = index < maxDepth ? index : maxDepth;
+      return (
+        <div
+          class="image-stack-item"
+          data-depth={String(initialDepth)}
+          data-logical-index={String(index)}
+          aria-hidden={initialDepth === maxDepth ? "true" : "false"}
+        >
+          <img
+            src={src}
+            alt={`Stack image ${index + 1}`}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      );
+    })
+  }
+</div>
+
+<script is:inline>
+  (function () {
+    // debug flag from server -> read from container attribute if present
+    const debugGlobal = false;
+
+    function log(...args) {
+      if (debugGlobal) console.debug("[ImageStack]", ...args);
+    }
+
+    function initAllStacks() {
+      const containers = Array.from(
+        document.querySelectorAll(".image-stack-container")
+      );
+      log("found containers", containers.length);
+
+      containers.forEach((container, ci) => {
+        // idempotent init
+        if (container.dataset.stackInit === "true") {
+          log("container already init", ci);
+          return;
+        }
+        container.dataset.stackInit = "true";
+        const maxDepth = parseInt(container.dataset.maxDepth || "3", 10);
+        log("init container", ci, "maxDepth=", maxDepth);
+
+        let isAnimating = false;
+
+        // helper to fetch current items
+        const getItems = () =>
+          Array.from(container.querySelectorAll(".image-stack-item"));
+
+        // ensure logicalIndex/depth attributes are present and consistent
+        function normalizeItems() {
+          const items = getItems();
+          items.forEach((it, i) => {
+            it.dataset.logicalIndex = String(i);
+            const depth = i < maxDepth ? i : maxDepth;
+            it.dataset.depth = String(depth);
+            // aria-hidden for fully-hidden/back items
+            it.setAttribute(
+              "aria-hidden",
+              depth === maxDepth ? "true" : "false"
+            );
+          });
+        }
+
+        normalizeItems();
+
+        function rotateOnce() {
+          if (isAnimating) {
+            log("rotate ignored: animating");
+            return;
+          }
+          const items = getItems();
+          if (items.length <= 1) {
+            log("rotate ignored: items <= 1");
+            return;
+          }
+
+          const front = items.find(
+            (it) => parseInt(it.dataset.logicalIndex || "0", 10) === 0
+          );
+          if (!front) {
+            log("no front found");
+            return;
+          }
+
+          log("rotate start, front idx=", front.dataset.logicalIndex);
+          isAnimating = true;
+
+          // kick out the front element with transform via rAF to batch style writes
+          requestAnimationFrame(() => {
+            front.style.transform = "translateX(-120%) rotate(-12deg)";
+            front.style.opacity = "0";
+          });
+
+          // wait for the visible exit animation to finish before rearranging
+          const exitMs = 420;
+          setTimeout(() => {
+            // recompute items (DOM unchanged)
+            const itemsAfter = getItems();
+
+            itemsAfter.forEach((item) => {
+              let idx = parseInt(item.dataset.logicalIndex || "0", 10);
+              if (idx === 0) {
+                // move to back
+                idx = itemsAfter.length - 1;
+                // clear inline styles to let CSS data-depth rules apply
+                item.style.transform = "";
+                item.style.opacity = "";
+              } else {
+                idx = idx - 1;
+              }
+              item.dataset.logicalIndex = String(idx);
+              const depth = idx < maxDepth ? idx : maxDepth;
+              item.dataset.depth = String(depth);
+              item.setAttribute(
+                "aria-hidden",
+                depth === maxDepth ? "true" : "false"
+              );
+            });
+
+            // small delay to avoid race with transition
+            setTimeout(() => {
+              isAnimating = false;
+              log(
+                "rotate done, new indices:",
+                getItems().map((i) => i.dataset.logicalIndex)
+              );
+            }, 60);
+          }, exitMs);
+        }
+
+        // attach handlers (click + keyboard)
+        container.addEventListener("click", (e) => {
+          // allow clicks anywhere in container (images have pointer-events:none)
+          rotateOnce();
+        });
+
+        container.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            rotateOnce();
+          }
+        });
+
+        // expose a method for external code (optional)
+        container.imageStackRotate = rotateOnce;
+
+        // keep normalized when window resizes (not strictly necessary but helps)
+        window.addEventListener("resize", () => {
+          normalizeItems();
+        });
+      });
+    }
+
+    // run ASAP: if DOM ready -> run, otherwise wait for DOMContentLoaded
+    if (
+      document.readyState === "complete" ||
+      document.readyState === "interactive"
+    ) {
+      initAllStacks();
+    } else {
+      document.addEventListener("DOMContentLoaded", initAllStacks);
+    }
+
+    // Also handle Astro client-side navigation if present (best-effort)
+    document.addEventListener("astro:page-load", initAllStacks);
+  })();
+</script>
