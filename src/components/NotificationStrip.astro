@@ -1,14 +1,19 @@
 ---
 const { items = [], speed = 40 } = Astro.props;
 const shouldRender = Array.isArray(items) && items.length > 0;
+
+const bannerItem = {
+  section: "",
+  date: "",
+  title: "WHATS NEW",
+  href: "#",
+  banner: true,
+};
 ---
 
 {
   shouldRender && (
-    <nav
-      aria-label="site notifications"
-      class="w-full border border-b bg-zinc-50"
-    >
+    <nav aria-label="site notifications" class="w-full border-y bg-zinc-50">
       <div class="mx-auto max-w-7xl">
         <div
           class="notif-scroll no-scrollbar relative overflow-x-auto"
@@ -19,8 +24,14 @@ const shouldRender = Array.isArray(items) && items.length > 0;
           aria-label="最新のお知らせ"
         >
           <ul class="notif-list flex gap-0 whitespace-nowrap">
+            {/* ここを最小変更：
+               - items の先頭に bannerItem を足した配列を複製して使うだけ
+               - レンダリング時に it.banner を見て分岐する */}
             {Array(10)
-              .fill(items)
+              .fill([
+                bannerItem,
+                ...items,
+              ]) /* ← ここだけ変更（元は .fill(items)） */
               .flat()
               .map((it) => (
                 <li
@@ -28,37 +39,47 @@ const shouldRender = Array.isArray(items) && items.length > 0;
                   role="group"
                   aria-roledescription="notification"
                 >
-                  <a
-                    href={it.href}
-                    class="notif-link inline-flex h-12 items-center gap-4 border border-zinc-200 bg-white px-4 py-2"
-                    aria-label={`${it.section} ${it.title}`}
-                  >
-                    <span class="block text-xs tracking-wide text-zinc-500">
-                      {it.section}
-                    </span>
-                    <span class="block text-xs text-zinc-400">
-                      {it.date ?? ""}
-                    </span>
-                    <span class="block text-sm font-medium text-zinc-800">
-                      {it.title}
-                    </span>
-                    <span class="ml-3 inline-flex items-center justify-center rounded-full border-none p-1">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4 text-zinc-600"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                      >
-                        <path d="M5 12h14" />
-                        <path d="M12 5l7 7-7 7" />
-                      </svg>
-                    </span>
-                  </a>
+                  {it.banner ? (
+                    /* シンプルなバナー表示（スクロール群に混ざる） */
+                    <div class="notif-banner inline-flex h-12 items-center justify-center border-r bg-[repeating-linear-gradient(45deg,#0000_0px,#0000_6px,#d1d5db_6px,#d1d5db_7px)] px-4 text-black">
+                      <span class="text-xs font-semibold tracking-wide">
+                        {it.title}
+                      </span>
+                    </div>
+                  ) : (
+                    /* 既存の通知アイテム（変更なし） */
+                    <a
+                      href={it.href}
+                      class="notif-link inline-flex h-12 items-center gap-4 border-r bg-white px-4 py-2"
+                      aria-label={`${it.section} ${it.title}`}
+                    >
+                      <span class="block text-xs tracking-wide text-zinc-500">
+                        {it.section}
+                      </span>
+                      <span class="block text-xs text-zinc-400">
+                        {it.date ?? ""}
+                      </span>
+                      <span class="block text-sm font-medium text-zinc-800">
+                        {it.title}
+                      </span>
+                      <span class="ml-3 inline-flex items-center justify-center rounded-full border-none p-1">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4 text-zinc-600"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M5 12h14" />
+                          <path d="M12 5l7 7-7 7" />
+                        </svg>
+                      </span>
+                    </a>
+                  )}
                 </li>
               ))}
           </ul>
@@ -95,13 +116,19 @@ const shouldRender = Array.isArray(items) && items.length > 0;
   /* Slight visual tweak: reduce touch-target shrink on small screens */
   .notif-link {
     min-width: 140px;
-    box-sizing: border-box;
+    box-sizing: ox;
   }
 
   /* Make keyboard focus visible (ID変数展開の代わりにクラスを使用) */
   .notif-scroll:focus {
     outline: 2px solid rgba(0, 0, 0, 0.06);
     outline-offset: 2px;
+  }
+
+  /* WHATS NEW部分 */
+  .notif-banner {
+    min-width: 140px; /* 他のアイテムと同程度の幅を確保 */
+    box-sizing: border-box;
   }
 </style>
 
