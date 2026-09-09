@@ -11,11 +11,18 @@ const { title = "mi-nato.com", description = "ブログサイト" } = Astro.prop
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..900&display=swap"
+      rel="stylesheet"
+    />
   </head>
-  <body>
+  <body class="font-sans">
     <header class="flex w-full justify-between p-3">
       <div>
-        <a href="/" class="hidden text-2xl sm:block">Minato Hayashi</a>
+        <a href="/" class="hidden font-sans text-2xl sm:block">Minato Hayashi</a
+        >
       </div>
       <nav class="flex w-full items-center justify-around sm:w-1/4">
         <a href="">blog</a>
