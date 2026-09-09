@@ -22,8 +22,11 @@ const sampleImages = [
       <h1 class="mb-7 text-2xl">bio</h1>
       <div class="flex flex-col items-center">
         <div class="my-5">What I saw</div>
-        <ImageStack images={sampleImages} />
-        <div class="h-20"></div>
+        <div class="mb-20 flex gap-15 items-center">
+          <ImageStack images={sampleImages} />
+          <div>各種SNSには猫の画像、外食の再撮影した写真、その他趣味関連の画像を投稿しています。</div>
+
+        </div>
 
         <div class="mt-15 mb-3">Who I am</div>
         <div class="mb-10 grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-8">
@@ -64,7 +67,7 @@ const sampleImages = [
           minFont={35}
         />
 
-        <div class="my-5">What I listen</div>
+        <div class="mt-15 mb-5">What I listen</div>
       </div>
     </section>
   </div>
