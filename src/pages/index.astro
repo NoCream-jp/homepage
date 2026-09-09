@@ -2,6 +2,29 @@
 import Layout from "../layouts/Layout.astro";
 import { getCollection } from "astro:content";
 import ArticleCard from "../components/ArticleCard.astro";
+import NotificationStrip from "../components/NotificationStrip.astro";
+
+// 通知帯
+const latestItems = [
+  {
+    section: "blog",
+    date: "2026/09/09",
+    title: "ハッカソンに出場してきました",
+    href: "/blog/pikka",
+  },
+  {
+    section: "work",
+    date: "2026/09/06",
+    title: "ABC472に参加しました",
+    href: "/blog/abc472",
+  },
+  {
+    section: "blog",
+    date: "2026/09/09",
+    title: "サイト公開記事を書きました",
+    href: "/blog/initial-article",
+  },
+];
 
 const posts = await getCollection("blog", ({ data }) => !data.draft);
 posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
@@ -11,14 +34,7 @@ const description = "Minato Hayashi's portfolio and blog";
 ---
 
 <Layout title={title} description={description}>
-  <!-- ティッカー・区切り線領域 -->
-  <div
-    class="flex h-10 w-full items-center overflow-hidden border-y px-4 text-xs text-zinc-600"
-  >
-    <span class="mr-4 text-zinc-400">blog</span>
-    <span class="mr-4">2026/09/09/08</span>
-    <span class="mr-8">ハッカソンに出場してきました →</span>
-  </div>
+  <NotificationStrip items={latestItems} />
 
   <div class="mx-auto max-w-5xl px-6 py-12">
     <!-- blogセクション -->
