@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import { getCollection } from "astro:content";
 import WordCloud from "../components/WordCloud.astro";
 import ImageStack from "../components/ImageStack.astro";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
 
 const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
@@ -18,6 +19,13 @@ const sampleImages = [
 
 <Layout title={title} description={description}>
   <div class="mx-5 mt-5 w-full max-w-5xl px-6 py-12">
+    <Breadcrumbs
+      items={[
+        { label: "TOP", href: "/" },
+        { label: "bio", href: "/bio" },
+      ]}
+    />
+
     <section class="mb-20 w-full">
       <h1 class="mb-7 text-2xl">bio</h1>
       <div class="flex flex-col items-center">
@@ -69,8 +77,6 @@ const sampleImages = [
         />
 
         <div class="mt-15 mb-5">What I listen</div>
-        
-
       </div>
     </section>
   </div>

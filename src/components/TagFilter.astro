@@ -19,7 +19,7 @@ const { tags = [], selector = ".post-item", initial = null } = Astro.props;
     data-tag="all"
     data-active="false"
     aria-pressed="false"
-    class="tag-btn cursor-pointer rounded-full border border-zinc-300 px-3 py-1 text-xs transition hover:bg-zinc-400 hover:text-white"
+    class="tag-btn cursor-pointer rounded-full border px-3 py-1 text-xs transition"
     type="button"
   >
     All
@@ -31,7 +31,7 @@ const { tags = [], selector = ".post-item", initial = null } = Astro.props;
         data-tag={tag}
         data-active="false"
         aria-pressed="false"
-        class="tag-btn cursor-pointer rounded-full border border-zinc-300 px-3 py-1 text-xs transition hover:bg-zinc-400 hover:text-white"
+        class="tag-btn cursor-pointer rounded-full border px-3 py-1 text-xs transition"
         type="button"
       >
         {tag}
@@ -79,14 +79,14 @@ const { tags = [], selector = ".post-item", initial = null } = Astro.props;
         btn.dataset.active = pressed ? "true" : "false";
         if (pressed) {
           btn.classList.add("bg-zinc-800", "text-white", "border-transparent");
-          btn.classList.remove("bg-white", "text-zinc-700", "border-zinc-200");
+          btn.classList.remove("bg-white", "text-zinc-700", "border");
         } else {
           btn.classList.remove(
             "bg-zinc-800",
             "text-white",
             "border-transparent"
           );
-          btn.classList.add("bg-white", "text-zinc-700", "border-zinc-200");
+          btn.classList.add("bg-white", "text-zinc-700", "border");
         }
       });
     }
