@@ -1,0 +1,26 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import ArticleCard from "../components/ArticleCard.astro";
+import NotificationStrip from "../components/NotificationStrip.astro";
+import ViewMoreButton from "../components/ViewMoreButton.astro";
+
+const posts = await getCollection("blog", ({ data }) => !data.draft);
+posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const title = "Minato Hayashi";
+const description = "Minato Hayashi's portfolio and blog";
+---
+
+<Layout title={title} description={description}>
+  <div class="mx-auto mt-5 max-w-5xl px-6 py-12">
+    <section class="">
+      <h1 class="mb-7 text-2xl">all blogs</h1>
+      <div
+        class="mb-8 grid w-full grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4 lg:gap-6"
+      >
+        {posts.map((post) => <ArticleCard post={post} />)}
+      </div>
+    </section>
+  </div>
+</Layout>

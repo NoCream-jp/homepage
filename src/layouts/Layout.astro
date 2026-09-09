@@ -1,5 +1,7 @@
 ---
 import "../styles/global.css";
+import ExternalLink from "../components/ExternalLink.astro";
+
 const { title = "mi-nato.com", description = "ブログサイト" } = Astro.props;
 ---
 
@@ -25,9 +27,9 @@ const { title = "mi-nato.com", description = "ブログサイト" } = Astro.prop
         >
       </div>
       <nav class="flex w-full items-center justify-around text-xl sm:w-1/4">
-        <a href="">blog</a>
-        <a href="">bio</a>
-        <a href="">work</a>
+        <a href="/blog">blog</a>
+        <a href="/bio">bio</a>
+        <a href="/">work</a>
       </nav>
     </header>
 
@@ -35,9 +37,14 @@ const { title = "mi-nato.com", description = "ブログサイト" } = Astro.prop
       <slot />
     </main>
 
-    <footer>
+    <footer class="w-full border-t p-10">
+      <div class="items-left flex w-full flex-col">
+        <ExternalLink href="/" text="GitHub" />
+        <ExternalLink href="/" text="X" />
+        <ExternalLink href="/" text="AtCoder" />
+      </div>
       <div>
-        <div>© {new Date().getFullYear()}</div>
+        <div class="mt-5">Minato Hayashi © {new Date().getFullYear()}</div>
       </div>
     </footer>
   </body>
