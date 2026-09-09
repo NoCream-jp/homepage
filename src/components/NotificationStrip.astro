@@ -1,12 +1,5 @@
 ---
-/**
- * NotificationStrip.astro
- * - items: Array<{ section: string, date?: string, title: string, href: string }>
- * - speed: px per second (optional, default 40)
- */
 const { items = [], speed = 40 } = Astro.props;
-
-// If no items, render nothing
 const shouldRender = Array.isArray(items) && items.length > 0;
 ---
 
@@ -40,7 +33,7 @@ const shouldRender = Array.isArray(items) && items.length > 0;
                     class="notif-link inline-flex h-12 items-center gap-4 border border-zinc-200 bg-white px-4 py-2"
                     aria-label={`${it.section} ${it.title}`}
                   >
-                    <span class="block text-xs tracking-wide text-zinc-500 uppercase">
+                    <span class="block text-xs tracking-wide text-zinc-500">
                       {it.section}
                     </span>
                     <span class="block text-xs text-zinc-400">

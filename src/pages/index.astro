@@ -9,20 +9,14 @@ const latestItems = [
   {
     section: "blog",
     date: "2026/09/09",
-    title: "ハッカソンに出場してきました",
-    href: "/blog/pikka",
+    title: "デザインをリニューアルしました",
+    href: "/blog/renew-site",
   },
   {
     section: "work",
-    date: "2026/09/06",
-    title: "ABC472に参加しました",
-    href: "/blog/abc472",
-  },
-  {
-    section: "blog",
-    date: "2026/09/09",
-    title: "サイト公開記事を書きました",
-    href: "/blog/initial-article",
+    date: "2026/09/",
+    title: "ICPCに参加してきました",
+    href: "/blog/icpc2026",
   },
 ];
 
@@ -36,10 +30,10 @@ const description = "Minato Hayashi's portfolio and blog";
 <Layout title={title} description={description}>
   <NotificationStrip items={latestItems} />
 
-  <div class="mx-auto max-w-5xl px-6 py-12">
+  <div class="mx-auto mt-5 max-w-5xl px-6 py-12">
     <!-- blogセクション -->
     <section class="mb-20 w-full">
-      <h2 class="mb-8 text-2xl font-normal">blog</h2>
+      <h2 class="mb-7 text-2xl font-normal">blog</h2>
       <div
         class="grid w-full grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4 lg:gap-6"
       >
@@ -49,7 +43,7 @@ const description = "Minato Hayashi's portfolio and blog";
 
     <!-- bioセクション -->
     <section class="w-full">
-      <h2 class="mb-8 text-2xl font-normal">bio</h2>
+      <h2 class="mb-7 text-2xl font-normal">bio</h2>
       <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
         <p class="text-sm leading-relaxed text-zinc-900">
           こんにちは。みなとといいます。大学4回生で、AIや機械学習、ネットワークについて学んでいます。webサイトを作ったり、競技プログラミングをしています。現在は、英語でアニメを見るのに熱中しています。寝ること、食べること、猫とお話しすることが好きです。どうぞよろしく。

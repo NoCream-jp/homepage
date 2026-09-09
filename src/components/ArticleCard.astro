@@ -11,7 +11,7 @@ const { post } = Astro.props;
 const href = `/blog/${post.id}`;
 
 const formattedDate = post.data.date
-  ? post.data.date.toLocaleDateString("ja-JP").replace(/\//g, ".")
+  ? post.data.date.toLocaleDateString("ja-JP")
   : null;
 ---
 

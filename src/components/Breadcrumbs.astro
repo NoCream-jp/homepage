@@ -22,7 +22,7 @@ const { items } = Astro.props;
             {isLast || !item.href ? (
               // 現在のページ（一番最後）はリンクにせず表示
               <span
-                class="text-zinc-400"
+                class={isLast ? "text-zinc-800" : "text-zinc-400"}
                 aria-current={isLast ? "page" : undefined}
               >
                 {item.label}
