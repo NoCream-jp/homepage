@@ -22,11 +22,13 @@ const { title = "mi-nato.com", description = "ブログサイト" } = Astro.prop
   </head>
   <body class="font-sans">
     <header class="flex w-full justify-between p-6">
-      <div>
-        <a href="/" class="hidden font-sans text-2xl sm:block">Minato Hayashi</a
+      <div class="flex flex-col">
+        <a href="/" class="display-none hidden font-sans text-2xl sm:block"
+          >Minato Hayashi</a
         >
+        <a href="/" class="block font-sans text-2xl sm:hidden">Home</a>
       </div>
-      <nav class="flex w-full items-center justify-around text-xl sm:w-1/4">
+      <nav class="flex w-1/4 items-center justify-end gap-5 text-xl">
         <a href="/blog">blog</a>
         <a href="/bio">bio</a>
         <a href="/">work</a>

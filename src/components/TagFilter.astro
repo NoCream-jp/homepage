@@ -1,0 +1,178 @@
+---
+// Props
+interface Props {
+  tags: string[];
+  selector?: string;
+  initial?: string | null;
+}
+
+const { tags = [], selector = ".post-item", initial = null } = Astro.props;
+---
+
+<div
+  class="mb-8 flex flex-wrap gap-2"
+  role="toolbar"
+  aria-label="Filter posts by tag"
+  data-component="tag-filter"
+>
+  <button
+    data-tag="all"
+    data-active="false"
+    aria-pressed="false"
+    class="tag-btn cursor-pointer rounded-full border border-zinc-300 px-3 py-1 text-xs transition hover:bg-zinc-400 hover:text-white"
+    type="button"
+  >
+    All
+  </button>
+
+  {
+    tags.map((tag) => (
+      <button
+        data-tag={tag}
+        data-active="false"
+        aria-pressed="false"
+        class="tag-btn cursor-pointer rounded-full border border-zinc-300 px-3 py-1 text-xs transition hover:bg-zinc-400 hover:text-white"
+        type="button"
+      >
+        {tag}
+      </button>
+    ))
+  }
+</div>
+
+<script is:inline>
+  (function () {
+    const root = document.querySelector('[data-component="tag-filter"]');
+    if (!root) return;
+
+    const buttons = Array.from(
+      root.querySelectorAll<HTMLButtonElement>(".tag-btn")
+    );
+    const allBtn = root.querySelector<HTMLButtonElement>('[data-tag="all"]');
+    const itemSelector =
+      root.getAttribute("data-selector") || "" || "__PLACEHOLDER__";
+    // We will read selector from a dataset fallback in use; but allow propagation from props via data-attr if needed.
+  })();
+</script>
+
+<!-- inline script with full logic (keeps everything in one file for easy drop-in) -->
+<script is:inline>
+  (function () {
+    const root = document.querySelector('[data-component="tag-filter"]');
+    if (!root) return;
+    const buttons = Array.from(root.querySelectorAll(".tag-btn"));
+    const allBtn = root.querySelector('[data-tag="all"]');
+    // default selector; you can override by adding data-selector attr on the root
+    const selector = root.getAttribute("data-selector") || ".post-item";
+    const getPostItems = () => Array.from(document.querySelectorAll(selector));
+
+    // read initial from URL unless data-initial attribute was set on root
+    const urlParams = new URLSearchParams(window.location.search);
+    let active =
+      root.getAttribute("data-initial") || urlParams.get("tag") || "all";
+
+    function updateButtons() {
+      buttons.forEach((btn) => {
+        const tag = btn.getAttribute("data-tag");
+        const pressed = tag === "all" ? active === "all" : active === tag;
+        btn.setAttribute("aria-pressed", pressed ? "true" : "false");
+        btn.dataset.active = pressed ? "true" : "false";
+        if (pressed) {
+          btn.classList.add("bg-zinc-800", "text-white", "border-transparent");
+          btn.classList.remove("bg-white", "text-zinc-700", "border-zinc-200");
+        } else {
+          btn.classList.remove(
+            "bg-zinc-800",
+            "text-white",
+            "border-transparent"
+          );
+          btn.classList.add("bg-white", "text-zinc-700", "border-zinc-200");
+        }
+      });
+    }
+
+    function updateURL() {
+      const url = new URL(window.location.href);
+      if (active === "all") url.searchParams.delete("tag");
+      else url.searchParams.set("tag", active);
+      history.replaceState({ ...window.history.state }, "", url);
+    }
+
+    function filterItems() {
+      const items = getPostItems();
+      if (!items.length) return;
+
+      if (active === "all") {
+        items.forEach((it) => {
+          it.classList.remove("hidden");
+          it.setAttribute("aria-hidden", "false");
+        });
+      } else {
+        const a = active;
+        items.forEach((it) => {
+          // expect data-tags="tag1,tag2,tag3" (comma separated)
+          const raw = it.getAttribute("data-tags") || "";
+          const tags = raw
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
+          const matched = tags.includes(a);
+          if (matched) {
+            it.classList.remove("hidden");
+            it.setAttribute("aria-hidden", "false");
+          } else {
+            it.classList.add("hidden");
+            it.setAttribute("aria-hidden", "true");
+          }
+        });
+      }
+
+      // dispatch event so page can react if needed
+      root.dispatchEvent(
+        new CustomEvent("tag-change", { detail: { tag: active } })
+      );
+    }
+
+    function setActive(next) {
+      if (!next) next = "all";
+      // toggle: clicking same tag again -> all
+      if (active === next) active = "all";
+      else active = next;
+      updateButtons();
+      updateURL();
+      filterItems();
+    }
+
+    // initialize UI
+    updateButtons();
+    // but ensure DOM items exist - run filter in next frame
+    requestAnimationFrame(filterItems);
+
+    // attach handlers
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const tag = btn.getAttribute("data-tag");
+        if (!tag) return;
+        setActive(tag);
+      });
+
+      // keyboard: Enter/Space activate
+      btn.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          const tag = btn.getAttribute("data-tag");
+          if (!tag) return;
+          setActive(tag);
+        }
+      });
+    });
+
+    // listen to popstate to reflect back/forward
+    window.addEventListener("popstate", () => {
+      const params = new URLSearchParams(window.location.search);
+      active = params.get("tag") || "all";
+      updateButtons();
+      filterItems();
+    });
+  })();
+</script>

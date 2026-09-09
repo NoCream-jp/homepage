@@ -2,24 +2,46 @@
 import Layout from "../layouts/Layout.astro";
 import { getCollection } from "astro:content";
 import ArticleCard from "../components/ArticleCard.astro";
-import NotificationStrip from "../components/NotificationStrip.astro";
-import ViewMoreButton from "../components/ViewMoreButton.astro";
-
-const posts = await getCollection("blog", ({ data }) => !data.draft);
-posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+import TagFilter from "../components/TagFilter.astro";
 
 const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
+
+/* 記事 */
+const posts = await getCollection("blog", ({ data }) => !data.draft);
+posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const allTags = Array.from(
+  new Set(posts.flatMap((p) => p.data.tags ?? []))
+).sort();
 ---
 
 <Layout title={title} description={description}>
-  <div class="mx-auto mt-5 max-w-5xl px-6 py-12">
-    <section class="">
+  <div class="mx-5 mt-5 w-full max-w-5xl px-6 py-12">
+    <section class="mb-20 w-full">
       <h1 class="mb-7 text-2xl">all blogs</h1>
+
+      <!-- タグフィルター -->
+      <TagFilter tags={allTags} />
+
       <div
-        class="mb-8 grid w-full grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4 lg:gap-6"
+        id="posts-grid"
+        class="grid w-full grid-cols-2 items-stretch gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4 lg:gap-6"
       >
-        {posts.map((post) => <ArticleCard post={post} />)}
+        {
+          posts.map((post) => {
+            const tags = post.data.tags ?? [];
+            return (
+              <div
+                class="post-item h-full"
+                data-tags={tags.join(",")}
+                data-id={post.id}
+              >
+                <ArticleCard post={post} />
+              </div>
+            );
+          })
+        }
       </div>
     </section>
   </div>
