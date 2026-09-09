@@ -13,8 +13,8 @@ const {
   words = [],
   width = "100%",
   height = "220px",
-  maxFont = 48,
-  minFont = 14,
+  maxFont = 20,
+  minFont = 12,
 } = Astro.props;
 
 // normalize words to { text, weight }
@@ -100,12 +100,8 @@ const payload = JSON.stringify({
         el.setAttribute("data-ready", "false");
         el.setAttribute("aria-hidden", "false");
         // compute font size based on weight (linear mapping)
-        const weight = Number(it.weight || 1);
-        // Simple mapping: map weight in range [minWeight, maxWeight] -> [minFont, maxFont]
-        // but here we approximate using item index distribution to avoid extra passes
         const font = Math.round(
-          minFont +
-            (weight - 1) * ((maxFont - minFont) / Math.max(1, items.length - 1))
+          minFont + Math.random() * (maxFont - minFont) * 0.5
         );
         el.style.fontSize = font + "px";
         // small random rotation
