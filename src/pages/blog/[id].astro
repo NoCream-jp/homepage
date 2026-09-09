@@ -1,11 +1,13 @@
 ---
-import { getCollection, render } from "astro:content";
+import { getCollection, render, type CollectionEntry } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import BackButton from "../../components/BackButton.astro";
+import Highlight from "../../components/Highlight.astro";
 
-// ビルド時に「どのURL（パス）を生成するか」をAstroに教える必須の関数
 export async function getStaticPaths() {
   const posts = await getCollection("blog", ({ data }) => {
-    return !data.draft;
+    return data.draft !== true;
   });
   return posts.map((post) => ({
     params: { id: post.id },
@@ -13,95 +15,89 @@ export async function getStaticPaths() {
   }));
 }
 
-// 上の関数から渡された記事データを受け取る
-const { post } = Astro.props;
+interface Props {
+  post: CollectionEntry<"blog">;
+}
 
+const { post } = Astro.props;
 const { Content } = await render(post);
 
-const formattedDate = post.data.date
-  .toLocaleDateString("ja-JP", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  })
-  .replace(/\//g, ".");
-
-// OGP用
+// OGP
 const description =
   post.data.description || `${post.data.title}についての記事です。`;
-const image = post.data.image || "/images/ogp-default.png";
+const image = post.data.image || "/brand/ogp-image.png";
 ---
 
-<!-- サイト全体のレイアウトで包む（タイトルには記事のタイトルを入れる） -->
-<Layout title={`${post.data.title} | Minato`}>
-  <main class="md:pr-sidebar min-h-screen bg-white px-6 py-32 md:px-12">
-    <article class="mx-auto w-full max-w-3xl">
-      <!-- 記事のヘッダー情報（極限までシンプルに） -->
-      <header class="mb-8 border-b border-black/10 pb-8">
-        <time class="text-label mb-4 block text-sm tracking-widest">
-          {formattedDate}
-        </time>
-        <h1 class="text-3xl leading-relaxed font-bold text-black md:text-4xl">
-          {post.data.title}
-        </h1>
+<Layout
+  title={`${post.data.title} | mi-nato.com`}
+  description={description}
+  image={image}
+>
+  <main
+    class="mx-auto min-h-screen w-full max-w-4xl rounded-md bg-white px-6 py-12 md:px-12 md:py-20"
+  >
+    <article class="mb-10">
+      <Breadcrumbs
+        items={[
+          { label: "TOP", href: "/" },
+          { label: "blog", href: "/blog" },
+          { label: post.data.title },
+        ]}
+      />
+
+      <header class="mt-12 mb-12">
+        <div
+          class="flex items-center justify-between border-b border-zinc-300 pb-5"
+        >
+          <h1
+            class="text-xl font-normal tracking-wide text-zinc-800 md:text-[1.7rem]"
+          >
+            {post.data.title}
+          </h1>
+        </div>
       </header>
+
       <div
-        class="blog-content space-y-6 text-base leading-loose text-black md:text-lg"
+        class="blog-content text-[15px] leading-[2.2] tracking-wide text-zinc-800 md:text-base"
       >
-        <Content />
+        <Content components={{ Highlight }} />
       </div>
     </article>
+    <BackButton href="/blog" />
   </main>
 </Layout>
 
 <style>
-  /*
-   * Markdownコンテンツ用のスタイリング
-   * :global() を使うことで、Astroが生成した子要素（Content内）にもスタイルを当てられます
-   */
+  :global(.blog-content p) {
+    margin-bottom: 0.5rem;
+  }
 
-  /* リンク（URL）: global.cssで定義されているテーマカラーを適用 */
   :global(.blog-content a) {
-    color: var(--color-link);
+    color: #52525b;
+    text-decoration: underline;
+    text-decoration-color: #18181b;
+    text-underline-offset: 4px;
     transition: all 0.2s ease;
   }
   :global(.blog-content a:hover) {
-    text-decoration-color: var(--color-link);
-    text-decoration-thickness: 2px;
+    color: #a0a0a0;
+    text-decoration-color: #d4d4d8;
   }
-
-  /* h2: 大きめの見出し（下線付き） */
   :global(.blog-content h2) {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-top: 3rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-top: 2rem;
+    margin-bottom: 1.2rem;
   }
-
-  /* h3: 中くらいの見出し */
   :global(.blog-content h3) {
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin-top: 2.5rem;
-    margin-bottom: 1.25rem;
-  }
-
-  /* 段落とリストにも適切な余白を追加（必要に応じて） */
-  :global(.blog-content p) {
-    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin-top: 1.5rem;
+    margin-bottom: 1.1rem;
   }
   :global(.blog-content ul) {
     list-style-type: disc;
     padding-left: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  :global(.blog-content ol) {
-    list-style-type: decimal;
-    padding-left: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  :global(.blog-content li) {
-    margin-bottom: 0.5rem;
+    margin-bottom: 2rem;
   }
 </style>

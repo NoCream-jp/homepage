@@ -1,145 +1,104 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import NewsItem from "../components/NewsItem.astro";
-import ViewMore from "../components/ViewMore.astro";
-import BlogItem from "../components/BlogItem.astro";
-import ActionAccordion from "../components/ActionAccordion.astro";
+import { getCollection } from "astro:content";
+import ArticleCard from "../components/ArticleCard.astro";
+import NotificationStrip from "../components/NotificationStrip.astro";
+import WordCloud from "../components/WordCloud.astro";
+// import BuisinessCard from "../components/BuisinessCard.astro";
+import ViewMoreButton from "../components/ViewMoreButton.astro";
 
-import { getCollection, render } from "astro:content";
-import type { CollectionEntry } from "astro:content";
+// 通知帯
+const latestItems = [
+  {
+    section: "blog",
+    date: "2026/09/09",
+    title: "ホームページをリニューアルしました",
+    href: "/blog/renew-site",
+  },
+  {
+    section: "work",
+    date: "2026/07/06",
+    title: "ICPCに参加してきました",
+    href: "/blog/icpc2026",
+  },
+];
 
-const allPosts = await getCollection("blog", ({ data }) => {
-  return !data.draft;
-});
-const sortedPosts = allPosts.sort(
-  (a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) =>
-    b.data.date.valueOf() - a.data.date.valueOf()
-);
+const posts = await getCollection("blog", ({ data }) => !data.draft);
+posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-const allNews = await getCollection("news");
-const sortedNews = allNews
-  .sort(
-    (a: CollectionEntry<"news">, b: CollectionEntry<"news">) =>
-      b.data.date.valueOf() - a.data.date.valueOf()
-  )
-  .slice(0, 10);
-
-const allActions = await getCollection("action");
-const sortedActions = allActions.sort(
-  (a: CollectionEntry<"action">, b: CollectionEntry<"action">) =>
-    b.data.date.valueOf() - a.data.date.valueOf()
-);
+const title = "Minato Hayashi";
+const description = "Minato Hayashi's portfolio and blog";
 ---
 
-<Layout title="Home">
-  <section
-    id="top"
-    class="fade-target scroll-mt-header mb-60 flex h-svh translate-y-4 flex-col justify-end bg-white opacity-0 transition-all duration-1000 ease-out"
-  >
-    <div class="ml-2">
-      <h1 class="font-saria text-8xl font-bold">I'm</h1>
-      <div class="mt-4 flex items-baseline">
-        <img src="/M.svg" alt="M" class="relative top-3 h-24 w-auto" />
-        <h1 class="font-saria text-8xl font-bold">inato</h1>
+<Layout title={title} description={description}>
+  <NotificationStrip items={latestItems} />
+
+  <div class="mx-auto mt-5 max-w-5xl px-6 py-12">
+    <!-- blogセクション -->
+    <section class="mb-20 w-full">
+      <h2 class="mb-7 text-2xl font-normal">blog</h2>
+      <div
+        class="grid w-full grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4 lg:gap-6"
+      >
+        {posts.map((post) => <ArticleCard post={post} />)}
       </div>
-    </div>
-  </section>
-
-  <section
-    id="news"
-    class="fade-target scroll-mt-header mb-40 h-auto translate-y-4 bg-white p-10 opacity-0 transition-all duration-1000 ease-out md:scroll-mt-0 lg:p-15"
-  >
-    <div class="section-header mb-20 lg:ml-10">
-      <h2 class="font-saria text-5xl font-bold">news</h2>
-    </div>
-    <div class="main-container md:mr-20 md:px-10 lg:px-20 lg:pr-50">
-      {
-        sortedNews.map((item) => (
-          <NewsItem
-            date={item.data.date}
-            title={item.data.title}
-            href={item.data.href}
-          />
-        ))
-      }
-    </div>
-    <div class="section-footer mt-8 flex justify-start md:px-10 lg:px-20">
-      <!-- 現時点でsection-fotterはmain-containerと手動で横幅をそろえている -->
-      <ViewMore href="/news" />
-    </div>
-  </section>
-
-  <section
-    id="about"
-    class="fade-target scroll-mt-header mb-40 h-auto translate-y-4 bg-white p-10 opacity-0 transition-all duration-1000 ease-out md:scroll-mt-0 lg:p-15"
-  >
-    <div class="section-header mb-20 lg:ml-10">
-      <h2 class="font-saria text-5xl font-bold">about</h2>
-    </div>
-    <div class="main-container mb-2 text-left text-xl md:px-10 lg:px-20">
-      こんにちは、みなとです。和歌山大学で機械学習について研究しています。趣味でwebアプリを作ったり、
-      競技プログラミングのコンテストに参加したりしています。最近は英語の学習に力を入れています。
-    </div>
-    <div class="main-container text-left text-xl md:px-10 lg:px-20">
-      Hi, I'm Minato. I'm a student at Wakayama University, where I'm
-      researching machine learning. In my free time, I like building web apps
-      and joining competitive programming contests. Lately, I've been really
-      focusing on studying English!
-    </div>
-    <div class="section-footer mt-8 flex justify-start md:px-10 lg:px-20">
-      <ViewMore href="/about" />
-    </div>
-  </section>
-
-  <section
-    id="blog"
-    class="fade-target scroll-mt-header mb-40 h-auto translate-y-4 bg-white p-10 opacity-0 transition-all duration-1000 ease-out md:scroll-mt-0 lg:p-15"
-  >
-    <div class="section-header mb-20 lg:ml-10">
-      <h2 class="font-saria text-5xl font-bold">blog</h2>
-    </div>
-    <div class="main-container md:px-10 lg:px-20">
-      {
-        sortedPosts.map((post) => (
-          <BlogItem
-            date={post.data.date}
-            title={post.data.title}
-            href={`/blog/${post.id}`}
-          />
-        ))
-      }
-    </div>
-    <div class="section-footer mt-8 flex justify-start md:px-10 lg:px-20">
-      <ViewMore href="/blog" />
-    </div>
-  </section>
-
-  <section
-    id="action"
-    class="fade-target scroll-mt-header h-screen translate-y-4 bg-white p-10 opacity-0 transition-all duration-1000 ease-out md:scroll-mt-0 lg:p-15"
-  >
-    <div class="section-header mb-20 lg:ml-10">
-      <h2 class="font-saria text-5xl font-bold">action</h2>
-    </div>
-    <div class="main-container md:px-10 lg:px-20">
-      <div class="">
-        {
-          sortedActions.map(async (action) => {
-            const { Content } = await render(action);
-            return (
-              <ActionAccordion
-                date={action.data.date}
-                title={action.data.title}
-              >
-                <Content />
-              </ActionAccordion>
-            );
-          })
-        }
+      <div class="section-footer mt-4 flex justify-end">
+        <ViewMoreButton href="/" />
       </div>
-    </div>
-    <!-- <div class="section-footer mt-8 flex justify-start md:px-10 lg:px-20">
-      <ViewMore href="/action" />
-    </div> -->
-  </section></Layout
->
+    </section>
+
+    <!-- bioセクション -->
+    <section class="mb-20 w-full">
+      <h2 class="mb-3 text-2xl font-normal">bio</h2>
+      <div class="flex flex-col items-center">
+        <div class="mb-3">Who I am</div>
+        <div class="mb-5 grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-8">
+          <p class="text-sm leading-relaxed text-zinc-900">
+            こんにちは。みなとといいます。大学4回生で、AIや機械学習、ネットワークについて学んでいます。webサイトを作ったり、競技プログラミングをしています。現在は、英語でアニメを見るのに熱中しています。寝ること、食べること、猫とお話することが好きです。どうぞよろしく。
+          </p>
+          <p class="text-sm leading-relaxed text-zinc-900">
+            Hi. I'm Minato Hayashi, a senior university student, in Japan. I'm
+            learning AI, machine learning, network, and more. I recently make
+            websites and articles, permit competitive programming. I love
+            eating, sleeping, and talking with cat. Have fun everything with me
+            !!
+          </p>
+        </div>
+        <!-- <div class="my-5">What I like</div>
+        <WordCloud
+          words={[
+            "AtCoder",
+            "学園アイドルマスター",
+            "東野圭吾",
+            "QuizKnock",
+            "星街すいせい",
+            "KALDI",
+            "ハリーポッター",
+            "ポケットモンスターチャンピオンズ",
+          ]}
+          width="80%"
+          height="150px"
+          maxFont={100}
+          minFont={50}
+        /> -->
+      </div>
+      <div class="section-footer mt-4 flex justify-end">
+        <ViewMoreButton href="/" />
+      </div>
+    </section>
+
+    <!-- workセクション -->
+    <section class="w-full">
+      <h2 class="mb-7 text-2xl font-normal">work</h2>
+
+      work in progress...
+      <!-- <div class="section-footer flex justify-end mt-4">
+        <ViewMoreButton href="/"/>
+      </div> -->
+    </section>
+
+    <footer>
+
+    </footer>
+  </div>
+</Layout>

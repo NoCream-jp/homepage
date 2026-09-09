@@ -1,0 +1,45 @@
+---
+interface Props {
+  items: {
+    label: string;
+    href?: string;
+  }[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav aria-label="Breadcrumb" class="mb-8">
+  <ol
+    class="flex flex-wrap items-center gap-2 text-[13px] tracking-wide text-zinc-400 md:text-sm"
+  >
+    {
+      items.map((item, index) => {
+        const isLast = index === items.length - 1;
+
+        return (
+          <li class="flex items-center gap-2">
+            {isLast || !item.href ? (
+              // 現在のページ（一番最後）はリンクにせず表示
+              <span
+                class={isLast ? "text-zinc-800" : "text-zinc-400"}
+                aria-current={isLast ? "page" : undefined}
+              >
+                {item.label}
+              </span>
+            ) : (
+              // 過去の階層はリンクにする
+              <a href={item.href} class="transition-colors hover:text-zinc-800">
+                {item.label}
+              </a>
+            )}
+
+            {!isLast && (
+              <span class="font-light text-zinc-300 select-none">/</span>
+            )}
+          </li>
+        );
+      })
+    }
+  </ol>
+</nav>
