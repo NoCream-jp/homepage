@@ -15,31 +15,16 @@ const safeImages = (images || []).filter(Boolean);
 ---
 
 <style>
-  /* minimal styles — Tailwind projects can omit or convert these */
-  .image-stack-container {
-    position: relative;
-    margin-inline: auto;
-    width: 100%;
-    max-width: 20rem; /* same as max-w-sm */
-    aspect-ratio: 3 / 2;
-    user-select: none;
-    cursor: pointer;
-    outline: none;
-  }
-
+  /* minimal attribute-based CSS for depth transforms and accessibility focus fallback */
   .image-stack-item {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    will-change: transform, opacity;
+    /* we keep transition control in Tailwind classes, but depth transforms need selectors */
     transition:
       transform 500ms ease-out,
       opacity 500ms ease-out;
-    display: block;
+    will-change: transform, opacity;
   }
 
-  /* Depth styles (0..3) — adjust translate/rotate values to taste */
+  /* depth rules: tweak translate/rotate values if you want different 'spread' */
   .image-stack-item[data-depth="0"] {
     z-index: 30;
     transform: translateX(0) translateY(0) rotate(0deg);
@@ -65,35 +50,28 @@ const safeImages = (images || []).filter(Boolean);
     pointer-events: none;
   }
 
-  .image-stack-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 0.5rem; /* rounded-xl */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    display: block;
-    pointer-events: none; /* let container capture clicks */
-  }
-
-  /* focus ring for accessibility */
+  /* exit animation inline style uses translateX(-120%) rotate(-12deg) from JS,
+     but we keep this CSS here for clarity / fallback. */
   .image-stack-container:focus {
+    /* no-op: Tailwind focus styles are applied on the element via classes */
   }
 </style>
 
 <div
-  class="image-stack-container"
+  class="image-stack-container relative mx-auto aspect-3/2 w-full max-w-45 cursor-pointer outline-none select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:ring-offset-2"
   role="button"
   tabindex="0"
   aria-label="image stack"
   data-max-depth={String(maxDepth)}
   data-stack-init="false"
+  data-debug={String(debug)}
 >
   {
     safeImages.map((src, index) => {
       const initialDepth = index < maxDepth ? index : maxDepth;
       return (
         <div
-          class="image-stack-item"
+          class="image-stack-item absolute inset-0 h-full w-full transition-opacity duration-500 ease-out will-change-transform"
           data-depth={String(initialDepth)}
           data-logical-index={String(index)}
           aria-hidden={initialDepth === maxDepth ? "true" : "false"}
@@ -103,6 +81,7 @@ const safeImages = (images || []).filter(Boolean);
             alt={`Stack image ${index + 1}`}
             loading="lazy"
             decoding="async"
+            class="pointer-events-none block h-full w-full rounded-xl object-cover shadow-lg"
           />
         </div>
       );
@@ -112,47 +91,43 @@ const safeImages = (images || []).filter(Boolean);
 
 <script is:inline>
   (function () {
-    // debug flag from server -> read from container attribute if present
-    const debugGlobal = false;
-
-    function log(...args) {
-      if (debugGlobal) console.debug("[ImageStack]", ...args);
-    }
-
     function initAllStacks() {
       const containers = Array.from(
         document.querySelectorAll(".image-stack-container")
       );
-      log("found containers", containers.length);
 
       containers.forEach((container, ci) => {
         // idempotent init
-        if (container.dataset.stackInit === "true") {
-          log("container already init", ci);
-          return;
-        }
+        if (container.dataset.stackInit === "true") return;
         container.dataset.stackInit = "true";
+
         const maxDepth = parseInt(container.dataset.maxDepth || "3", 10);
+        const debugFlag = container.dataset.debug === "true";
+
+        function log(...args) {
+          if (debugFlag) console.debug("[ImageStack]", ...args);
+        }
+
         log("init container", ci, "maxDepth=", maxDepth);
 
         let isAnimating = false;
 
-        // helper to fetch current items
         const getItems = () =>
           Array.from(container.querySelectorAll(".image-stack-item"));
 
-        // ensure logicalIndex/depth attributes are present and consistent
         function normalizeItems() {
           const items = getItems();
           items.forEach((it, i) => {
             it.dataset.logicalIndex = String(i);
             const depth = i < maxDepth ? i : maxDepth;
             it.dataset.depth = String(depth);
-            // aria-hidden for fully-hidden/back items
             it.setAttribute(
               "aria-hidden",
               depth === maxDepth ? "true" : "false"
             );
+            // clear any inline transform/opacity left from previous runs
+            it.style.transform = "";
+            it.style.opacity = "";
           });
         }
 
@@ -180,13 +155,12 @@ const safeImages = (images || []).filter(Boolean);
           log("rotate start, front idx=", front.dataset.logicalIndex);
           isAnimating = true;
 
-          // kick out the front element with transform via rAF to batch style writes
+          // animate the front out (use rAF to batch)
           requestAnimationFrame(() => {
             front.style.transform = "translateX(-120%) rotate(-12deg)";
             front.style.opacity = "0";
           });
 
-          // wait for the visible exit animation to finish before rearranging
           const exitMs = 420;
           setTimeout(() => {
             // recompute items (DOM unchanged)
@@ -225,7 +199,6 @@ const safeImages = (images || []).filter(Boolean);
 
         // attach handlers (click + keyboard)
         container.addEventListener("click", (e) => {
-          // allow clicks anywhere in container (images have pointer-events:none)
           rotateOnce();
         });
 
@@ -239,14 +212,13 @@ const safeImages = (images || []).filter(Boolean);
         // expose a method for external code (optional)
         container.imageStackRotate = rotateOnce;
 
-        // keep normalized when window resizes (not strictly necessary but helps)
+        // keep normalized when window resizes
         window.addEventListener("resize", () => {
           normalizeItems();
         });
       });
     }
 
-    // run ASAP: if DOM ready -> run, otherwise wait for DOMContentLoaded
     if (
       document.readyState === "complete" ||
       document.readyState === "interactive"
@@ -256,7 +228,7 @@ const safeImages = (images || []).filter(Boolean);
       document.addEventListener("DOMContentLoaded", initAllStacks);
     }
 
-    // Also handle Astro client-side navigation if present (best-effort)
+    // Astro client navigation hook (best-effort)
     document.addEventListener("astro:page-load", initAllStacks);
   })();
 </script>

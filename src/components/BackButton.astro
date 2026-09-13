@@ -29,27 +29,133 @@ const { href, label = "戻る" } = Astro.props;
 </button>
 
 <script is:inline>
-  document.addEventListener(
-    "astro:page-load",
-    () => {
-      const btns = document.querySelectorAll(".smart-back-btn");
+  (function initSmartBackButtons() {
+    // safe navigation helper
+    function safeGoto(url) {
+      try {
+        window.location.href = url;
+      } catch (e) {
+        try {
+          window.location.replace(url);
+        } catch (e2) {
+          /* give up */
+        }
+      }
+    }
+
+    function handleBackClick(btn) {
+      const fallback = btn.getAttribute("data-fallback") || "/";
+      const before = location.href;
+      const ref = document.referrer || "";
+
+      console.debug(
+        "[SmartBack] click — history.length=",
+        history.length,
+        "referrer=",
+        ref,
+        "fallback=",
+        fallback
+      );
+
+      if (history.length > 1) {
+        history.back();
+
+        // back() may be swallowed by SPA routers — check shortly after
+        setTimeout(() => {
+          if (location.href === before) {
+            try {
+              const refUrl = ref ? new URL(ref, location.href) : null;
+              if (refUrl && refUrl.origin === location.origin) {
+                console.debug(
+                  "[SmartBack] back ineffective — using referrer",
+                  refUrl.href
+                );
+                safeGoto(refUrl.href);
+              } else {
+                console.debug(
+                  "[SmartBack] back ineffective — using fallback",
+                  fallback
+                );
+                safeGoto(fallback);
+              }
+            } catch (e) {
+              console.debug("[SmartBack] fallback due to exception", e);
+              safeGoto(fallback);
+            }
+          } else {
+            console.debug("[SmartBack] history.back() worked");
+          }
+        }, 250);
+
+        return;
+      }
+
+      // no history — try same-origin referrer
+      try {
+        if (ref) {
+          const refUrl = new URL(ref, location.href);
+          if (refUrl.origin === location.origin) {
+            console.debug(
+              "[SmartBack] no history — using referrer",
+              refUrl.href
+            );
+            safeGoto(refUrl.href);
+            return;
+          }
+        }
+      } catch (e) {
+        /* ignore */
+      }
+
+      // last resort: fallback
+      console.debug(
+        "[SmartBack] no history/referrer — using fallback",
+        fallback
+      );
+      safeGoto(fallback);
+    }
+
+    function setup() {
+      const btns = Array.from(document.querySelectorAll(".smart-back-btn"));
+      if (!btns.length) {
+        console.debug("[SmartBack] no buttons found");
+        return;
+      }
 
       btns.forEach((btn) => {
-        if (btn.dataset.init) return;
-        btn.dataset.init = "true";
+        if (btn.dataset._smartInit === "1") return;
+        btn.dataset._smartInit = "1";
 
-        btn.addEventListener("click", (e) => {
-          e.preventDefault();
-          const fallback = btn.getAttribute("data-fallback");
+        const onClick = (e) => {
+          if (e && typeof e.preventDefault === "function") e.preventDefault();
+          handleBackClick(btn);
+        };
 
-          if (window.history.length > 1) {
-            window.history.back();
-          } else {
-            window.location.href = fallback;
+        btn.addEventListener("click", onClick);
+        btn.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleBackClick(btn);
           }
         });
+
+        // optional exposure for debugging
+        btn._smartBackHandler = onClick;
+        console.debug("[SmartBack] handler attached for", btn);
       });
-    },
-    { once: false }
-  );
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", setup);
+    } else {
+      setTimeout(setup, 0);
+    }
+
+    // also initialize on Astro client navigation if available
+    try {
+      document.addEventListener("astro:page-load", setup);
+    } catch (e) {
+      /* ignore */
+    }
+  })();
 </script>
