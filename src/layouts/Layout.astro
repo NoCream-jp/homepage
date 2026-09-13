@@ -2,7 +2,8 @@
 import "../styles/global.css";
 import ExternalLink from "../components/ExternalLink.astro";
 
-const { title = "Minato Hayashi", description = "my portfolio / blog" } = Astro.props;
+const { title = "Minato Hayashi", description = "my portfolio / blog" } =
+  Astro.props;
 ---
 
 <!doctype html>
@@ -20,36 +21,43 @@ const { title = "Minato Hayashi", description = "my portfolio / blog" } = Astro.
       rel="stylesheet"
     />
   </head>
-  <body>
-    <header class="flex w-full justify-between p-6">
-      <div class="flex flex-col">
-        <a href="/" class="display-none hidden font-sans text-2xl sm:block"
-          >Minato Hayashi</a
-        >
-        <a href="/" class="block font-sans text-2xl sm:hidden">TOP</a>
+  <body class="min-h-screen overflow-x-hidden bg-white font-sans">
+    <header class="">
+      <div class="mx-auto flex items-center justify-between px-6 py-6">
+        <div class="flex items-center">
+          <a href="/" class="hidden text-2xl font-semibold sm:block"
+            >Minato Hayashi</a
+          >
+          <a href="/" class="block text-2xl font-semibold sm:hidden">TOP</a>
+        </div>
+        <nav aria-label="main-navigation">
+          <ul class="flex items-center gap-7 text-lg">
+            <li><a href="/blog" class="">blog</a></li>
+            <li><a href="/bio" class="">bio</a></li>
+            <!-- <li><a href="/" class="">work</a></li> -->
+          </ul>
+        </nav>
       </div>
-      <nav class="flex w-1/4 items-center justify-end gap-7 text-xl">
-        <a href="/blog">blog</a>
-        <a href="/bio">bio</a>
-        <a href="/">work</a>
-      </nav>
     </header>
 
-    <main class="flex w-full flex-col items-center">
-      <slot />
-    </main>
-
-    <footer class="flex flex-col items-center w-full border-t">
-      <div class="mx-5 mt-5 max-w-5xl p-6 w-full">
-        <div class="items-left flex w-full flex-col">
-          <ExternalLink href="/" text="GitHub" />
-          <ExternalLink href="/" text="X" />
-          <ExternalLink href="/" text="AtCoder" />
-        </div>
-        <div class="mt-5">
-          Minato Hayashi © {new Date().getFullYear()}
-        </div>
+    <main class="w-full">
+      <div class="mx-auto flex flex-col items-center">
+        <slot />
       </div>
-    </footer>
+
+      <footer class="w-full border-t py-7">
+        <div class="mx-auto flex max-w-5xl flex-col items-center px-6">
+          <div class="flex w-full flex-col items-start">
+            <ExternalLink href="/" text="GitHub" />
+            <ExternalLink href="/" text="X" />
+            <ExternalLink href="/" text="AtCoder" />
+          </div>
+
+          <div class="mt-5 w-full text-left text-sm text-zinc-600">
+            Minato Hayashi © {new Date().getFullYear()}
+          </div>
+        </div>
+      </footer>
+    </main>
   </body>
 </html>

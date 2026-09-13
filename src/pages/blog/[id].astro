@@ -33,10 +33,7 @@ const image = post.data.image || "/brand/ogp-image.png";
   description={description}
   image={image}
 >
-  <!-- <main
-    class="mx-auto min-h-screen w-full max-w-4xl rounded-md bg-white px-6 py-12 md:px-12 md:py-20"
-  > -->
-  <main class="mx-5 mt-5 max-w-5xl px-6 py-12">
+  <div class="mx-5 mt-5 w-full max-w-5xl px-6 py-5">
     <article class="mb-10">
       <Breadcrumbs
         items={[
@@ -65,7 +62,7 @@ const image = post.data.image || "/brand/ogp-image.png";
       </div>
     </article>
     <BackButton href="/blog" />
-  </main>
+  </div>
 </Layout>
 
 <style>
