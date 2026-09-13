@@ -4,7 +4,6 @@ import { getCollection } from "astro:content";
 import ArticleCard from "../components/ArticleCard.astro";
 import NotificationStrip from "../components/NotificationStrip.astro";
 import WordCloud from "../components/WordCloud.astro";
-// import BuisinessCard from "../components/BuisinessCard.astro";
 import ViewMoreButton from "../components/ViewMoreButton.astro";
 
 // 通知帯
@@ -16,7 +15,7 @@ const latestItems = [
     href: "/blog/renew-site",
   },
   {
-    section: "work",
+    section: "blog",
     date: "2026/07/06",
     title: "ICPCに参加してきました",
     href: "/blog/icpc2026",
@@ -64,23 +63,6 @@ const description = "Minato Hayashi's portfolio and blog";
             !!
           </p>
         </div>
-        <!-- <div class="my-5">What I like</div>
-        <WordCloud
-          words={[
-            "AtCoder",
-            "学園アイドルマスター",
-            "東野圭吾",
-            "QuizKnock",
-            "星街すいせい",
-            "KALDI",
-            "ハリーポッター",
-            "ポケットモンスターチャンピオンズ",
-          ]}
-          width="80%"
-          height="150px"
-          maxFont={100}
-          minFont={50}
-        /> -->
       </div>
       <div class="section-footer mt-4 flex justify-end">
         <ViewMoreButton href="/bio" />

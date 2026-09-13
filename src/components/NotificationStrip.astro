@@ -24,14 +24,8 @@ const bannerItem = {
           aria-label="最新のお知らせ"
         >
           <ul class="notif-list flex gap-0 whitespace-nowrap">
-            {/* ここを最小変更：
-               - items の先頭に bannerItem を足した配列を複製して使うだけ
-               - レンダリング時に it.banner を見て分岐する */}
             {Array(10)
-              .fill([
-                bannerItem,
-                ...items,
-              ]) /* ← ここだけ変更（元は .fill(items)） */
+              .fill([bannerItem, ...items])
               .flat()
               .map((it) => (
                 <li
@@ -40,14 +34,12 @@ const bannerItem = {
                   aria-roledescription="notification"
                 >
                   {it.banner ? (
-                    /* シンプルなバナー表示（スクロール群に混ざる） */
                     <div class="notif-banner inline-flex h-12 items-center justify-center border-r bg-[repeating-linear-gradient(45deg,#0000_0px,#0000_6px,#d1d5db_6px,#d1d5db_7px)] px-4 text-black">
                       <span class="text-xs font-semibold tracking-wide">
                         {it.title}
                       </span>
                     </div>
                   ) : (
-                    /* 既存の通知アイテム（変更なし） */
                     <a
                       href={it.href}
                       class="notif-link inline-flex h-12 items-center gap-4 border-r bg-white px-4 py-2"
