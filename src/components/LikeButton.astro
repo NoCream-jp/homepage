@@ -24,91 +24,67 @@ const { articleId } = Astro.props;
   <span class="min-w-6 text-sm tabular-nums" data-like-count> 0 </span>
 </div>
 
-<script>
-  const buttons =
-    document.querySelectorAll<HTMLButtonElement>("[data-like-button]");
+<script is:inline>
+  function initLikeButtons() {
+    const roots = document.querySelectorAll("[data-like-root]");
 
-  buttons.forEach((button) => {
-    if (button.dataset.likeInit === "true") {
-      return;
-    }
+    roots.forEach((root) => {
+      if (root.dataset.likeInit === "true") return;
+      root.dataset.likeInit = "true";
 
-    button.dataset.likeInit = "true";
+      const articleId = root.dataset.articleId ?? "";
+      if (!articleId) return;
 
-    /*
-     * dataset は string | undefined なので、
-     * ここで必ず string に確定させる。
-     */
-    const articleId = button.dataset.articleId ?? "";
+      const button = root.querySelector("[data-like-button]");
+      const countElement = root.querySelector("[data-like-count]");
 
-    if (articleId === "") {
-      return;
-    }
+      if (!(button instanceof HTMLButtonElement)) return;
+      if (!(countElement instanceof HTMLElement)) return;
 
-    /*
-     * countElement もここで必ず HTMLElement に確定させる。
-     */
-    const element = button.querySelector<HTMLElement>("[data-like-count]");
+      async function loadLikes() {
+        try {
+          const res = await fetch(`/api/likes/${articleId}`);
+          if (!res.ok) return;
 
-    if (element === null) {
-      return;
-    }
-
-    const countElement: HTMLElement = element;
-
-    async function loadLikes() {
-      try {
-        const response = await fetch(
-          `/api/likes/${encodeURIComponent(articleId)}`
-        );
-
-        if (!response.ok) {
-          return;
+          const data = await res.json();
+          countElement.textContent = String(data.count);
+        } catch (e) {
+          console.error(e);
         }
-
-        const data = (await response.json()) as {
-          id: string;
-          count: number;
-        };
-
-        countElement.textContent = String(data.count);
-      } catch (error) {
-        console.error("Failed to load likes:", error);
-      }
-    }
-
-    button.addEventListener("click", async () => {
-      if (button.disabled) {
-        return;
       }
 
-      button.disabled = true;
+      button.addEventListener("click", async () => {
+        if (button.disabled) return;
 
-      try {
-        const response = await fetch(
-          `/api/likes/${encodeURIComponent(articleId)}`,
-          {
+        button.disabled = true;
+
+        try {
+          const res = await fetch(`/api/likes/${articleId}`, {
             method: "POST",
-          }
-        );
+          });
 
-        if (!response.ok) {
-          return;
+          if (!res.ok) return;
+
+          const data = await res.json();
+          countElement.textContent = String(data.count);
+        } catch (e) {
+          console.error(e);
+        } finally {
+          button.disabled = false;
         }
+      });
 
-        const data = (await response.json()) as {
-          id: string;
-          count: number;
-        };
-
-        countElement.textContent = String(data.count);
-      } catch (error) {
-        console.error("Failed to add like:", error);
-      } finally {
-        button.disabled = false;
-      }
+      loadLikes();
     });
+  }
 
-    loadLikes();
-  });
+  // 初回
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initLikeButtons);
+  } else {
+    initLikeButtons();
+  }
+
+  // Astro遷移対応（これ超重要）
+  document.addEventListener("astro:page-load", initLikeButtons);
 </script>
