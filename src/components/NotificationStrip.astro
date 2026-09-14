@@ -41,7 +41,7 @@ const bannerItem = {
                     </div>
                   ) : (
                     <a
-                      href={it.href}
+                      href={it.href || null}
                       class="notif-link inline-flex h-12 items-center gap-4 border-r bg-white px-4 py-2"
                       aria-label={`${it.section} ${it.title}`}
                     >
@@ -54,22 +54,24 @@ const bannerItem = {
                       <span class="block text-sm font-medium text-zinc-800">
                         {it.title}
                       </span>
-                      <span class="ml-3 inline-flex items-center justify-center rounded-full border-none p-1">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="h-4 w-4 text-zinc-600"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          aria-hidden="true"
-                        >
-                          <path d="M5 12h14" />
-                          <path d="M12 5l7 7-7 7" />
-                        </svg>
-                      </span>
+                      {it.href && it.href !== "" && (
+                        <span class="ml-3 inline-flex items-center justify-center rounded-full border-none p-1">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4 text-zinc-600"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                          >
+                            <path d="M5 12h14" />
+                            <path d="M12 5l7 7-7 7" />
+                          </svg>
+                        </span>
+                      )}
                     </a>
                   )}
                 </li>
