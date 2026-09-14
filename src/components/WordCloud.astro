@@ -1,14 +1,4 @@
 ---
-/**
- * WordCloud.astro (改訂版)
- *
- * props:
- *  - words: (string | { text: string; weight?: number })[]
- *  - width: CSS width string (default "100%")
- *  - height: CSS height string (default "220px")
- *  - maxFont: number (px) max font size (default 48)
- *  - minFont: number (px) min font size (default 14)
- */
 const {
   words = [],
   width = "100%",
@@ -44,8 +34,14 @@ const payload = JSON.stringify({
 
 <style>
   .wordcloud-root {
-    /* container reset (optional override by parent) */
+    mask-image: radial-gradient(ellipse at center, black 60%, transparent 70%);
+    -webkit-mask-image: radial-gradient(
+      ellipse at center,
+      black 60%,
+      transparent 70%
+    );
   }
+
   .wordcloud-word {
     position: absolute;
     white-space: nowrap;
@@ -58,9 +54,11 @@ const payload = JSON.stringify({
     display: inline-block;
     opacity: 0;
   }
+
   .wordcloud-word[data-ready="true"] {
     opacity: 1;
   }
+
   .wordcloud-word:hover {
     transform: scale(1.08);
     z-index: 999;
@@ -68,14 +66,7 @@ const payload = JSON.stringify({
 </style>
 
 <script type="module">
-  /*
-  Client-side layout for WordCloud.astro (robust version)
-  - Finds all elements with class .wordcloud-root and initializes each once.
-  - Does not rely on document.currentScript or data-uid.
-  - Sets dataset._wc_inited on root to avoid double-initialization.
-*/
   (function () {
-    // Initialize one root element (runs for every root found)
     function initRoot(root) {
       if (!root || root.dataset._wc_inited === "1") return;
       root.dataset._wc_inited = "1";
@@ -87,31 +78,36 @@ const payload = JSON.stringify({
         console.warn("WordCloud: invalid payload JSON", e);
         payload = { words: [] };
       }
+
       const items = payload.words || [];
       const maxFont = payload.maxFont || 48;
       const minFont = payload.minFont || 14;
 
-      // prepare elements
       const wordEls = items.map((it, idx) => {
         const el = document.createElement("span");
+
         el.className = "wordcloud-word";
         el.textContent = it.text ?? String(it);
         el.setAttribute("data-ready", "false");
         el.setAttribute("aria-hidden", "false");
-        // compute font size based on weight (linear mapping)
+
         const font = Math.round(
           minFont + Math.random() * (maxFont - minFont) * 0.5
         );
+
         el.style.fontSize = font + "px";
-        // small random rotation
-        const angle = (Math.random() - 0.5) * 30; // -15deg..+15deg
+
+        const angle = (Math.random() - 0.5) * 30;
+
         el.style.transform = `rotate(${angle}deg)`;
+
         el.dataset._angle = String(angle);
+
         el.dataset._idx = String(idx);
+
         return el;
       });
 
-      // helper intersect by axis-aligned bounding boxes
       function intersectRect(a, b) {
         return !(
           a.right <= b.left ||
@@ -122,9 +118,8 @@ const payload = JSON.stringify({
       }
 
       function layout() {
-        // clear
         root.innerHTML = "";
-        // attach off-screen to measure
+
         wordEls.forEach((el) => {
           el.style.position = "absolute";
           el.style.left = "-9999px";
@@ -133,12 +128,14 @@ const payload = JSON.stringify({
         });
 
         const containerRect = root.getBoundingClientRect();
+
         if (containerRect.width < 10 || containerRect.height < 10) {
           // too small to layout; leave as is and retry later
           return;
         }
 
         const placed = [];
+
         const order = Array.from(wordEls).sort(
           (a, b) => parseFloat(b.style.fontSize) - parseFloat(a.style.fontSize)
         );
@@ -146,8 +143,10 @@ const payload = JSON.stringify({
         order.forEach((el) => {
           const w = el.offsetWidth;
           const h = el.offsetHeight;
+
           const padding = 6;
           const maxAttempts = 300;
+
           let placedOk = false;
 
           for (let attempt = 0; attempt < maxAttempts; attempt++) {
@@ -156,24 +155,34 @@ const payload = JSON.stringify({
                 Math.random() *
                   Math.max(1, containerRect.width - w - padding * 2)
               ) + padding;
+
             const y =
               Math.floor(
                 Math.random() *
                   Math.max(1, containerRect.height - h - padding * 2)
               ) + padding;
 
-            const candidate = { left: x, top: y, right: x + w, bottom: y + h };
+            const candidate = {
+              left: x,
+              top: y,
+              right: x + w,
+              bottom: y + h,
+            };
 
             let collision = false;
+
             for (const pr of placed) {
               if (intersectRect(candidate, pr)) {
                 collision = true;
                 break;
               }
             }
+
             if (!collision) {
               el.style.left = x + "px";
+
               el.style.top = y + "px";
+
               placed.push(candidate);
               placedOk = true;
               break;
@@ -187,14 +196,23 @@ const payload = JSON.stringify({
                 Math.random() *
                   Math.max(1, containerRect.width - w - padding * 2)
               ) + padding;
+
             const y =
               Math.floor(
                 Math.random() *
                   Math.max(1, containerRect.height - h - padding * 2)
               ) + padding;
+
             el.style.left = x + "px";
+
             el.style.top = y + "px";
-            placed.push({ left: x, top: y, right: x + w, bottom: y + h });
+
+            placed.push({
+              left: x,
+              top: y,
+              right: x + w,
+              bottom: y + h,
+            });
           }
 
           el.setAttribute("data-ready", "true");
@@ -203,8 +221,12 @@ const payload = JSON.stringify({
 
       // schedule layout with debounce
       let resizeTimer = null;
+
       function scheduleLayout() {
-        if (resizeTimer) clearTimeout(resizeTimer);
+        if (resizeTimer) {
+          clearTimeout(resizeTimer);
+        }
+
         resizeTimer = setTimeout(() => {
           try {
             layout();
@@ -225,22 +247,33 @@ const payload = JSON.stringify({
 
       // re-layout on resize / orientation change
       window.addEventListener("resize", scheduleLayout);
+
       window.addEventListener("orientationchange", scheduleLayout);
 
       // cleanup when root is removed
       const mo = new MutationObserver(() => {
         if (!document.body.contains(root)) {
           window.removeEventListener("resize", scheduleLayout);
+
           window.removeEventListener("orientationchange", scheduleLayout);
+
           mo.disconnect();
         }
       });
-      mo.observe(document.body, { childList: true, subtree: true });
-    } // initRoot()
 
-    // initialize all roots on page (this is robust in module scripts)
+      mo.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+    }
+
+    // initRoot()
+
+    // initialize all roots on page
+    // this is robust in module scripts
     function initAll() {
       const roots = Array.from(document.querySelectorAll(".wordcloud-root"));
+
       roots.forEach((r) => {
         try {
           initRoot(r);
@@ -250,9 +283,11 @@ const payload = JSON.stringify({
       });
     }
 
-    // run on next frame (and again after fonts ready)
+    // run on next frame
+    // (and again after fonts ready)
     window.requestAnimationFrame(() => {
       initAll();
+
       if (document.fonts && document.fonts.status !== "loaded") {
         document.fonts.ready.then(() => initAll());
       }
