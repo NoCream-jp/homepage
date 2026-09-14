@@ -1,0 +1,13 @@
+// like数をカウントするためのwrangler設定ファイル
+{
+  "name": "mi-nato-com",
+  "compatibility_date": "2026-09-14",
+  "pages_build_output_dir": "./dist",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "mi-nato-likes",
+      "database_id": "145ada09-4dd1-42a1-9491-58a5c78648d8",
+    },
+  ],
+}

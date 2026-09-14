@@ -1,0 +1,107 @@
+---
+interface Props {
+  articleId: string;
+}
+
+const { articleId } = Astro.props;
+---
+
+<button
+  type="button"
+  class="inline-flex items-center gap-2 rounded-full border border-zinc-300 px-4 py-2 text-sm transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50"
+  data-like-button
+  data-article-id={articleId}
+>
+  <span aria-hidden="true">♡</span>
+  <span>いいね</span>
+  <span data-like-count>0</span>
+</button>
+
+<script>
+  const buttons =
+    document.querySelectorAll<HTMLButtonElement>("[data-like-button]");
+
+  buttons.forEach((button) => {
+    if (button.dataset.likeInit === "true") {
+      return;
+    }
+
+    button.dataset.likeInit = "true";
+
+    /*
+     * dataset は string | undefined なので、
+     * ここで必ず string に確定させる。
+     */
+    const articleId = button.dataset.articleId ?? "";
+
+    if (articleId === "") {
+      return;
+    }
+
+    /*
+     * countElement もここで必ず HTMLElement に確定させる。
+     */
+    const element = button.querySelector<HTMLElement>("[data-like-count]");
+
+    if (element === null) {
+      return;
+    }
+
+    const countElement: HTMLElement = element;
+
+    async function loadLikes() {
+      try {
+        const response = await fetch(
+          `/api/likes/${encodeURIComponent(articleId)}`
+        );
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data = (await response.json()) as {
+          id: string;
+          count: number;
+        };
+
+        countElement.textContent = String(data.count);
+      } catch (error) {
+        console.error("Failed to load likes:", error);
+      }
+    }
+
+    button.addEventListener("click", async () => {
+      if (button.disabled) {
+        return;
+      }
+
+      button.disabled = true;
+
+      try {
+        const response = await fetch(
+          `/api/likes/${encodeURIComponent(articleId)}`,
+          {
+            method: "POST",
+          }
+        );
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data = (await response.json()) as {
+          id: string;
+          count: number;
+        };
+
+        countElement.textContent = String(data.count);
+      } catch (error) {
+        console.error("Failed to add like:", error);
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    loadLikes();
+  });
+</script>
