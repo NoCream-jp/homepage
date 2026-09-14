@@ -26,7 +26,7 @@ const actionCollection = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/action" }),
   schema: z.object({
     title: z.string(),
-    date: z.date(), // ソートのためにDate型で持ちます
+    date: z.date(),
   }),
 });
 

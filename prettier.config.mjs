@@ -8,10 +8,7 @@ export default {
   trailingComma: "es5", // 複数行の末尾にカンマをつける
 
   // プラグインの有効化
-  plugins: [
-    "prettier-plugin-astro",
-    "prettier-plugin-tailwindcss", // 必ず最後に記述する
-  ],
+  plugins: ["prettier-plugin-astro", "prettier-plugin-tailwindcss"],
 
   // Astroファイル用の個別設定
   overrides: [
