@@ -4,19 +4,20 @@
   --font-sans: "Schibsted Grotesk", ui-sans-serif, system-ui, sans-serif;
 }
 
-/* 後で問題が解決したらこのブロックは削除してOK */
-.prose table,
-article table,
-main table,
-.content table,
-.post table {
-  display: table !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  height: auto !important;
-  max-height: none !important;
-  transform: none !important;
-  clip-path: none !important;
-  color: inherit !important;
-  background-color: transparent !important;
+/* 記事内のテーブルを復活させるCSS */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5rem 0;
+}
+
+th,
+td {
+  border: 1px solid #d1d5db; /* 薄いグレーの枠線 */
+  padding: 0.75rem;
+}
+
+th {
+  background-color: #f3f4f6; /* ヘッダーの背景色 */
+  font-weight: bold;
 }

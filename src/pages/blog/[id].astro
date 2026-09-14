@@ -98,4 +98,29 @@ const image = post.data.image || "/brand/ogp-image.png";
     padding-left: 1.5rem;
     margin-bottom: 2rem;
   }
+
+  /* テーブル全体 */
+  :global(.blog-content table) {
+    width: 100%;
+    margin-top: 1.5rem;
+    margin-bottom: 2.5rem;
+
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* テーブルヘッダー（h1の下線と同じ色で統一感を持たせる） */
+  :global(.blog-content th) {
+    font-weight: 500; /* h2と同じ太さで統一 */
+    color: #27272a; /* text-zinc-800 */
+    padding: 0.8rem 1rem;
+    text-align: left;
+    background-color: white;
+  }
+
+  /* テーブルデータ（控えめな細いラインで区切る） */
+  :global(.blog-content td) {
+    padding: 0.8rem 1rem;
+  }
 </style>
