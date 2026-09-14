@@ -6,22 +6,22 @@ interface Props {
 const { articleId } = Astro.props;
 ---
 
-<div class="flex w-fit items-center gap-3">
-  <!-- アイコンボタン（円） -->
+<div
+  class="flex w-fit items-center gap-3"
+  data-like-root
+  data-article-id={articleId}
+>
   <button
     type="button"
     class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-300 bg-white text-lg leading-none transition-all duration-150 hover:bg-zinc-100 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
     data-like-button
-    data-article-id={articleId}
   >
     <span aria-hidden="true">♡</span>
   </button>
 
-  <!-- ラベル -->
   <span class="text-sm">いいね</span>
 
-  <!-- カウント -->
-  <span class="min-w-6 text-sm tabular-nums" data-like-count> 0 </span>
+  <span class="min-w-6 text-sm tabular-nums" data-like-count>0</span>
 </div>
 
 <script is:inline>
