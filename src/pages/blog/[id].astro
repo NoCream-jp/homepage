@@ -4,6 +4,7 @@ import Layout from "../../layouts/Layout.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import BackButton from "../../components/BackButton.astro";
 import Highlight from "../../components/Highlight.astro";
+import LikeButton from "../../components/LikeButton.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog", ({ data }) => {
@@ -61,8 +62,9 @@ const image = post.data.image || "/brand/ogp-image.png";
         <Content components={{ Highlight }} />
       </div>
     </article>
-    <BackButton href="/blog" />
+    <LikeButton articleId={post.id} />
   </div>
+  <BackButton href="/blog" />
 </Layout>
 
 <style>
