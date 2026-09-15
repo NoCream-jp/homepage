@@ -3,44 +3,49 @@ import { glob } from "astro/loaders";
 
 const blogCollection = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/blog" }),
+
   schema: z.object({
     title: z.string(),
     date: z.date(),
     draft: z.boolean().optional(),
     description: z.string().optional(),
+
     image: z.string().optional(),
+
+    images: z.array(z.string()).optional(),
+
     tags: z.array(z.string()).default([]),
   }),
 });
 
-const newsCollection = defineCollection({
-  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/news" }),
-  schema: z.object({
-    title: z.string(),
-    date: z.date(),
-    href: z.string().optional(),
-  }),
-});
+// const newsCollection = defineCollection({
+//   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/news" }),
+//   schema: z.object({
+//     title: z.string(),
+//     date: z.date(),
+//     href: z.string().optional(),
+//   }),
+// });
 
-const actionCollection = defineCollection({
-  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/action" }),
-  schema: z.object({
-    title: z.string(),
-    date: z.date(),
-  }),
-});
+// const actionCollection = defineCollection({
+//   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/action" }),
+//   schema: z.object({
+//     title: z.string(),
+//     date: z.date(),
+//   }),
+// });
 
-const achievementCollection = defineCollection({
-  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/achievement" }),
-  schema: z.object({
-    title: z.string(),
-    date: z.date(),
-  }),
-});
+// const achievementCollection = defineCollection({
+//   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/achievement" }),
+//   schema: z.object({
+//     title: z.string(),
+//     date: z.date(),
+//   }),
+// });
 
 export const collections = {
   blog: blogCollection,
-  news: newsCollection,
-  action: actionCollection,
-  achievement: achievementCollection,
+  // news: newsCollection,
+  // action: actionCollection,
+  // achievement: achievementCollection,
 };
