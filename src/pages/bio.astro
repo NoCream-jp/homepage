@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { getCollection } from "astro:content";
+// import { getCollection } from "astro:content";
 import WordCloud from "../components/WordCloud.astro";
 import ImageStack from "../components/ImageStack.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
@@ -60,14 +60,14 @@ const cwords = [
         <div class="mt-7 mb-3">Who I am</div>
         <div class="mb-10 grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-8">
           <p class="text-md leading-relaxed text-zinc-900">
-            こんにちは。みなとといいます。大学4回生で、AIや機械学習、ネットワークについて学んでいます。webサイトを作ったり、競技プログラミングをしています。現在は、英語でアニメを見るのに熱中しています。寝ること、食べること、猫とお話することが好きです。どうぞよろしく。
+            こんにちは。みなとといいます。大学4回生で、AIや機械学習、ブロックチェーン、ネットワークについて学んでいます。webサイトを作ったり、競技プログラミングをしています。現在は、英語でアニメを見るのに熱中しています。寝ること、食べること、猫とお話することが好きです。どうぞよろしく。
           </p>
           <p class="text-md leading-relaxed text-zinc-900">
             Hi. I'm Minato Hayashi, a senior university student, in Japan. I'm
-            learning AI, machine learning, network, and more. I recently make
-            websites and articles, permit competitive programming. I love
-            eating, sleeping, and talking with cat. Have fun everything with me
-            !!
+            learning AI, machine learning, blockchain, network, and more. I
+            recently make websites and articles, participate competitive
+            programming. I love eating, sleeping, and talking with cat. Have fun
+            everything with me !!
           </p>
         </div>
 
@@ -82,7 +82,7 @@ const cwords = [
         <div class="mb-10"></div>
 
         <div class="my-5">What I did</div>
-        <div class="px-35">
+        <div class="px-15 sm:px-20 md:px-25 lg:px-35">
           <ActionLog limit={10} />
         </div>
         <!-- <div class="mt-15 mb-5">What I listen</div> -->
