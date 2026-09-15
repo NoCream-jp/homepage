@@ -1,6 +1,4 @@
 ---
-// src/components/MultiImages.astro
-
 interface Props {
   images?: any[];
 }
@@ -52,7 +50,7 @@ const displayImages = images.filter(Boolean).slice(0, 3);
           <img
             src={src}
             alt=""
-            class="absolute aspect-square w-[65%] max-w-40 rounded-md border border-zinc-800 bg-white object-cover shadow-sm"
+            class="absolute aspect-square w-[45%] max-w-40 rounded-md border border-zinc-800 bg-white object-cover shadow-sm"
             style={`transform: translate(${translateX}rem, ${translateY}rem); z-index: ${zIndex};`}
           />
         );
