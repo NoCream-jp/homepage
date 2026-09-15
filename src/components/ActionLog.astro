@@ -17,87 +17,109 @@ if (limit) {
   sortedLogs = sortedLogs.slice(0, limit);
 }
 
-const displayLogs = sortedLogs.map((log, index) => {
+const displayLogs = sortedLogs.map((log) => {
   const year = log.data.date.getFullYear().toString();
   const monthDay = log.data.date.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
   });
 
-  const prevLog = sortedLogs[index - 1];
-  const isFirstOfYear =
-    !prevLog || prevLog.data.date.getFullYear().toString() !== year;
-
-  const nextLog = sortedLogs[index + 1];
-  const isLastOfYear =
-    !nextLog || nextLog.data.date.getFullYear().toString() !== year;
-
   return {
     data: log.data,
     year,
     monthDay,
-    isFirstOfYear,
-    isLastOfYear,
     originalEntry: log,
   };
 });
+
+const grouped = Object.entries(
+  displayLogs.reduce(
+    (acc, log) => {
+      if (!acc[log.year]) acc[log.year] = [];
+      acc[log.year].push(log);
+      return acc;
+    },
+    {} as Record<string, typeof displayLogs>
+  )
+).sort((a, b) => Number(b[0]) - Number(a[0]));
 ---
 
-<div class="mx-auto w-full max-w-2xl">
-  <div class="relative pl-8">
+<div class="mx-auto w-full max-w-5xl p-2">
+  <div class="relative">
     {
       await Promise.all(
-        displayLogs.map(async (log) => {
-          const { Content } = await render(log.originalEntry);
-
+        grouped.map(async ([year, logs]) => {
           return (
-            <div class="w-full">
-              {/* 年が変わるタイミングのバッジと区切りの余白 */}
-              {log.isFirstOfYear && (
-                <div class="group relative z-10 mt-10 mb-5 flex items-center first:mt-0">
-                  <div class="absolute -left-4 flex -translate-x-1/2 items-center justify-center bg-white py-2">
-                    <span class="text-md inline-block px-3 py-1 font-semibold tracking-widest text-zinc-600">
-                      {log.year}
-                    </span>
-                  </div>
-                </div>
-              )}
+            <details class="group mb-2 w-100">
+              <summary class="text-md flex w-full cursor-pointer list-none items-center justify-between font-semibold tracking-widest text-zinc-600">
+                {year}
 
-              <div class="group relative mb-8">
-                {/* isLastOfYearがtrueなら bottom-0 で止め、falseなら -bottom-8 で次のドットまで繋ぐ */}
-                <div
-                  class={`absolute top-3 -left-4 w-px -translate-x-1/2 bg-zinc-200 ${log.isLastOfYear ? "bottom-0" : "-bottom-10"}`}
-                />
+                <svg
+                  class="h-4 w-4 -rotate-90 transition-transform duration-300 group-open:rotate-0"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="m6 9 6 6 6-6"
+                  />
+                </svg>
+              </summary>
 
-                {/* ドット（丸いインジケーター） */}
-                <span
-                  aria-hidden="true"
-                  class="absolute top-1.5 -left-4 flex h-2.5 w-2.5 -translate-x-1/2 items-center justify-center rounded-full bg-zinc-300 ring-4 ring-white transition-all duration-300"
-                />
+              <div class="w-full">
+                <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out group-open:max-h-500">
+                  <div class="w-full min-w-0">
+                    <div class="relative mt-3 -translate-y-4 pl-8 opacity-0 transition-all duration-300 group-open:translate-y-0 group-open:opacity-100">
+                      {await Promise.all(
+                        logs.map(async (log, index) => {
+                          const { Content } = await render(log.originalEntry);
 
-                <div>
-                  <div class="mb-1 flex flex-col gap-2 md:flex-row md:items-baseline">
-                    <h3 class="text-base font-medium text-zinc-900 transition-colors group-hover:text-black">
-                      {log.data.title}
-                    </h3>
-                  </div>
+                          const isLast = index === logs.length - 1;
 
-                  <time class="mb-2 block text-sm font-normal text-zinc-400">
-                    {log.monthDay}
-                  </time>
+                          return (
+                            <div class="relative mb-3 w-full">
+                              {/* 縦線 */}
+                              <div
+                                class={`absolute top-3 -left-4 w-px -translate-x-1/2 bg-zinc-200 ${
+                                  isLast ? "bottom-0" : "-bottom-10"
+                                }`}
+                              />
 
-                  <div class="text-[13px] leading-relaxed text-zinc-600">
-                    {log.data.description && (
-                      <p class="mb-2">{log.data.description}</p>
-                    )}
+                              {/* ドット */}
+                              <span class="absolute top-1.5 -left-4 h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-zinc-300 ring-4 ring-white" />
 
-                    <div class="prose prose-zinc prose-sm max-w-none">
-                      <Content />
+                              <div class="w-full">
+                                <h3 class="text-base font-medium text-zinc-900">
+                                  {log.data.title}
+                                </h3>
+
+                                <time class="mb-2 block text-sm text-zinc-400">
+                                  {log.monthDay}
+                                </time>
+
+                                <div class="text-[13px] leading-relaxed text-zinc-600">
+                                  {log.data.description && (
+                                    <p class="mb-2">{log.data.description}</p>
+                                  )}
+
+                                  <div class="prose prose-zinc prose-sm max-w-none">
+                                    <Content />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </details>
           );
         })
       )
