@@ -12,7 +12,7 @@ const displayImages = images.filter(Boolean).slice(0, 3);
 <div
   class:list={[
     "relative flex aspect-4/3 w-full items-center justify-center transition-transform",
-    displayImages.length === 3 ? "origin-center scale-[0.66]" : "",
+    displayImages.length === 3 ? "origin-center scale-[0.8]" : "",
   ]}
 >
   {
@@ -40,18 +40,29 @@ const displayImages = images.filter(Boolean).slice(0, 3);
     ) : (
       // 画像がある場合
       displayImages.map((img, i) => {
-        const offset = i - (displayImages.length - 1) / 2;
+        const count = displayImages.length;
+
+        const offset = i - (count - 1) / 2;
         const translateX = offset * -1.5;
-        const translateY = offset * 1.5;
+        const translateY = offset * 1.2;
         const zIndex = 10 - i;
+
+        const maxAngle = 20; // 全体の開き具合（調整ポイント）
+        const step = count > 1 ? -maxAngle / (count - 1) : 0;
+        const rotate = count > 1 ? maxAngle / 2 + step * i : 0;
+
         const src = typeof img === "object" && img.src ? img.src : img;
 
         return (
           <img
             src={src}
             alt=""
-            class="absolute aspect-square w-[45%] max-w-40 rounded-md border border-zinc-800 bg-white object-cover shadow-sm"
-            style={`transform: translate(${translateX}rem, ${translateY}rem); z-index: ${zIndex};`}
+            class="absolute aspect-square w-[45%] max-w-40 rounded-md border border-zinc-500 bg-white object-cover shadow-sm"
+            style={`
+              transform: translate(${translateX}rem, ${translateY}rem) rotate(${rotate}deg);
+              transform-origin: bottom center;
+              z-index: ${zIndex};
+            `}
           />
         );
       })
