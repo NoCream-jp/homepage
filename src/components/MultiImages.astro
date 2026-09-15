@@ -11,7 +11,12 @@ const { images = [] } = Astro.props;
 const displayImages = images.filter(Boolean).slice(0, 3);
 ---
 
-<div class="relative flex aspect-4/3 w-full items-center justify-center">
+<div
+  class:list={[
+    "relative flex aspect-4/3 w-full items-center justify-center transition-transform",
+    displayImages.length === 3 ? "origin-center scale-[0.66]" : "",
+  ]}
+>
   {
     displayImages.length === 0 ? (
       // 画像がない場合
