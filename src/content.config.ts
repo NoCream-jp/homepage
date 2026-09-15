@@ -27,13 +27,14 @@ const blogCollection = defineCollection({
 //   }),
 // });
 
-// const actionCollection = defineCollection({
-//   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/action" }),
-//   schema: z.object({
-//     title: z.string(),
-//     date: z.date(),
-//   }),
-// });
+const actionCollection = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/action" }),
+  schema: z.object({
+    title: z.string(),
+    date: z.date(),
+    description: z.string().optional(),
+  }),
+});
 
 // const achievementCollection = defineCollection({
 //   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/achievement" }),
@@ -46,6 +47,6 @@ const blogCollection = defineCollection({
 export const collections = {
   blog: blogCollection,
   // news: newsCollection,
-  // action: actionCollection,
+  "action-log": actionCollection,
   // achievement: achievementCollection,
 };

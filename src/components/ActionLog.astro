@@ -1,0 +1,106 @@
+---
+import { getCollection, render } from "astro:content";
+
+interface Props {
+  limit?: number;
+}
+
+const { limit } = Astro.props;
+
+const allLogs = await getCollection("action-log");
+
+let sortedLogs = [...allLogs].sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+if (limit) {
+  sortedLogs = sortedLogs.slice(0, limit);
+}
+
+const displayLogs = sortedLogs.map((log, index) => {
+  const year = log.data.date.getFullYear().toString();
+  const monthDay = log.data.date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+
+  const prevLog = sortedLogs[index - 1];
+  const isFirstOfYear =
+    !prevLog || prevLog.data.date.getFullYear().toString() !== year;
+
+  const nextLog = sortedLogs[index + 1];
+  const isLastOfYear =
+    !nextLog || nextLog.data.date.getFullYear().toString() !== year;
+
+  return {
+    data: log.data,
+    year,
+    monthDay,
+    isFirstOfYear,
+    isLastOfYear,
+    originalEntry: log,
+  };
+});
+---
+
+<div class="mx-auto w-full max-w-2xl">
+  <div class="relative pl-8">
+    {
+      await Promise.all(
+        displayLogs.map(async (log) => {
+          const { Content } = await render(log.originalEntry);
+
+          return (
+            <div class="w-full">
+              {/* 年が変わるタイミングのバッジと区切りの余白 */}
+              {log.isFirstOfYear && (
+                <div class="group relative z-10 mt-10 mb-5 flex items-center first:mt-0">
+                  <div class="absolute -left-4 flex -translate-x-1/2 items-center justify-center bg-white py-2">
+                    <span class="text-md inline-block px-3 py-1 font-semibold tracking-widest text-zinc-600">
+                      {log.year}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <div class="group relative mb-8">
+                {/* isLastOfYearがtrueなら bottom-0 で止め、falseなら -bottom-8 で次のドットまで繋ぐ */}
+                <div
+                  class={`absolute top-3 -left-4 w-px -translate-x-1/2 bg-zinc-200 ${log.isLastOfYear ? "bottom-0" : "-bottom-10"}`}
+                />
+
+                {/* ドット（丸いインジケーター） */}
+                <span
+                  aria-hidden="true"
+                  class="absolute top-1.5 -left-4 flex h-2.5 w-2.5 -translate-x-1/2 items-center justify-center rounded-full bg-zinc-300 ring-4 ring-white transition-all duration-300"
+                />
+
+                <div>
+                  <div class="mb-1 flex flex-col gap-2 md:flex-row md:items-baseline">
+                    <h3 class="text-base font-medium text-zinc-900 transition-colors group-hover:text-black">
+                      {log.data.title}
+                    </h3>
+                  </div>
+
+                  <time class="mb-2 block text-sm font-normal text-zinc-400">
+                    {log.monthDay}
+                  </time>
+
+                  <div class="text-[13px] leading-relaxed text-zinc-600">
+                    {log.data.description && (
+                      <p class="mb-2">{log.data.description}</p>
+                    )}
+
+                    <div class="prose prose-zinc prose-sm max-w-none">
+                      <Content />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })
+      )
+    }
+  </div>
+</div>

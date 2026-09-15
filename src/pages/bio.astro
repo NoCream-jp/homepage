@@ -4,6 +4,7 @@ import { getCollection } from "astro:content";
 import WordCloud from "../components/WordCloud.astro";
 import ImageStack from "../components/ImageStack.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
+import ActionLog from "../components/ActionLog.astro";
 
 const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
@@ -78,7 +79,12 @@ const cwords = [
           maxFont={50}
           minFont={35}
         />
+        <div class="mb-10"></div>
 
+        <div class="my-5">What I did</div>
+        <div class="px-20">
+          <ActionLog limit={10} />
+        </div>
         <!-- <div class="mt-15 mb-5">What I listen</div> -->
       </div>
     </section>
