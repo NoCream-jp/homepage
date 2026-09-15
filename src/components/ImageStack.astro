@@ -16,34 +16,42 @@ const safeImages = (images || []).filter(Boolean);
 
 <style>
   /* minimal attribute-based CSS for depth transforms and accessibility focus fallback */
+
+  /* default: hidden / slightly lowered / slightly scaled — 入場前の状態 */
   .image-stack-item {
-    /* we keep transition control in Tailwind classes, but depth transforms need selectors */
     transition:
-      transform 500ms ease-out,
-      opacity 500ms ease-out;
+      transform 1000ms cubic-bezier(0.2, 0.9, 0.2, 1),
+      opacity 1000ms cubic-bezier(0.2, 0.9, 0.2, 1);
     will-change: transform, opacity;
+    transform: translateY(8px) scale(0.98); /* start slightly down & small */
+    opacity: 0;
+    pointer-events: none; /* depth 帯域が有効になるまではクリック無効 */
   }
 
-  /* depth rules: tweak translate/rotate values if you want different 'spread' */
-  .image-stack-item[data-depth="0"] {
+  /* 入場完了（data-stack-init が true に切り替わったら各 depth の transform を適用） */
+  .image-stack-container[data-stack-init="true"]
+    .image-stack-item[data-depth="0"] {
     z-index: 30;
     transform: translateX(0) translateY(0) rotate(0deg);
     opacity: 1;
     pointer-events: auto;
   }
-  .image-stack-item[data-depth="1"] {
+  .image-stack-container[data-stack-init="true"]
+    .image-stack-item[data-depth="1"] {
     z-index: 20;
     transform: translateX(0.75rem) translateY(0.5rem) rotate(2deg);
     opacity: 1;
     pointer-events: auto;
   }
-  .image-stack-item[data-depth="2"] {
+  .image-stack-container[data-stack-init="true"]
+    .image-stack-item[data-depth="2"] {
     z-index: 10;
     transform: translateX(1.5rem) translateY(1rem) rotate(4deg);
     opacity: 1;
     pointer-events: auto;
   }
-  .image-stack-item[data-depth="3"] {
+  .image-stack-container[data-stack-init="true"]
+    .image-stack-item[data-depth="3"] {
     z-index: 0;
     transform: translateX(2rem) translateY(1.5rem) rotate(6deg);
     opacity: 0;
@@ -51,9 +59,19 @@ const safeImages = (images || []).filter(Boolean);
   }
 
   /* exit animation inline style uses translateX(-120%) rotate(-12deg) from JS,
-     but we keep this CSS here for clarity / fallback. */
+     but keep this CSS here for clarity / fallback. */
   .image-stack-container:focus {
     /* no-op: Tailwind focus styles are applied on the element via classes */
+  }
+
+  /* reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .image-stack-item {
+      transition: none !important;
+      transform: none !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
   }
 </style>
 
@@ -97,9 +115,11 @@ const safeImages = (images || []).filter(Boolean);
       );
 
       containers.forEach((container, ci) => {
-        // idempotent init
+        // idempotent init: 既に true なら何もしない
         if (container.dataset.stackInit === "true") return;
-        container.dataset.stackInit = "true";
+
+        // NOTE: ここではまだ data-stack-init を true にしない（入場アニメを制御するため）
+        // container.dataset.stackInit = "true";
 
         const maxDepth = parseInt(container.dataset.maxDepth || "3", 10);
         const debugFlag = container.dataset.debug === "true";
@@ -128,10 +148,39 @@ const safeImages = (images || []).filter(Boolean);
             // clear any inline transform/opacity left from previous runs
             it.style.transform = "";
             it.style.opacity = "";
+            // clear previous transitionDelay to be safe
+            it.style.transitionDelay = "";
           });
         }
 
         normalizeItems();
+
+        (function stageEntrance() {
+          const items = getItems();
+          // small cap on per-item delay to avoid very long chains
+          const perStepMs = 70;
+          items.forEach((it, i) => {
+            // shallow items first, deeper ones slightly later
+            const logical = parseInt(it.dataset.logicalIndex || "0", 10);
+            const delay = Math.min(logical, maxDepth) * perStepMs;
+            it.style.transitionDelay = `${delay}ms`;
+          });
+
+          // force a reflow to ensure transitionDelay is applied before toggling attribute
+          // (read a layout property)
+          void container.offsetHeight;
+
+          // now enable the "entered" styles — CSS will animate transform/opacity
+          container.dataset.stackInit = "true";
+
+          // clear transition-delay after animation finishes to avoid affecting later rotations
+          const totalDelay = Math.min(items.length, maxDepth) * perStepMs + 600;
+          setTimeout(() => {
+            items.forEach((it) => {
+              it.style.transitionDelay = "";
+            });
+          }, totalDelay);
+        })();
 
         function rotateOnce() {
           if (isAnimating) {
@@ -210,6 +259,7 @@ const safeImages = (images || []).filter(Boolean);
         });
 
         // expose a method for external code (optional)
+        // @ts-ignore - consumer may call this
         container.imageStackRotate = rotateOnce;
 
         // keep normalized when window resizes
