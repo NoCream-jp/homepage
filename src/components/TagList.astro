@@ -1,15 +1,125 @@
 ---
-const { tags = [] } = Astro.props;
+// src/components/TagList.astro
+interface Props {
+  tags?: string[] | null;
+  // 常に表示するタグ個数（compact時の個数）。通常は1。
+  compactCount?: number;
+}
+
+const { compactCount = 1 } = Astro.props;
+const tags: string[] = Array.isArray(Astro.props.tags) ? Astro.props.tags : [];
+const overflowTotal =
+  tags.length > compactCount ? tags.length - compactCount : 0;
+
+// ユニークID（クライアントスクリプトで要素を参照するため）
+const uid = `taglist-${Math.random().toString(36).slice(2, 9)}`;
 ---
 
 {
   tags.length > 0 && (
-    <div class="flex flex-wrap gap-1">
+    <div class="flex items-center gap-1">
+      {" "}
       {tags.map((tag: unknown) => (
         <span class="rounded-full border bg-white px-2 py-0.5 text-[10px]">
+          {" "}
+          {tag}{" "}
+        </span>
+      ))}{" "}
+    </div>
+  )
+}
+
+<!-- {tags.length > 0 && (
+  <div id={uid} class="taglist-root inline-block">
+    <div class="taglist-compact flex items-center gap-1 sm:hidden">
+      <span class="inline-flex items-center whitespace-nowrap rounded-full border bg-white px-2 py-0.5 text-[10px]">
+        {tags[0]}
+      </span>
+      {overflowTotal > 0 && (
+        <span class="inline-flex items-center border-white whitespace-nowrap rounded-full bg-white px-2 py-0.5 text-[10px]">
+          + {overflowTotal}
+        </span>
+      )}
+    </div>
+
+    <div class="taglist-full hidden sm:flex items-center gap-1">
+      {tags.map((tag) => (
+        <span class="inline-flex items-center whitespace-nowrap rounded-full border bg-white px-2 py-0.5 text-[10px]" title={String(tag)}>
           {tag}
         </span>
       ))}
     </div>
-  )
-}
+  </div>
+)}
+
+<script type="module">
+  (function () {
+    // safety: run only in browser
+    if (typeof window === 'undefined') return;
+    const root = document.getElementById(/**/ "{{uid}}" /**/);
+    if (!root) return;
+
+    const compactEl = root.querySelector('.taglist-compact');
+    const fullEl = root.querySelector('.taglist-full');
+    if (!compactEl || !fullEl) return;
+
+    // helper: measure fullEl's natural width even if it's hidden (display:none)
+    function measureFullWidth() {
+      // if visible and not display:none, just read scrollWidth
+      const prevDisplay = fullEl.style.display;
+      let width = 0;
+      if (getComputedStyle(fullEl).display !== 'none') {
+        width = fullEl.scrollWidth;
+      } else {
+        // temporarily show it off-document to measure
+        fullEl.style.position = 'absolute';
+        fullEl.style.visibility = 'hidden';
+        fullEl.style.display = 'flex';
+        fullEl.style.pointerEvents = 'none';
+        width = fullEl.scrollWidth;
+        // restore
+        fullEl.style.display = prevDisplay;
+        fullEl.style.position = '';
+        fullEl.style.visibility = '';
+        fullEl.style.pointerEvents = '';
+      }
+      return width;
+    }
+
+    function update() {
+      const containerW = root.clientWidth;
+      const required = measureFullWidth();
+      // if full content doesn't fit the container, show compact; otherwise show full.
+      if (required > containerW + 1) { // +1 tolerance
+        compactEl.style.display = 'flex';
+        fullEl.style.display = 'none';
+      } else {
+        compactEl.style.display = 'none';
+        // for small screens css hides fullEl by default; only show if it fits
+        // but respect responsive: if screen >= sm the CSS default is to show full;
+        // we decide explicitly based on measured fit.
+        fullEl.style.display = 'flex';
+      }
+    }
+
+    // initial
+    update();
+
+    // observe resizes on the root (container) so layout changes flip appropriately
+    const ro = new ResizeObserver(() => update());
+    ro.observe(root);
+
+    // also observe window font/load/resizes to be safe
+    window.addEventListener('resize', update);
+
+    // cleanup when element removed
+    const mo = new MutationObserver(() => {
+      if (!document.contains(root)) {
+        ro.disconnect();
+        mo.disconnect();
+        window.removeEventListener('resize', update);
+      }
+    });
+    mo.observe(document.documentElement, { childList: true, subtree: true });
+  })();
+</script> -->

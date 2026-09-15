@@ -1,6 +1,9 @@
 ---
 import "../styles/global.css";
 import ExternalLink from "../components/ExternalLink.astro";
+import ViewMoreButton from "../components/ViewMoreButton.astro";
+
+const pathname = Astro.url.pathname;
 
 const { title = "Minato Hayashi", description = "my portfolio / blog" } =
   Astro.props;
@@ -43,19 +46,60 @@ const { title = "Minato Hayashi", description = "my portfolio / blog" } =
         <slot />
       </div>
 
-      <footer class="mt-5 w-full border-t py-9">
-        <div class="mx-auto flex max-w-5xl flex-col items-center px-6">
-          <div class="flex w-full flex-col items-start">
-            <ExternalLink href="https://github.com/NoCream-jp" text="GitHub" />
-            <ExternalLink href="https://x.com/sXMN1au45a68174" text="X" />
-            <ExternalLink
-              href="https://atcoder.jp/users/Caffeineholic"
-              text="AtCoder"
-            />
-          </div>
+      <footer class="mt-5 w-full border-t">
+        <div class="mx-auto max-w-5xl px-6">
+          <div class="flex items-center justify-between py-9">
+            <!-- 左 -->
+            {
+              pathname !== "/link" && (
+                <nav class="flex flex-col items-start gap-1 text-sm">
+                  <ExternalLink
+                    href="https://github.com/NoCream-jp"
+                    text="GitHub"
+                  />
+                  <ExternalLink href="https://x.com/sXMN1au45a68174" text="X" />
+                  <ExternalLink
+                    href="https://atcoder.jp/users/Caffeineholic"
+                    text="AtCoder"
+                  />
+                </nav>
+              )
+            }
 
-          <div class="mt-1 w-full text-left text-sm text-zinc-600">
-            Minato Hayashi © {new Date().getFullYear()}
+            <!-- 中央 -->
+            <div class="flex-1 text-center text-sm text-zinc-500">
+              Minato Hayashi © {new Date().getFullYear()}
+            </div>
+
+            <!-- 右 -->
+            {
+              pathname !== "/link" && (
+                <div class="group flex items-center justify-end hover:text-zinc-500">
+                  <a
+                    href="/link"
+                    class="group-hover:text-primary inline-flex items-center gap-2 text-sm tracking-wide"
+                  >
+                    all links
+                    <span class="inline-flex items-center justify-center rounded-full border-none p-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4 group-hover:text-zinc-500"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M5 12h14" />
+                        <path d="M12 5l7 7-7 7" />
+                      </svg>
+                    </span>
+                  </a>
+                </div>
+              )
+            }
           </div>
         </div>
       </footer>

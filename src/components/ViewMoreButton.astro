@@ -1,14 +1,16 @@
 ---
 interface Props {
   href: string;
+  text?: string;
 }
 
-const { href } = Astro.props;
+const { href, text } = Astro.props;
+const showText = text?.trim() ? text : "View More";
 ---
 
 <a
   href={href}
-  class="align-center flex w-20 justify-center rounded-full border p-1 text-center text-xs hover:border-zinc-500"
+  class="align-center flex w-20 justify-center rounded-full border p-1 text-center text-xs hover:border-zinc-500 hover:text-zinc-500"
 >
-  View More
+  {showText}
 </a>
