@@ -15,6 +15,25 @@ const sampleImages = [
   "/images/ra-men.webp",
   "/images/spotify.webp",
 ];
+
+// WordCloud用
+const cwords = [
+  "AtCoder",
+  "学園アイドルマスター",
+  "東野圭吾",
+  "QuizKnock",
+  "星街すいせい",
+  "KALDI",
+  "ハリー・ポッター",
+  "ポケットモンスターチャンピオンズ",
+  "Spotify",
+  "Arena Breakout",
+  "Anker",
+  "ナナホシ管弦楽団",
+  "Orangestar",
+  "米津玄師",
+  "The Amasing Degital Circus",
+];
 ---
 
 <Layout title={title} description={description}>
@@ -53,23 +72,7 @@ const sampleImages = [
 
         <div class="my-5">What I like</div>
         <WordCloud
-          words={[
-            "AtCoder",
-            "学園アイドルマスター",
-            "東野圭吾",
-            "QuizKnock",
-            "星街すいせい",
-            "KALDI",
-            "ハリー・ポッター",
-            "ポケットモンスターチャンピオンズ",
-            "Spotify",
-            "Arena Breakout",
-            "Anker",
-            "ナナホシ管弦楽団",
-            "Orangestar",
-            "米津玄師",
-            "The Amasing Degital Circus",
-          ]}
+          words={cwords}
           width="80%"
           height="250px"
           maxFont={50}
