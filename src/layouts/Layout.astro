@@ -23,11 +23,17 @@ const { title = "Minato Hayashi", description = "my portfolio / blog" } =
       href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..900&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
   </head>
   <body
     class="flex h-screen w-full flex-col overflow-hidden bg-white font-sans"
   >
-    <main class="flex w-full flex-1 flex-col items-center overflow-hidden">
+    <main
+      class="flex h-full w-full flex-1 flex-col items-center overflow-hidden"
+    >
       <slot />
     </main>
 
