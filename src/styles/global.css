@@ -21,3 +21,12 @@ th {
   background-color: #f3f4f6; /* ヘッダーの背景色 */
   font-weight: bold;
 }
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

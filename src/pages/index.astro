@@ -1,54 +1,41 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { getCollection } from "astro:content";
-import ArticleCard from "../components/ArticleCard.astro";
-import BlogCard from "../components/BlogCard.astro";
 import ArticleCardList from "../components/ArticleCardList.astro";
-import NotificationStrip from "../components/NotificationStrip.astro";
-import WordCloud from "../components/WordCloud.astro";
-import ViewMoreButton from "../components/ViewMoreButton.astro";
 import BuisinessCard from "../components/BuisinessCard.astro";
 import LinkCard from "../components/LinkCard.astro";
-
-// 通知帯
-const latestItems = [
-  {
-    section: "blog",
-    date: "2026/09/15",
-    title: "最近考えていること",
-    href: "/blog/20260915_diary",
-  },
-  {
-    section: "blog",
-    date: "2026/09/09",
-    title: "ホームページをリニューアルしました",
-    href: "/blog/20260909_renew-site",
-  },
-];
+import TagFilter from "../components/TagFilter.astro";
+import NotificationStrip from "../components/NotificationStrip.astro";
 
 const posts = await getCollection("blog", ({ data }) => !data.draft);
 posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-const currentPosts = posts.slice(0, 12);
+
+const allTags = Array.from(
+  new Set(posts.flatMap((p) => p.data.tags ?? []))
+).sort();
+
+const notificationItems = [
+  {
+    section: "blog",
+    date: "2026/09/17",
+    title: "ホームページをリニューアルしました",
+    href: "/blog/20260915_renew-site",
+    banner: false,
+  },
+];
 
 const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
 ---
 
 <Layout title={title} description={description}>
-  <!-- <NotificationStrip items={latestItems} /> -->
-  <div class="p-auto grid h-full w-full grid-cols-[auto_1fr] gap-5">
+  <NotificationStrip items={notificationItems} />
+  <div class="flex h-full min-h-0 w-full flex-1">
     <!-- 左 -->
-    <div
-      class="flex h-full w-full max-w-3xl flex-col items-stretch justify-around gap-5 bg-red-50 p-5"
-    >
-      <!-- 左上 -->
-      <div class="flex w-full flex-col items-stretch bg-white">
-        <BuisinessCard />
-      </div>
+    <aside class="flex h-full flex-col justify-around gap-5 p-5">
+      <BuisinessCard />
 
-      <!-- 左下 -->
-      <div class="grid h-full w-full grid-cols-2 gap-1">
-        <!-- 横幅をBuisinessCardと合わせる -->
+      <div class="grid grid-cols-2 gap-1">
         <LinkCard
           title="GitHub"
           username="NoCream-jp"
@@ -78,34 +65,22 @@ const description = "Minato Hayashi's portfolio and blog";
           username="_NoCream"
           href="https://qiita.com/_NoCream"
         />
-        <LinkCard
-          title="GitHub"
-          username="NoCream-jp"
-          href="https://github.com/NoCream-jp"
-        />
-        <LinkCard
-          title="X"
-          username="Cafe"
-          href="https://x.com/sXMN1au45a68174"
-        />
-        <LinkCard
-          title="LinkedIn"
-          username="Minato Hayashi"
-          href="https://www.linkedin.com/in/m-hayashi/"
-        />
-        <LinkCard
-          title="occ3710@outlook.jp"
-          href=""
-          bg="bg-zinc-100"
-          disabled
-        />
       </div>
-    </div>
+    </aside>
 
     <!-- 右 -->
-    <div class="flex h-full flex-col items-center bg-blue-50 p-5">
-      <!-- <BlogCard post={posts[0]}/> -->
-      <ArticleCardList posts={posts} />
-    </div>
+    <main class="flex min-h-0 w-full flex-1 flex-col items-stretch p-7">
+      <div class="w-full shrink-0 p-3">
+        <TagFilter tags={allTags} selector=".post-item" />
+      </div>
+
+      <div class="relative min-h-0 flex-1">
+        <div class="no-scrollbar h-full overflow-y-auto py-3">
+          <ArticleCardList posts={posts} />
+        </div>
+
+        <!-- <div class="pointer-events-none absolute bottom-0 left-0 right-0 h-20 z-10 bg-linear-to-t from-white to-transparent" /> -->
+      </div>
+    </main>
   </div>
 </Layout>

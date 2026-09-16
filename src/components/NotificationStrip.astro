@@ -34,7 +34,7 @@ const bannerItem = {
                   aria-roledescription="notification"
                 >
                   {it.banner ? (
-                    <div class="notif-banner inline-flex h-12 items-center justify-center border-r bg-[repeating-linear-gradient(135deg,#0000_0px,#0000_6px,#d1d5db_6px,#d1d5db_7px)] px-4 text-black">
+                    <div class="notif-banner inline-flex h-10 items-center justify-center border-r bg-[repeating-linear-gradient(135deg,#0000_0px,#0000_6px,#d1d5db_6px,#d1d5db_7px)] px-4 text-black">
                       <span class="notif-banner-title text-xs font-semibold tracking-wide">
                         {it.title.split("").map((char: unknown, index: any) => (
                           <span
@@ -49,7 +49,7 @@ const bannerItem = {
                   ) : (
                     <a
                       href={it.href || null}
-                      class="notif-link inline-flex h-12 items-center gap-4 border-r bg-white px-4 py-2"
+                      class="notif-link inline-flex h-10 items-center gap-4 border-r bg-white px-4 py-2"
                       aria-label={`${it.section} ${it.title}`}
                     >
                       <span class="block text-xs tracking-wide text-zinc-600">
