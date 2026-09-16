@@ -5,6 +5,9 @@ import ArticleCard from "../components/ArticleCard.astro";
 import NotificationStrip from "../components/NotificationStrip.astro";
 import WordCloud from "../components/WordCloud.astro";
 import ViewMoreButton from "../components/ViewMoreButton.astro";
+import BuisinessCard from "../components/BuisinessCard.astro";
+import LinkCard from "../components/LinkCard.astro";
+import Link from "./link.astro";
 
 // 通知帯
 const latestItems = [
@@ -31,60 +34,74 @@ const description = "Minato Hayashi's portfolio and blog";
 ---
 
 <Layout title={title} description={description}>
-  <NotificationStrip items={latestItems} />
-
-  <div class="mx-5 mb-10 max-w-5xl px-6 py-12">
-    <!-- blog -->
-    <section class="my-10 w-full">
-      <h2 class="mb-7 text-2xl font-normal">
-        blog (最新の{Math.min(12, currentPosts.length)}件)
-      </h2>
-      <div
-        class="grid w-full grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4 lg:gap-6"
-      >
-        {currentPosts.map((post) => <ArticleCard post={post} />)}
-      </div>
-      <div class="section-footer mt-4 flex justify-end">
-        <ViewMoreButton href="/blog" />
-      </div>
-    </section>
-
-    <!-- bio -->
-    <section class="my-10 w-full">
-      <h2 class="mb-3 text-2xl font-normal">bio</h2>
-      <div class="flex flex-col items-center">
-        <div class="mb-3">Who I am</div>
-        <div class="grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-8">
-          <p class="text-md md: mb-2 leading-relaxed text-zinc-900">
-            こんにちは。みなとといいます。大学4回生で、AIや機械学習、ブロックチェーン、ネットワークについて学んでいます。
-            webサイトを作ったり、競技プログラミングに参加したりしています。現在は、英語でアニメを見るのに熱中しています。
-            寝ること、食べること、音楽を聴くこと、猫とお話することが好きです。美しいと思ったものはなんでも勉強します。どうぞよろしく。
-          </p>
-          <p class="text-md leading-relaxed text-zinc-900">
-            Hi. I'm Minato Hayashi, a senior university student, in Japan. I'm
-            learning AI, machine learning, blockchain, network, and more. I
-            recently make websites and articles, participate competitive
-            programming. I love eating, sleeping, and talking with cat. Have fun
-            everything with me !!
-          </p>
-        </div>
-      </div>
-      <div class="section-footer mt-4 flex justify-end">
-        <ViewMoreButton href="/bio" />
-      </div>
-    </section>
-
-    <!-- work -->
-    <!-- <section class="w-full">
-      <h2 class="mb-7 text-2xl font-normal">work</h2>
-
-      <div class="flex flex-col items-center">
-
+  <!-- <NotificationStrip items={latestItems} /> -->
+  <div class="p-auto grid h-full w-full grid-cols-[auto_1fr] gap-5">
+    <!-- 左 -->
+    <div
+      class="flex h-full w-full max-w-xl flex-col items-center justify-around bg-red-50 p-5"
+    >
+      <!-- 左上 -->
+      <div class="flex w-full flex-col items-center bg-white">
+        <BuisinessCard />
       </div>
 
-      <div class="section-footer flex justify-end mt-4">
-        <ViewMoreButton href="/"/>
+      <!-- 左下 -->
+      <div class="grid w-full grid-cols-2 gap-1">
+        <!-- 横幅をBuisinessCardと合わせる -->
+        <LinkCard
+          title="GitHub"
+          username="NoCream-jp"
+          href="https://github.com/NoCream-jp"
+        />
+        <LinkCard
+          title="X"
+          username="Cafe"
+          href="https://x.com/sXMN1au45a68174"
+        />
+        <LinkCard
+          title="LinkedIn"
+          username="Minato Hayashi"
+          href="https://www.linkedin.com/in/m-hayashi/"
+        />
+        <LinkCard
+          title="Instagram"
+          href="https://www.instagram.com/koshi2055"
+        />
+        <LinkCard
+          title="AtCoder"
+          username="Caffeineholic"
+          href="https://atcoder.jp/users/Caffeineholic"
+        />
+        <LinkCard
+          title="Qiita"
+          username="_NoCream"
+          href="https://qiita.com/_NoCream"
+        />
+        <LinkCard
+          title="GitHub"
+          username="NoCream-jp"
+          href="https://github.com/NoCream-jp"
+        />
+        <LinkCard
+          title="X"
+          username="Cafe"
+          href="https://x.com/sXMN1au45a68174"
+        />
+        <LinkCard
+          title="LinkedIn"
+          username="Minato Hayashi"
+          href="https://www.linkedin.com/in/m-hayashi/"
+        />
+        <LinkCard
+          title="Instagram"
+          href="https://www.instagram.com/koshi2055"
+          bg="bg-zinc-100"
+          disabled
+        />
       </div>
-    </section> -->
+    </div>
+
+    <!-- 右 -->
+    <div class="flex flex-col items-center bg-blue-50"></div>
   </div>
 </Layout>

@@ -2,33 +2,49 @@
 interface Props {
   title: string;
   username?: string;
-  href: string;
+  href?: string;
+  bg?: string;
+  disabled?: boolean;
 }
 
-const { title, username, href } = Astro.props;
+const {
+  title,
+  username,
+  href = "#",
+  bg = "bg-white",
+  disabled = false,
+} = Astro.props;
+
+const Tag = disabled ? "div" : "a";
 ---
 
-<a
-  href={href}
-  target="_blank"
-  rel="noopener noreferrer"
-  class="group block h-full w-auto self-stretch rounded-md border bg-white p-4 hover:border-zinc-500"
+<Tag
+  {...!disabled && {
+    href,
+    target: "_blank",
+    rel: "noopener noreferrer",
+  }}
+  class={`group max-h-15 h-full w-auto self-stretch rounded-md border p-1  ${bg} ${disabled ? "cursor-default " : "hover:border-zinc-500"}`}
 >
-  <div class="flex items-center justify-between">
+  <div class="flex h-full items-center justify-between">
     <!-- 左側 -->
     <div class="flex flex-col">
       <span
-        class="text-base font-medium text-zinc-800 group-hover:text-zinc-400"
+        class={`text-sm font-medium text-zinc-800  ${disabled ? "" : "group-hover:text-zinc-400"}`}
       >
         {title}
       </span>
 
-      {username && <span class="mt-1 text-xs text-zinc-400">{username}</span>}
+      {
+        username && (
+          <span class="mt-0 text-[10px] text-zinc-400">{username}</span>
+        )
+      }
     </div>
 
-    <!-- 右上アイコン -->
+    <!-- 右側アイコン -->
     <div
-      class="align-center flex justify-center text-zinc-700 group-hover:text-zinc-400"
+      class={`flex justify-center text-zinc-700 transition ${disabled ? "opacity-0" : "group-hover:text-zinc-400"}`}
     >
       <svg
         class="h-5 w-auto"
@@ -42,4 +58,4 @@ const { title, username, href } = Astro.props;
       >
     </div>
   </div>
-</a>
+</Tag>
