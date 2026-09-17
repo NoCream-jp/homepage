@@ -19,46 +19,261 @@ const {
 ---
 
 <div
-  class="relative aspect-8/5 w-full max-w-100 rounded-xl border bg-white p-4 md:p-6"
+  id="profile-card"
+  class="relative aspect-8/5 w-full max-w-100 cursor-pointer"
 >
-  <!-- 左上：画像 -->
-  <div class="absolute top-6 left-6">
-    <div class="h-32 w-32 overflow-hidden rounded-full border bg-white">
-      {image && <img src={image} alt="" class="h-full w-full object-cover" />}
-    </div>
-  </div>
-
-  <!-- 右上：装飾 -->
   <div
-    class="absolute top-4 right-4 h-8 w-8 rounded-full bg-zinc-100 md:top-6 md:right-6 md:h-10 md:w-10"
+    id="profile-card-inner"
+    class="relative h-full w-full"
+    style="transform-style: preserve-3d;"
   >
-  </div>
+    <!-- 表 -->
+    <div
+      class="absolute inset-0 rounded-xl border bg-white p-4 md:p-6"
+      style="backface-visibility: hidden;"
+    >
+      <!-- 左上：画像 -->
+      <div class="absolute top-6 left-6">
+        <div class="h-32 w-32 overflow-hidden rounded-full border bg-white">
+          {
+            image && (
+              <img src={image} alt="" class="h-full w-full object-cover" />
+            )
+          }
+        </div>
+      </div>
 
-  <!-- 右下寄せ：テキスト -->
-  <div class="absolute right-4 bottom-4 flex flex-col gap-1 text-sm">
-    <div class="flex gap-2 whitespace-nowrap">
-      <span class="w-20 text-right text-zinc-500 md:w-24">name :</span>
-      <span class="font-semibold">{name}</span>
+      <!-- 右上：装飾 -->
+      <div
+        class="absolute top-4 right-4 h-8 w-8 rounded-full bg-zinc-100 md:top-6 md:right-6 md:h-10 md:w-10"
+      >
+      </div>
+
+      <!-- 右下寄せ：テキスト -->
+      <div class="absolute right-4 bottom-4 flex flex-col gap-1 text-sm">
+        <div class="flex gap-2 whitespace-nowrap">
+          <span class="w-20 text-right text-zinc-500 md:w-24"> name : </span>
+          <span class="font-semibold">{name}</span>
+        </div>
+
+        <div class="flex gap-2 whitespace-nowrap">
+          <span class="w-20 text-right text-zinc-500 md:w-24"> age : </span>
+          <span>{age}</span>
+        </div>
+
+        <div class="flex gap-2 whitespace-nowrap">
+          <span class="w-20 text-right text-zinc-500 md:w-24">
+            location :
+          </span>
+          <span>{location}</span>
+        </div>
+
+        <div class="flex gap-2 whitespace-nowrap">
+          <span class="w-20 text-right text-zinc-500 md:w-24"> pronoun : </span>
+          <span>{pronoun}</span>
+        </div>
+
+        <div class="flex gap-2 whitespace-nowrap">
+          <span class="w-20 text-right text-zinc-500 md:w-24"> study : </span>
+          <span>{study}</span>
+        </div>
+      </div>
     </div>
 
-    <div class="flex gap-2 whitespace-nowrap">
-      <span class="w-20 text-right text-zinc-500 md:w-24">age :</span>
-      <span>{age}</span>
-    </div>
-
-    <div class="flex gap-2 whitespace-nowrap">
-      <span class="w-20 text-right text-zinc-500 md:w-24">location :</span>
-      <span>{location}</span>
-    </div>
-
-    <div class="flex gap-2 whitespace-nowrap">
-      <span class="w-20 text-right text-zinc-500 md:w-24">pronoun :</span>
-      <span>{pronoun}</span>
-    </div>
-
-    <div class="flex gap-2 whitespace-nowrap">
-      <span class="w-20 text-right text-zinc-500 md:w-24">study :</span>
-      <span>{study}</span>
+    <!-- 裏 -->
+    <div
+      class="absolute inset-0 rounded-xl border bg-white p-4 md:p-6"
+      style="
+        backface-visibility: hidden;
+        transform: rotateY(180deg);
+      "
+    >
     </div>
   </div>
 </div>
+
+<script>
+  const PROFILE_CARD_STORAGE_KEY = "profile-card-flipped";
+
+  const setupProfileCard = () => {
+    const card = document.querySelector<HTMLElement>("#profile-card");
+    const inner = document.querySelector<HTMLElement>("#profile-card-inner");
+
+    if (!card || !inner) return;
+    if (card.dataset.initialized === "true") return;
+
+    card.dataset.initialized = "true";
+
+    const savedState = sessionStorage.getItem(PROFILE_CARD_STORAGE_KEY);
+
+    let flipped = savedState === "true";
+
+    /*
+     * -------------------------
+     * 表裏の初期状態
+     * -------------------------
+     */
+    inner.style.transform = flipped
+      ? "perspective(1200px) rotateY(180deg)"
+      : "perspective(1200px) rotateY(0deg)";
+
+    inner.dataset.flipped = String(flipped);
+
+    /*
+     * -------------------------
+     * マウス追従
+     * -------------------------
+     */
+    let currentX = 0;
+    let currentY = 0;
+    let currentZ = 0;
+    let currentScale = 1;
+
+    let targetX = 0;
+    let targetY = 0;
+    let targetZ = 0;
+    let targetScale = 1;
+
+    let animationFrame = 0;
+
+    const updateTilt = () => {
+      currentX += (targetX - currentX) * 0.12;
+      currentY += (targetY - currentY) * 0.12;
+      currentZ += (targetZ - currentZ) * 0.12;
+      currentScale += (targetScale - currentScale) * 0.12;
+
+      card.style.transform = `
+        perspective(1000px)
+        rotateX(${currentX}deg)
+        rotateY(${currentY}deg)
+        rotateZ(${currentZ}deg)
+        scale(${currentScale})
+      `;
+
+      animationFrame = requestAnimationFrame(updateTilt);
+    };
+
+    const handleMouseMove = (event: MouseEvent) => {
+      const rect = card.getBoundingClientRect();
+
+      const x = (event.clientX - rect.left) / rect.width;
+      const y = (event.clientY - rect.top) / rect.height;
+
+      /*
+       * -1 ～ 1 に変換
+       */
+      const normalizedX = x * 2 - 1;
+      const normalizedY = y * 2 - 1;
+
+      /*
+       * マウス位置に応じて
+       * X・Y 両方向へ傾く
+       */
+      const flipDirection = flipped ? -1 : 1;
+
+      targetY = normalizedX * 3.5 * flipDirection;
+      targetX = normalizedY * -3.5;
+
+      /*
+       * 斜め方向に少しだけ回転を加える
+       */
+      targetZ = normalizedX * normalizedY * 1.2;
+
+      /*
+       * 外側に行くほどほんの少し浮く
+       */
+      const distance = Math.min(
+        1,
+        Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY)
+      );
+
+      targetScale = 1 + distance * 0.012;
+    };
+
+    const handleMouseLeave = () => {
+      targetX = 0;
+      targetY = 0;
+      targetZ = 0;
+      targetScale = 1;
+    };
+
+    card.addEventListener("mousemove", handleMouseMove);
+    card.addEventListener("mouseleave", handleMouseLeave);
+
+    animationFrame = requestAnimationFrame(updateTilt);
+
+    /*
+     * -------------------------
+     * 裏返し
+     * -------------------------
+     */
+    card.addEventListener("click", () => {
+      inner.getAnimations().forEach((animation) => {
+        animation.cancel();
+      });
+
+      const target = flipped ? 0 : 180;
+      const start = flipped ? 180 : 0;
+
+      inner.animate(
+        [
+          {
+            transform: `
+              perspective(1200px)
+              rotateY(${start}deg)
+              rotateX(0deg)
+              rotateZ(0deg)
+              translateY(0)
+              scale(1)
+            `,
+          },
+          {
+            transform: `
+              perspective(1200px)
+              rotateY(${start + (target - start) * 0.4}deg)
+              rotateX(2deg)
+              rotateZ(${flipped ? "-0.5deg" : "0.5deg"})
+              translateY(-3px)
+              scale(1.02)
+            `,
+          },
+          {
+            transform: `
+              perspective(1200px)
+              rotateY(${start + (target - start) * 0.58}deg)
+              rotateX(-1deg)
+              rotateZ(${flipped ? "0.25deg" : "-0.25deg"})
+              translateY(-2px)
+              scale(1.015)
+            `,
+          },
+          {
+            transform: `
+              perspective(1200px)
+              rotateY(${target}deg)
+              rotateX(0deg)
+              rotateZ(0deg)
+              translateY(0)
+              scale(1)
+            `,
+          },
+        ],
+        {
+          duration: 700,
+          easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+          fill: "forwards",
+        }
+      );
+
+      flipped = !flipped;
+
+      inner.dataset.flipped = String(flipped);
+
+      sessionStorage.setItem(PROFILE_CARD_STORAGE_KEY, String(flipped));
+    });
+  };
+
+  setupProfileCard();
+
+  document.addEventListener("astro:page-load", setupProfileCard);
+</script>
