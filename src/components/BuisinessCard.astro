@@ -18,42 +18,50 @@ const {
 } = Astro.props;
 ---
 
-<div class="relative aspect-8/5 w-100 rounded-xl border bg-white p-6">
+<div
+  class="relative aspect-8/5 w-full max-w-100 rounded-xl border bg-white p-4 md:p-6"
+>
   <!-- 左上：画像 -->
-  <div class="absolute top-6 left-6">
-    <div class="b h-32 w-32 overflow-hidden rounded-full border bg-white">
+  <div class="absolute top-4 left-4 md:top-6 md:left-6">
+    <div
+      class="h-20 w-20 overflow-hidden rounded-full border bg-white md:h-32 md:w-32"
+    >
       {image && <img src={image} alt="" class="h-full w-full object-cover" />}
     </div>
   </div>
 
   <!-- 右上：装飾 -->
-  <div class="absolute top-6 right-6 h-10 w-10 rounded-full bg-zinc-100"></div>
+  <div
+    class="absolute top-4 right-4 h-8 w-8 rounded-full bg-zinc-100 md:top-6 md:right-6 md:h-10 md:w-10"
+  >
+  </div>
 
   <!-- 右下寄せ：テキスト -->
-  <div class="absolute right-8 bottom-6 flex flex-col gap-1 text-sm">
-    <div class="flex gap-2">
-      <!-- ラベルに幅と右揃えを付与してコロンを揃える -->
-      <span class="w-24 text-right text-zinc-500">name :</span>
+  <div
+    class="absolute right-4 bottom-4 flex flex-col gap-1 text-sm md:right-8 md:bottom-6"
+  >
+    <div class="flex gap-2 whitespace-nowrap">
+      <span class="w-20 text-right text-zinc-500 md:w-24">name :</span>
       <span class="font-semibold">{name}</span>
     </div>
 
-    <div class="flex gap-2">
-      <span class="w-24 text-right text-zinc-500">age :</span>
+    <div class="flex gap-2 whitespace-nowrap">
+      <span class="w-20 text-right text-zinc-500 md:w-24">age :</span>
       <span>{age}</span>
     </div>
 
-    <div class="flex gap-2">
-      <span class="w-24 text-right text-zinc-500">location :</span>
+    <div class="flex gap-2 whitespace-nowrap">
+      <span class="w-20 text-right text-zinc-500 md:w-24">location :</span>
       <span>{location}</span>
     </div>
 
-    <div class="flex gap-2">
-      <span class="w-24 text-right text-zinc-500">pronoun :</span>
+    <div class="flex gap-2 whitespace-nowrap">
+      <span class="w-20 text-right text-zinc-500 md:w-24">pronoun :</span>
       <span>{pronoun}</span>
     </div>
 
-    <div class="flex gap-2">
-      <span class="w-24 text-right text-zinc-500">study :</span>
+    <div class="flex gap-2 whitespace-nowrap">
+      <span class="w-20 text-right text-zinc-500 md:w-24">study :</span>
       <span>{study}</span>
     </div>
   </div>

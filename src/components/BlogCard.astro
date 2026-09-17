@@ -16,9 +16,12 @@ const formattedDate = post.data.date
   : "";
 ---
 
-<a href={href} class="group flex min-h-20 w-full items-stretch gap-5 py-3">
+<a
+  href={href}
+  class="group flex min-h-20 w-full items-stretch gap-3 py-2 md:gap-5 md:py-3"
+>
   <!-- 左：テキスト領域 -->
-  <div class="flex flex-1 flex-col justify-between gap-1">
+  <div class="flex min-w-0 flex-1 flex-col justify-between gap-1">
     <!-- タイトル -->
     <p
       class="text-sm leading-snug font-medium text-zinc-900 group-hover:text-zinc-600"
@@ -27,17 +30,16 @@ const formattedDate = post.data.date
     </p>
 
     <!-- メタ情報 -->
-    <div class="flex justify-between gap-2 text-[11px]">
+    <div
+      class="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-[11px]"
+    >
       <span class="text-zinc-400">{formattedDate}</span>
       <TagList tags={post.data.tags} />
     </div>
   </div>
 
-  <!-- 中央仕切り -->
-  <!-- <div class="border-r"></div> -->
-
   <!-- 右：画像（扇） -->
-  <div class="flex w-16 items-center justify-center">
+  <div class="flex w-16 shrink-0 items-center justify-center">
     <MultiImages images={post.data.images} />
   </div>
 </a>

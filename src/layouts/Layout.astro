@@ -1,12 +1,17 @@
 ---
 import "../styles/global.css";
-import ExternalLink from "../components/ExternalLink.astro";
-import ViewMoreButton from "../components/ViewMoreButton.astro";
 
-const pathname = Astro.url.pathname;
+interface Props {
+  title?: string;
+  description?: string;
+  lockScroll?: boolean;
+}
 
-const { title = "Minato Hayashi", description = "my portfolio / blog" } =
-  Astro.props;
+const {
+  title = "Minato Hayashi",
+  description = "my portfolio / blog",
+  lockScroll = false,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -17,19 +22,32 @@ const { title = "Minato Hayashi", description = "my portfolio / blog" } =
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="icon" href="/favicon.ico" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..900&display=swap"
       rel="stylesheet"
     />
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
   </head>
-  <body class="flex h-screen flex-col overflow-hidden">
-    <main class="min-h-0 flex-1 overflow-hidden">
+
+  <body
+    class:list={[
+      "flex min-h-screen flex-col overflow-x-hidden",
+      lockScroll ? "lg:h-screen lg:min-h-0 lg:overflow-hidden" : "",
+    ]}
+  >
+    <main
+      class:list={[
+        "flex min-h-0 flex-1 flex-col",
+        lockScroll ? "lg:overflow-hidden" : "overflow-visible",
+      ]}
+    >
       <slot />
     </main>
 

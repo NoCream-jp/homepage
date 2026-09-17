@@ -28,11 +28,15 @@ const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} lockScroll={true}>
   <NotificationStrip items={notificationItems} />
-  <div class="flex h-full min-h-0 w-full flex-1">
+
+  <div class="flex min-h-0 w-full flex-1 flex-col lg:flex-row">
     <!-- 左 -->
-    <aside class="flex h-full flex-col justify-around gap-5 p-5">
+    <aside
+      class="flex w-full shrink-0 flex-col gap-4 p-4 lg:w-110 lg:justify-around lg:gap-5 lg:p-5"
+    >
+      <div class="text-3xl"></div>
       <BuisinessCard
         name="Minato Hayashi"
         age="23+"
@@ -41,7 +45,7 @@ const description = "Minato Hayashi's portfolio and blog";
         study="reinforcement learning"
       />
 
-      <div class="grid grid-cols-2 gap-1">
+      <div class="grid w-full max-w-100 grid-cols-2 gap-1">
         <LinkCard
           title="GitHub"
           username="NoCream-jp"
@@ -75,16 +79,18 @@ const description = "Minato Hayashi's portfolio and blog";
     </aside>
 
     <!-- 右 -->
-    <main class="flex min-h-0 w-full flex-1 flex-col items-stretch p-7">
-      <div class="flex h-fit w-full shrink-0 justify-end p-3"> 
+    <main
+      class="flex w-full flex-none flex-col items-stretch p-4 lg:min-h-0 lg:flex-1 lg:p-7"
+    >
+      <div class="flex h-fit w-full shrink-0 justify-end p-1 lg:p-3">
         <TagFilter tags={allTags} selector=".post-item" />
       </div>
 
-      <div class="relative min-h-0 flex-1">
+      <div class="relative flex-none lg:min-h-0 lg:flex-1">
         <!-- 上スクロールボタン -->
         <button
           id="scroll-up-btn"
-          class="group absolute top-4 left-1/2 z-10 flex h-6 w-20 -translate-x-1/2 cursor-pointer items-center justify-center rounded-full border bg-white transition hover:border-zinc-500"
+          class="group absolute top-2 left-1/2 z-10 hidden h-6 w-25 -translate-x-1/2 cursor-pointer items-center justify-center rounded-full border bg-white transition hover:border-zinc-500 lg:flex"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -104,7 +110,7 @@ const description = "Minato Hayashi's portfolio and blog";
         <!-- スクロール本体 -->
         <div
           id="post-scroll"
-          class="no-scrollbar h-full overflow-y-auto pt-3 pb-10"
+          class="no-scrollbar h-auto overflow-visible pt-3 pb-10 lg:h-full lg:overflow-y-auto"
         >
           <ArticleCardList posts={posts} />
         </div>
@@ -112,7 +118,7 @@ const description = "Minato Hayashi's portfolio and blog";
         <!-- 下スクロールボタン -->
         <button
           id="scroll-down-btn"
-          class="group absolute bottom-4 left-1/2 z-10 flex h-6 w-20 -translate-x-1/2 cursor-pointer items-center justify-center rounded-full border bg-white transition hover:border-zinc-500"
+          class="group absolute bottom-2 left-1/2 z-10 hidden h-6 w-25 -translate-x-1/2 cursor-pointer items-center justify-center rounded-full border bg-white transition hover:border-zinc-500 lg:flex"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -120,7 +126,7 @@ const description = "Minato Hayashi's portfolio and blog";
             fill="none"
             stroke="currentColor"
             stroke-width="1.5"
-            class="transtion h-4 w-4 text-black group-hover:text-zinc-500"
+            class="h-4 w-4 text-black group-hover:text-zinc-500"
           >
             <path
               stroke-linecap="round"
@@ -139,12 +145,10 @@ const description = "Minato Hayashi's portfolio and blog";
   const upBtn = document.getElementById("scroll-up-btn");
 
   if (scroll && downBtn && upBtn) {
-    // 下へ
     downBtn.addEventListener("click", () => {
       scroll.scrollBy({ top: 200, behavior: "smooth" });
     });
 
-    // 上へ
     upBtn.addEventListener("click", () => {
       scroll.scrollBy({ top: -200, behavior: "smooth" });
     });
@@ -153,12 +157,10 @@ const description = "Minato Hayashi's portfolio and blog";
       const top = scroll.scrollTop;
       const max = scroll.scrollHeight - scroll.clientHeight;
 
-      // 上ボタン
       const isTop = top <= 5;
       upBtn.style.opacity = isTop ? "0" : "1";
       upBtn.style.pointerEvents = isTop ? "none" : "auto";
 
-      // 下ボタン
       const isBottom = top >= max - 5;
       downBtn.style.opacity = isBottom ? "0" : "1";
       downBtn.style.pointerEvents = isBottom ? "none" : "auto";
