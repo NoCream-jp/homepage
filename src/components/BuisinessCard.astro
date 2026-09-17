@@ -1,9 +1,52 @@
 ---
-const name = "Minato Hayashi";
-const age = 23;
-const location = "Osaka, Japan";
-const pronounce = "He / Him";
-const study = "reinforcement learning";
+interface Props {
+  name: string;
+  age: string | number;
+  location: string;
+  pronoun: string;
+  study: string;
+  image?: string;
+}
+
+const { name, age, location, pronoun, study, image = "" } = Astro.props;
 ---
 
-<div class="aspect-8/5 h-auto w-100 rounded-md bg-black"></div>
+<div class="relative aspect-8/5 w-100 rounded-xl border bg-white p-6">
+  <!-- 左上：画像 -->
+  <div class="absolute top-6 left-6">
+    <div class="b h-32 w-32 overflow-hidden rounded-full border bg-white">
+      {image && <img src={image} alt="" class="h-full w-full object-cover" />}
+    </div>
+  </div>
+
+  <!-- 右上：装飾 -->
+  <div class="absolute top-6 right-6 h-10 w-10 rounded-full bg-zinc-100"></div>
+
+  <!-- 右下寄せ：テキスト -->
+  <div class="absolute right-8 bottom-6 flex flex-col gap-1 text-sm">
+    <div class="flex gap-2">
+      <span class="text-zinc-500">name :</span>
+      <span class="font-semibold">{name}</span>
+    </div>
+
+    <div class="flex gap-2">
+      <span class="text-zinc-500">age :</span>
+      <span>{age}</span>
+    </div>
+
+    <div class="flex gap-2">
+      <span class="text-zinc-500">location :</span>
+      <span>{location}</span>
+    </div>
+
+    <div class="flex gap-2">
+      <span class="text-zinc-500">pronoun :</span>
+      <span>{pronoun}</span>
+    </div>
+
+    <div class="flex gap-2">
+      <span class="text-zinc-500">study :</span>
+      <span>{study}</span>
+    </div>
+  </div>
+</div>
