@@ -1,10 +1,10 @@
 ---
+// src/pages/bio.astro
 import Layout from "../layouts/Layout.astro";
-import Breadcrumbs from "../components/Breadcrumbs.astro";
-import ActionLog from "../components/ActionLog.astro";
-import ImageStack from "../components/ImageStack.astro";
 import LeftNav from "../components/LeftNav.astro";
-import NotificationStrip from "../components/NotificationStrip.astro";
+import ImageStack from "../components/ImageStack.astro";
+import LearningCard from "../components/LearningCard.astro";
+import { getCollection, type CollectionEntry } from "astro:content";
 
 const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
@@ -32,6 +32,38 @@ const notificationItems = [
     banner: false,
   },
 ];
+
+// learning コレクションを取得（存在しない場合は空配列にフォールバック）
+let learning: CollectionEntry<"learning">[] = [];
+try {
+  learning = await getCollection("learning");
+} catch (e) {
+  // collection が無ければ空のままにしておく（ビルドが止まらないよう）
+  console.warn("collection 'learning' not found:", e);
+}
+
+// 既存の learning を取得済みとして
+function entryTime(e: any): number {
+  // e.data の型が厳密でないので any を使って安全に参照
+  const data = e.data || {};
+  const maybe = data.date ?? data.published;
+  if (maybe) {
+    const t = new Date(maybe).getTime();
+    return Number.isFinite(t) ? t : 0;
+  }
+  // 日付がなければ 0（古い扱い）。必要なら order と併用して優先度付けも可能
+  return 0;
+}
+
+// 安定ソート：まず日付降順、同値なら order（小さい順）で
+learning.sort((a, b) => {
+  const ta = entryTime(a);
+  const tb = entryTime(b);
+  if (ta !== tb) return tb - ta;
+  const oa = (a.data as any).order ?? 0;
+  const ob = (b.data as any).order ?? 0;
+  return oa - ob;
+});
 ---
 
 <Layout title={title} description={description}>
@@ -49,12 +81,13 @@ const notificationItems = [
         class="flex min-h-0 w-full min-w-0 flex-1 flex-col px-4 py-10 lg:px-7 lg:py-15"
       >
         <h1 class="mb-6 text-2xl font-semibold text-zinc-800">bio</h1>
+
         <div class="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto">
           <div class="w-full">
             <section class="mt-10 mb-10 flex w-full flex-col gap-4">
               <h2 class="">Who I am</h2>
               <div class="rounded-md border p-5">
-                <div class="">
+                <div>
                   こんにちは。みなとといいます。大学4回生で、AIや機械学習、ブロックチェーン、ネットワークについて学んでいます。
                   ウェブサイトを作ったり、競技プログラミングに参加したりしています。現在は、英語でアニメを見るのに熱中しています。
                   寝ること、食べること、音楽を聴くこと、猫とお話することが好きです。美しいと思ったものはなんでも勉強します。どうぞよろしく。
@@ -74,7 +107,18 @@ const notificationItems = [
 
               <h2 class="">What I'm learning</h2>
               <div class="rounded-md border p-5">
-                <div class="flex items-center gap-10"></div>
+                <!-- learning コレクションのエントリをそのまま LearningCard に渡す -->
+                <div
+                  class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                >
+                  {
+                    learning.length === 0 ? (
+                      <div class="col-span-full text-sm text-zinc-500" />
+                    ) : (
+                      learning.map((entry) => <LearningCard item={entry} />)
+                    )
+                  }
+                </div>
               </div>
             </section>
           </div>

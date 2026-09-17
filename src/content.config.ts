@@ -44,9 +44,23 @@ const actionCollection = defineCollection({
 //   }),
 // });
 
+const learningCollection = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/learning" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    order: z.number().optional(),
+    logo: z.string().optional(),
+    date: z.union([z.string(), z.date()]).optional(),
+    published: z.union([z.string(), z.date()]).optional(),
+  }),
+});
+
 export const collections = {
   blog: blogCollection,
   // news: newsCollection,
   "action-log": actionCollection,
   // achievement: achievementCollection,
+  learning: learningCollection,
 };
