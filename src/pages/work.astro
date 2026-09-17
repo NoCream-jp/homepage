@@ -1,15 +1,20 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { getCollection } from "astro:content";
-import ArticleCardList from "../components/ArticleCardList.astro";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+import ActionLog from "../components/ActionLog.astro";
+import ImageStack from "../components/ImageStack.astro";
 import LeftNav from "../components/LeftNav.astro";
 import NotificationStrip from "../components/NotificationStrip.astro";
-import ViewMoreButton from "../components/ViewMoreButton.astro";
 
-const posts = await getCollection("blog", ({ data }) => !data.draft);
-posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const title = "Minato Hayashi";
+const description = "Minato Hayashi's portfolio and blog";
 
-const latestPosts = posts.slice(0, 5);
+const sampleImages = [
+  "/images/cat.webp",
+  "/images/atcoder.png",
+  "/images/ra-men.webp",
+  "/images/spotify.webp",
+];
 
 const notificationItems = [
   {
@@ -27,14 +32,10 @@ const notificationItems = [
     banner: false,
   },
 ];
-
-const title = "Minato Hayashi";
-const description = "Minato Hayashi's portfolio and blog";
 ---
 
 <Layout title={title} description={description}>
   <div class="flex h-full min-h-0 flex-col pt-10">
-    <!-- NotificationStripより下 -->
     <div class="flex min-h-0 flex-1 flex-col lg:flex-row">
       <!-- 左 -->
       <aside
@@ -47,16 +48,13 @@ const description = "Minato Hayashi's portfolio and blog";
       <main
         class="flex min-h-0 w-full min-w-0 flex-1 flex-col px-4 py-7 lg:px-7 lg:py-10"
       >
-        <!-- ここだけスクロール可能 -->
+        <h1 class="mb-6 text-2xl font-semibold text-zinc-800">work</h1>
         <div class="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto">
-          <!-- 下：最新記事 -->
-          <section class="mt-10 w-full lg:mt-auto lg:pt-10">
-            <ArticleCardList posts={latestPosts} />
-
-            <div class="mt-4 flex justify-end">
-              <ViewMoreButton href="/blog" />
-            </div>
-          </section>
+          <div class="w-full">
+            <section class="mt-10 mb-10 flex w-full flex-col gap-4">
+              work in progress ...
+            </section>
+          </div>
         </div>
       </main>
     </div>

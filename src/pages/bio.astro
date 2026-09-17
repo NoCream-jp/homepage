@@ -1,15 +1,14 @@
 ---
+// src/pages/bio.astro
 import Layout from "../layouts/Layout.astro";
-// import { getCollection } from "astro:content";
-import WordCloud from "../components/WordCloud.astro";
+import LeftNav from "../components/LeftNav.astro";
 import ImageStack from "../components/ImageStack.astro";
-import Breadcrumbs from "../components/Breadcrumbs.astro";
-import ActionLog from "../components/ActionLog.astro";
+import LearningCard from "../components/LearningCard.astro";
+import { getCollection, type CollectionEntry } from "astro:content";
 
 const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
 
-// ImageStack用
 const sampleImages = [
   "/images/cat.webp",
   "/images/atcoder.png",
@@ -17,78 +16,114 @@ const sampleImages = [
   "/images/spotify.webp",
 ];
 
-// WordCloud用
-const cwords = [
-  "AtCoder",
-  "学園アイドルマスター",
-  "東野圭吾",
-  "QuizKnock",
-  "星街すいせい",
-  "KALDI",
-  "ハリー・ポッター",
-  "ポケットモンスターチャンピオンズ",
-  "Spotify",
-  "Arena Breakout",
-  "Anker",
-  "ナナホシ管弦楽団",
-  "Orangestar",
-  "米津玄師",
-  "The Amasing Degital Circus",
+const notificationItems = [
+  {
+    section: "blog",
+    date: "2026/09/15",
+    title: "最近考えていること",
+    href: "/blog/20260915_diary",
+    banner: false,
+  },
+  {
+    section: "blog",
+    date: "2026/09/15",
+    title: "ホームページをリニューアルしました",
+    href: "/blog/20260915_renew-site",
+    banner: false,
+  },
 ];
+
+// learning コレクションを取得（存在しない場合は空配列にフォールバック）
+let learning: CollectionEntry<"learning">[] = [];
+try {
+  learning = await getCollection("learning");
+} catch (e) {
+  // collection が無ければ空のままにしておく（ビルドが止まらないよう）
+  console.warn("collection 'learning' not found:", e);
+}
+
+// 既存の learning を取得済みとして
+function entryTime(e: any): number {
+  // e.data の型が厳密でないので any を使って安全に参照
+  const data = e.data || {};
+  const maybe = data.date ?? data.published;
+  if (maybe) {
+    const t = new Date(maybe).getTime();
+    return Number.isFinite(t) ? t : 0;
+  }
+  // 日付がなければ 0（古い扱い）。必要なら order と併用して優先度付けも可能
+  return 0;
+}
+
+// 安定ソート：まず日付降順、同値なら order（小さい順）で
+learning.sort((a, b) => {
+  const ta = entryTime(a);
+  const tb = entryTime(b);
+  if (ta !== tb) return tb - ta;
+  const oa = (a.data as any).order ?? 0;
+  const ob = (b.data as any).order ?? 0;
+  return oa - ob;
+});
 ---
 
 <Layout title={title} description={description}>
-  <div class="mx-5 mt-5 w-full max-w-5xl px-6 py-5">
-    <Breadcrumbs
-      items={[
-        { label: "TOP", href: "/" },
-        { label: "bio", href: "/bio" },
-      ]}
-    />
+  <div class="flex h-full min-h-0 flex-col pt-10">
+    <div class="flex min-h-0 flex-1 flex-col lg:flex-row">
+      <!-- 左 -->
+      <aside
+        class="flex w-full shrink-0 flex-col gap-4 p-4 lg:w-110 lg:justify-around lg:gap-5 lg:p-5"
+      >
+        <LeftNav />
+      </aside>
 
-    <section class="mb-20 w-full">
-      <h1 class="mb-7 text-2xl">bio</h1>
-      <div class="flex flex-col items-center">
-        <div class="mt-7 mb-3">Who I am</div>
-        <div class="mb-10 grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-8">
-          <p class="text-md leading-relaxed text-zinc-900">
-            こんにちは。みなとといいます。大学4回生で、AIや機械学習、ブロックチェーン、ネットワークについて学んでいます。
-            webサイトを作ったり、競技プログラミングに参加したりしています。現在は、英語でアニメを見るのに熱中しています。
-            寝ること、食べること、音楽を聴くこと、猫とお話することが好きです。美しいと思ったものはなんでも勉強します。どうぞよろしく。
-          </p>
-          <p class="text-md leading-relaxed text-zinc-900">
-            Hi. I'm Minato Hayashi, a senior university student, in Japan. I'm
-            learning AI, machine learning, blockchain, network, and more. I
-            recently make websites and articles, participate competitive
-            programming. I love eating, sleeping, and talking with cat. Have fun
-            everything with me !!
-          </p>
-        </div>
+      <!-- 右 -->
+      <main
+        class="flex min-h-0 w-full min-w-0 flex-1 flex-col px-4 py-7 lg:px-7 lg:py-10"
+      >
+        <h1 class="mb-6 text-2xl font-semibold text-zinc-800">bio</h1>
 
-        <div class="my-5">What I saw</div>
-        <div class="mb-10 flex max-w-full items-center gap-15">
-          <ImageStack images={sampleImages} />
-          <div>
-            各種SNSには猫の画像、外食の際撮影した写真、その他趣味関連の画像を投稿しています。
+        <div class="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <div class="w-full">
+            <section class="mt-10 mb-10 flex w-full flex-col gap-4">
+              <h2 class="">Who I am</h2>
+              <div class="rounded-md border p-5">
+                <div>
+                  こんにちは。みなとといいます。大学4回生で、AIや機械学習、ブロックチェーン、ネットワークについて学んでいます。
+                  ウェブサイトを作ったり、競技プログラミングに参加したりしています。現在は、英語でアニメを見るのに熱中しています。
+                  寝ること、食べること、音楽を聴くこと、猫とお話することが好きです。美しいと思ったものはなんでも勉強します。どうぞよろしく。
+                </div>
+              </div>
+
+              <h2 class="">What I saw</h2>
+              <div class="rounded-md border p-5">
+                <div class="flex items-center gap-10">
+                  <ImageStack images={sampleImages} />
+                  <div>
+                    各種SNSには、猫の画像や外出時に撮影した写真、その他趣味関連のお気に入りの画像を投稿しています。
+                    外食時には、後から見返せるように食べた料理を記録しています。
+                  </div>
+                </div>
+              </div>
+
+              <h2 class="">What I'm learning</h2>
+              <div class="rounded-md border p-5">
+                <!-- learning コレクションのエントリをそのまま LearningCard に渡す -->
+                <div
+                  class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                >
+                  {
+                    learning.length === 0 ? (
+                      <div class="col-span-full text-sm text-zinc-500" />
+                    ) : (
+                      learning.map((entry) => <LearningCard item={entry} />)
+                    )
+                  }
+                </div>
+              </div>
+            </section>
           </div>
         </div>
-
-        <div class="my-5">What I like</div>
-        <WordCloud
-          words={cwords}
-          width="80%"
-          height="250px"
-          maxFont={50}
-          minFont={35}
-        />
-        <div class="mb-10"></div>
-
-        <div class="my-5">What I did</div>
-        <div class="">
-          <ActionLog limit={10} />
-        </div>
-        <!-- <div class="mt-15 mb-5">What I listen</div> -->
-      </div>
-    </section>
+      </main>
+    </div>
   </div>
 </Layout>

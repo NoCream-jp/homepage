@@ -1,15 +1,14 @@
 ---
+// src/pages/blog/[id].astro
 import { getCollection, render, type CollectionEntry } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
-import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import BackButton from "../../components/BackButton.astro";
 import Highlight from "../../components/Highlight.astro";
 import LikeButton from "../../components/LikeButton.astro";
+import LeftNav from "../../components/LeftNav.astro";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog", ({ data }) => {
-    return data.draft !== true;
-  });
+  const posts = await getCollection("blog", ({ data }) => data.draft !== true);
   return posts.map((post) => ({
     params: { id: post.id },
     props: { post },
@@ -20,52 +19,54 @@ interface Props {
   post: CollectionEntry<"blog">;
 }
 
-const { post } = Astro.props;
+const { post } = Astro.props as Props;
 const { Content } = await render(post);
 
-// OGP
+// OGP meta (kept for Layout props)
 const description =
   post.data.description || `${post.data.title}についての記事です。`;
 const image = post.data.image || "/brand/ogp-image.png";
 ---
 
-<Layout
-  title={`${post.data.title} | mi-nato.com`}
-  description={description}
-  image={image}
->
-  <div class="items-left mx-5 mt-5 flex w-full max-w-5xl flex-col px-6 py-5">
-    <article class="mb-10">
-      <Breadcrumbs
-        items={[
-          { label: "TOP", href: "/" },
-          { label: "blog", href: "/blog" },
-          { label: post.data.title },
-        ]}
-      />
-
-      <header class="mt-12 mb-12">
-        <div
-          class="flex items-center justify-between border-b border-zinc-300 pb-5"
-        >
-          <h1
-            class="text-xl font-bold tracking-wide text-zinc-800 md:text-[1.7rem]"
-          >
-            {post.data.title}
-          </h1>
-        </div>
-      </header>
-
-      <div
-        class="blog-content text-[15px] leading-[2.2] tracking-wide text-zinc-800 md:text-base"
+<Layout title={`${post.data.title} | mi-nato.com`} description={description}>
+  <div class="flex h-full min-h-0 flex-col pt-10">
+    <div class="flex min-h-0 flex-1 flex-col lg:flex-row">
+      <!-- 左 -->
+      <aside
+        class="flex w-full shrink-0 flex-col gap-4 p-4 lg:w-110 lg:justify-around lg:gap-5 lg:p-5"
       >
-        <Content components={{ Highlight }} />
-      </div>
-    </article>
+        <LeftNav />
+      </aside>
 
-    <div class="article-footer flex w-full items-center justify-between">
-      <BackButton href="/blog" />
-      <LikeButton articleId={post.id} />
+      <!-- 右 -->
+      <main
+        class="flex min-h-0 w-full min-w-0 flex-1 flex-col px-4 py-7 lg:px-7 lg:py-10"
+      >
+        <h1 class="mb-3 text-2xl font-semibold text-zinc-800">
+          {post.data.title}
+        </h1>
+
+        <!-- 本文のみスクロール -->
+        <div
+          class="no-scrollbar flex min-h-0 flex-1 overflow-y-auto rounded-md border px-5"
+        >
+          <div class="w-full">
+            <section class="w-full pb-10">
+              <article
+                class="blog-content text-[15px] leading-normal tracking-wide text-zinc-800 md:text-base"
+              >
+                <Content components={{ Highlight }} />
+              </article>
+            </section>
+          </div>
+        </div>
+
+        <!-- フッター-->
+        <div class="mt-2 flex w-full items-center justify-between">
+          <BackButton href="/blog" />
+          <LikeButton articleId={post.id} />
+        </div>
+      </main>
     </div>
   </div>
 </Layout>
@@ -115,18 +116,26 @@ const image = post.data.image || "/brand/ogp-image.png";
     white-space: nowrap;
   }
 
-  /* テーブルヘッダー（h1の下線と同じ色で統一感を持たせる） */
   :global(.blog-content th) {
     width: 100%;
-    font-weight: 500; /* h2と同じ太さで統一 */
-    color: #27272a; /* text-zinc-800 */
+    font-weight: 500;
+    color: #27272a;
     padding: 0.8rem 1rem;
     text-align: left;
     background-color: white;
   }
 
-  /* テーブルデータ（控えめな細いラインで区切る） */
   :global(.blog-content td) {
     padding: 0.8rem 1rem;
+  }
+
+  /* スクロールバーの見た目（任意） */
+  :global(.no-scrollbar::-webkit-scrollbar) {
+    width: 8px;
+    height: 8px;
+  }
+  :global(.no-scrollbar::-webkit-scrollbar-thumb) {
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 999px;
   }
 </style>

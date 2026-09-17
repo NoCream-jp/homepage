@@ -1,9 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { getCollection } from "astro:content";
-import ArticleCard from "../components/ArticleCard.astro";
+import ArticleCardList from "../components/ArticleCardList.astro";
 import TagFilter from "../components/TagFilter.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
+import LeftNav from "../components/LeftNav.astro";
+import NotificationStrip from "../components/NotificationStrip.astro";
 
 const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
@@ -15,42 +17,161 @@ posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 const allTags = Array.from(
   new Set(posts.flatMap((p) => p.data.tags ?? []))
 ).sort();
+
+/* 通知 */
+const notificationItems = [
+  {
+    section: "blog",
+    date: "2026/09/15",
+    title: "最近考えていること",
+    href: "/blog/20260915_diary",
+    banner: false,
+  },
+  {
+    section: "blog",
+    date: "2026/09/15",
+    title: "ホームページをリニューアルしました",
+    href: "/blog/20260915_renew-site",
+    banner: false,
+  },
+];
 ---
 
 <Layout title={title} description={description}>
-  <div class="mx-5 mt-5 w-full max-w-5xl px-6 py-5">
-    <Breadcrumbs
-      items={[
-        { label: "TOP", href: "/" },
-        { label: "blog", href: "/blog" },
-      ]}
-    />
-
-    <section class="mb-20 w-full">
-      <h1 class="mb-7 text-2xl">all blogs</h1>
-
-      <!-- タグフィルター -->
-      <TagFilter tags={allTags} />
-
-      <div
-        id="posts-grid"
-        class="grid w-full grid-cols-2 items-stretch gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4 lg:gap-6"
+  <div class="flex h-full min-h-0 flex-col pt-10">
+    <!-- NotificationStripより下 -->
+    <div class="flex min-h-0 flex-1 flex-col lg:flex-row">
+      <!-- 左 -->
+      <aside
+        class="flex w-full shrink-0 flex-col gap-4 p-4 lg:w-110 lg:justify-around lg:gap-5 lg:px-5"
       >
-        {
-          posts.map((post) => {
-            const tags = post.data.tags ?? [];
-            return (
-              <div
-                class="post-item h-full"
-                data-tags={tags.join(",")}
-                data-id={post.id}
-              >
-                <ArticleCard post={post} />
+        <LeftNav />
+      </aside>
+
+      <!-- 右 -->
+      <main
+        class="flex min-h-0 w-full min-w-0 flex-1 flex-col px-4 py-7 lg:px-7 lg:py-10"
+      >
+        <h1 class="text-2xl font-semibold text-zinc-800">all blogs</h1>
+
+        <!-- タグフィルター -->
+        <div class="mb-1 flex w-full shrink-0 justify-end">
+          <TagFilter tags={allTags} selector=".post-item" />
+        </div>
+
+        <!-- 記事カードのスクロール領域 -->
+        <div id="article-scroll-area" class="relative min-h-0 flex-1">
+          <!-- 記事一覧だけがスクロールする -->
+          <div
+            id="article-scroll-container"
+            class="no-scrollbar h-full min-h-0 overflow-y-auto"
+          >
+            <section class="mt-10 mb-10 w-full">
+              <div class="w-full">
+                <ArticleCardList posts={posts} />
               </div>
-            );
-          })
-        }
-      </div>
-    </section>
+            </section>
+          </div>
+
+          <!-- 上へ -->
+          <button
+            id="article-scroll-up"
+            type="button"
+            aria-label="上へスクロール"
+            class="absolute top-2 left-1/2 z-10 -translate-x-1/2 rounded-full border bg-white/40 p-2 text-zinc-700 transition hover:bg-zinc-100"
+            hidden
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="h-5 w-5"
+              aria-hidden="true"
+            >
+              <path d="m18 15-6-6-6 6"></path>
+            </svg>
+          </button>
+
+          <!-- 下へ -->
+          <button
+            id="article-scroll-down"
+            type="button"
+            aria-label="下へスクロール"
+            class="absolute bottom-2 left-1/2 z-10 -translate-x-1/2 rounded-full border bg-white/40 p-2 text-zinc-700 transition hover:bg-zinc-100"
+            hidden
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="h-5 w-5"
+              aria-hidden="true"
+            >
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
+          </button>
+        </div>
+      </main>
+    </div>
   </div>
 </Layout>
+
+<script>
+  const setupArticleScrollButtons = () => {
+    const scrollContainer = document.querySelector<HTMLDivElement>(
+      "#article-scroll-container"
+    );
+
+    const upButton =
+      document.querySelector<HTMLButtonElement>("#article-scroll-up");
+
+    const downButton = document.querySelector<HTMLButtonElement>(
+      "#article-scroll-down"
+    );
+
+    if (!scrollContainer || !upButton || !downButton) return;
+
+    const updateButtons = () => {
+      const atTop = scrollContainer.scrollTop <= 1;
+
+      const atBottom =
+        scrollContainer.scrollTop + scrollContainer.clientHeight >=
+        scrollContainer.scrollHeight - 1;
+
+      upButton.hidden = atTop;
+      downButton.hidden = atBottom;
+    };
+
+    upButton.addEventListener("click", () => {
+      scrollContainer.scrollBy({
+        top: -scrollContainer.clientHeight * 0.8,
+        behavior: "smooth",
+      });
+    });
+
+    downButton.addEventListener("click", () => {
+      scrollContainer.scrollBy({
+        top: scrollContainer.clientHeight * 0.8,
+        behavior: "smooth",
+      });
+    });
+
+    scrollContainer.addEventListener("scroll", updateButtons, {
+      passive: true,
+    });
+
+    window.addEventListener("resize", updateButtons);
+
+    updateButtons();
+  };
+
+  document.addEventListener("astro:page-load", setupArticleScrollButtons);
+</script>

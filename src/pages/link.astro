@@ -5,7 +5,7 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 ---
 
 <Layout>
-  <div class="mx-5 mt-5 w-full max-w-5xl px-6 py-5">
+  <div class="mx-auto mt-8 w-full max-w-3xl px-4 md:px-6">
     <Breadcrumbs
       items={[
         { label: "TOP", href: "/" },
@@ -14,9 +14,9 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
     />
 
     <section class="my-10 w-full">
-      <h2 class="mb-7 text-2xl font-normal">links</h2>
+      <h2 class="mb-6 text-2xl font-normal text-zinc-800">links</h2>
 
-      <div class="grid w-full grid-cols-2 gap-3 md:grid-cols-3">
+      <div class="grid w-full grid-cols-2 gap-2 md:grid-cols-3 md:gap-3">
         <LinkCard
           title="GitHub"
           username="NoCream-jp"

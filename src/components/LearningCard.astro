@@ -1,0 +1,70 @@
+---
+// src/components/LearnigCard.astro
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  item: CollectionEntry<"learning">;
+}
+
+const { item } = Astro.props as Props;
+
+// 最低限の表示データを正しく取得（frontmatter が最小でも安全）
+const title = (item.data as any)?.title ?? item.id;
+const logo = (item.data as any)?.logo ?? null;
+
+// ロゴがない場合に使うイニシャル（2文字まで）
+function initialsOf(s: string) {
+  if (!s) return "";
+  const parts = s.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).slice(0, 2).toUpperCase();
+}
+const initials = initialsOf(String(title));
+---
+
+<article
+  class="cert-card group relative flex w-full items-center gap-4 overflow-hidden rounded-md border bg-white px-4 py-3 transition-colors duration-150 ease-out focus-within:outline-none"
+  role="article"
+  aria-labelledby={`learning-title-${item.id}`}
+  data-tags={(item.data as any).tags?.join(",") ?? ""}
+>
+  <!-- ロゴ（あれば画像、なければイニシャル丸） -->
+  {
+    logo ? (
+      <div class="shrink-0">
+        <img
+          src={logo}
+          alt={`${title} logo`}
+          class="h-10 w-10 rounded-md object-contain"
+          loading="lazy"
+        />
+      </div>
+    ) : (
+      <div
+        class="flex h-10 w-10 items-center justify-center rounded-md border border-black/5 bg-black/5 text-sm font-medium text-zinc-900"
+        aria-hidden="true"
+      >
+        {initials}
+      </div>
+    )
+  }
+
+  <!-- タイトル -->
+  <div class="min-w-0">
+    <h3
+      id={`learning-title-${item.id}`}
+      class="truncate text-sm font-medium text-zinc-900"
+      title={String(title)}
+    >
+      {title}
+    </h3>
+  </div>
+
+  <style>
+    :global(.cert-card:focus-within),
+    :global(.cert-card:focus-visible) {
+      box-shadow: 0 0 0 3px rgb(0 0 0 / 6%);
+      border-color: rgb(0 0 0 / 40%);
+    }
+  </style>
+</article>

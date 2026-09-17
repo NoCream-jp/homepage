@@ -10,10 +10,12 @@ const { tags = [], selector = ".post-item", initial = null } = Astro.props;
 ---
 
 <div
-  class="mb-8 flex flex-wrap gap-2"
+  class="mb-0 flex flex-wrap gap-2"
   role="toolbar"
   aria-label="Filter posts by tag"
   data-component="tag-filter"
+  data-selector={selector}
+  data-initial={initial}
 >
   <button
     data-tag="all"
@@ -41,33 +43,21 @@ const { tags = [], selector = ".post-item", initial = null } = Astro.props;
 </div>
 
 <script is:inline>
-  (function () {
+  function setupTagFilter() {
     const root = document.querySelector('[data-component="tag-filter"]');
     if (!root) return;
 
-    const buttons = Array.from(
-      root.querySelectorAll<HTMLButtonElement>(".tag-btn")
-    );
-    const allBtn = root.querySelector<HTMLButtonElement>('[data-tag="all"]');
-    const itemSelector =
-      root.getAttribute("data-selector") || "" || "__PLACEHOLDER__";
-    // We will read selector from a dataset fallback in use; but allow propagation from props via data-attr if needed.
-  })();
-</script>
+    // 同じページで二重初期化しない
+    if (root.dataset.initialized === "true") return;
+    root.dataset.initialized = "true";
 
-<!-- inline script with full logic (keeps everything in one file for easy drop-in) -->
-<script is:inline>
-  (function () {
-    const root = document.querySelector('[data-component="tag-filter"]');
-    if (!root) return;
     const buttons = Array.from(root.querySelectorAll(".tag-btn"));
-    const allBtn = root.querySelector('[data-tag="all"]');
-    // default selector; you can override by adding data-selector attr on the root
     const selector = root.getAttribute("data-selector") || ".post-item";
+
     const getPostItems = () => Array.from(document.querySelectorAll(selector));
 
-    // read initial from URL unless data-initial attribute was set on root
     const urlParams = new URLSearchParams(window.location.search);
+
     let active =
       root.getAttribute("data-initial") || urlParams.get("tag") || "all";
 
@@ -75,10 +65,13 @@ const { tags = [], selector = ".post-item", initial = null } = Astro.props;
       buttons.forEach((btn) => {
         const tag = btn.getAttribute("data-tag");
         const pressed = tag === "all" ? active === "all" : active === tag;
+
         btn.setAttribute("aria-pressed", pressed ? "true" : "false");
         btn.dataset.active = pressed ? "true" : "false";
+
         if (pressed) {
           btn.classList.add("bg-zinc-800", "text-white", "border-transparent");
+
           btn.classList.remove("bg-white", "text-zinc-700", "border");
         } else {
           btn.classList.remove(
@@ -86,6 +79,7 @@ const { tags = [], selector = ".post-item", initial = null } = Astro.props;
             "text-white",
             "border-transparent"
           );
+
           btn.classList.add("bg-white", "text-zinc-700", "border");
         }
       });
@@ -93,86 +87,197 @@ const { tags = [], selector = ".post-item", initial = null } = Astro.props;
 
     function updateURL() {
       const url = new URL(window.location.href);
-      if (active === "all") url.searchParams.delete("tag");
-      else url.searchParams.set("tag", active);
+
+      if (active === "all") {
+        url.searchParams.delete("tag");
+      } else {
+        url.searchParams.set("tag", active);
+      }
+
       history.replaceState({ ...window.history.state }, "", url);
+    }
+
+    function updateLastBorder() {
+      const items = getPostItems();
+
+      items.forEach((it) => {
+        it.classList.remove("border-b");
+      });
+
+      const visible = items.filter((it) => !it.classList.contains("hidden"));
+
+      if (visible.length > 0) {
+        visible[visible.length - 1].classList.add("border-b");
+      }
     }
 
     function filterItems() {
       const items = getPostItems();
+
       if (!items.length) return;
 
+      /*
+       * フィルター前の位置を記録
+       * ↓
+       * hiddenの切り替え
+       * ↓
+       * フィルター後の位置との差分をアニメーション
+       */
+      const previousPositions = new Map();
+
+      items.forEach((item) => {
+        const rect = item.getBoundingClientRect();
+
+        if (rect.width > 0 && rect.height > 0) {
+          previousPositions.set(item, rect);
+        }
+      });
+
+      // 表示・非表示を切り替える
       if (active === "all") {
-        items.forEach((it) => {
-          it.classList.remove("hidden");
-          it.setAttribute("aria-hidden", "false");
+        items.forEach((item) => {
+          item.classList.remove("hidden");
+          item.setAttribute("aria-hidden", "false");
         });
       } else {
-        const a = active;
-        items.forEach((it) => {
-          // expect data-tags="tag1,tag2,tag3" (comma separated)
-          const raw = it.getAttribute("data-tags") || "";
+        items.forEach((item) => {
+          const raw = item.getAttribute("data-tags") || "";
+
           const tags = raw
             .split(",")
             .map((s) => s.trim())
             .filter(Boolean);
-          const matched = tags.includes(a);
-          if (matched) {
-            it.classList.remove("hidden");
-            it.setAttribute("aria-hidden", "false");
+
+          if (tags.includes(active)) {
+            item.classList.remove("hidden");
+            item.setAttribute("aria-hidden", "false");
           } else {
-            it.classList.add("hidden");
-            it.setAttribute("aria-hidden", "true");
+            item.classList.add("hidden");
+            item.setAttribute("aria-hidden", "true");
           }
         });
       }
 
-      // dispatch event so page can react if needed
-      root.dispatchEvent(
-        new CustomEvent("tag-change", { detail: { tag: active } })
+      updateLastBorder();
+
+      /*
+       * 記事一覧を先頭へ戻す
+       */
+      const scrollContainer = document.querySelector(
+        "#article-scroll-container"
       );
+
+      if (scrollContainer) {
+        scrollContainer.scrollTop = 0;
+      }
+
+      /*
+       * レイアウト確定後にアニメーション
+       */
+      requestAnimationFrame(() => {
+        const visible = items.filter(
+          (item) => !item.classList.contains("hidden")
+        );
+
+        visible.forEach((item, index) => {
+          const current = item.getBoundingClientRect();
+          const previous = previousPositions.get(item);
+
+          let translateX = 0;
+          let translateY = -16;
+
+          /*
+           * 以前から表示されていたカード
+           * → 新しい位置まで滑らかに移動
+           */
+          if (previous) {
+            translateX = previous.left - current.left;
+            translateY = previous.top - current.top;
+          }
+
+          item.animate(
+            [
+              {
+                transform: `translate(${translateX}px, ${translateY}px)`,
+                opacity: 0,
+              },
+              {
+                transform: "translate(0, 0)",
+                opacity: 1,
+              },
+            ],
+            {
+              duration: 420,
+              delay: index * 35,
+              easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+              fill: "both",
+            }
+          );
+        });
+
+        /*
+         * 記事スクロールボタン側へ更新を通知
+         */
+        document.dispatchEvent(new CustomEvent("tag-filter-updated"));
+      });
     }
 
     function setActive(next) {
-      if (!next) next = "all";
-      // toggle: clicking same tag again -> all
-      if (active === next) active = "all";
-      else active = next;
+      if (!next) {
+        next = "all";
+      }
+
+      if (active === next) {
+        active = "all";
+      } else {
+        active = next;
+      }
+
       updateButtons();
       updateURL();
       filterItems();
     }
 
-    // initialize UI
+    // 初期化
     updateButtons();
-    // but ensure DOM items exist - run filter in next frame
-    requestAnimationFrame(filterItems);
 
-    // attach handlers
+    requestAnimationFrame(() => {
+      filterItems();
+    });
+
+    // click
     buttons.forEach((btn) => {
-      btn.addEventListener("click", (e) => {
+      btn.addEventListener("click", () => {
         const tag = btn.getAttribute("data-tag");
+
         if (!tag) return;
+
         setActive(tag);
       });
 
-      // keyboard: Enter/Space activate
       btn.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          const tag = btn.getAttribute("data-tag");
-          if (!tag) return;
-          setActive(tag);
-        }
+        if (e.key !== "Enter" && e.key !== " ") return;
+
+        e.preventDefault();
+
+        const tag = btn.getAttribute("data-tag");
+
+        if (!tag) return;
+
+        setActive(tag);
       });
     });
 
-    // listen to popstate to reflect back/forward
+    // 戻る・進む対応
     window.addEventListener("popstate", () => {
       const params = new URLSearchParams(window.location.search);
+
       active = params.get("tag") || "all";
+
       updateButtons();
       filterItems();
     });
-  })();
+  }
+
+  document.addEventListener("astro:page-load", setupTagFilter);
 </script>

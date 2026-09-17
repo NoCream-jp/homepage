@@ -1,0 +1,26 @@
+---
+import type { CollectionEntry } from "astro:content";
+import ArticleCard from "./ArticleCard.astro";
+
+interface Props {
+  posts: CollectionEntry<"blog">[];
+}
+
+const { posts } = Astro.props;
+---
+
+<div class="w-full">
+  {
+    posts.map((post, i) => (
+      <div
+        class:list={[
+          "post-item border-t",
+          i === posts.length - 1 ? "border-b" : "",
+        ]}
+        data-tags={(post.data.tags ?? []).join(",")}
+      >
+        <ArticleCard post={post} />
+      </div>
+    ))
+  }
+</div>
