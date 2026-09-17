@@ -70,17 +70,95 @@ const description = "Minato Hayashi's portfolio and blog";
 
     <!-- 右 -->
     <main class="flex min-h-0 w-full flex-1 flex-col items-stretch p-7">
-      <div class="w-full shrink-0 p-3">
+      <div class="flex h-fit w-full shrink-0 justify-end p-3">
         <TagFilter tags={allTags} selector=".post-item" />
       </div>
 
       <div class="relative min-h-0 flex-1">
-        <div class="no-scrollbar h-full overflow-y-auto py-3">
+        <!-- 上スクロールボタン -->
+        <button
+          id="scroll-up-btn"
+          class="absolute top-6 left-1/2 z-10 flex h-6 w-20 -translate-x-1/2 items-center justify-center rounded-full border bg-white backdrop-blur transition hover:bg-white"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            class="h-4 w-4 text-zinc-600"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M18 15l-6-6-6 6"></path>
+          </svg>
+        </button>
+
+        <!-- スクロール本体 -->
+        <div
+          id="post-scroll"
+          class="no-scrollbar h-full overflow-y-auto pt-3 pb-10"
+        >
           <ArticleCardList posts={posts} />
         </div>
 
-        <!-- <div class="pointer-events-none absolute bottom-0 left-0 right-0 h-20 z-10 bg-linear-to-t from-white to-transparent" /> -->
+        <!-- 下スクロールボタン -->
+        <button
+          id="scroll-down-btn"
+          class="absolute bottom-6 left-1/2 z-10 flex h-6 w-20 -translate-x-1/2 items-center justify-center rounded-full border bg-white backdrop-blur transition hover:bg-white"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            class="h-4 w-4 text-zinc-600"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 9l6 6 6-6"></path>
+          </svg>
+        </button>
       </div>
     </main>
   </div>
 </Layout>
+
+<script is:inline>
+  const scroll = document.getElementById("post-scroll");
+  const downBtn = document.getElementById("scroll-down-btn");
+  const upBtn = document.getElementById("scroll-up-btn");
+
+  if (scroll && downBtn && upBtn) {
+    // 下へ
+    downBtn.addEventListener("click", () => {
+      scroll.scrollBy({ top: 200, behavior: "smooth" });
+    });
+
+    // 上へ
+    upBtn.addEventListener("click", () => {
+      scroll.scrollBy({ top: -200, behavior: "smooth" });
+    });
+
+    const update = () => {
+      const top = scroll.scrollTop;
+      const max = scroll.scrollHeight - scroll.clientHeight;
+
+      // 上ボタン
+      const isTop = top <= 5;
+      upBtn.style.opacity = isTop ? "0" : "1";
+      upBtn.style.pointerEvents = isTop ? "none" : "auto";
+
+      // 下ボタン
+      const isBottom = top >= max - 5;
+      downBtn.style.opacity = isBottom ? "0" : "1";
+      downBtn.style.pointerEvents = isBottom ? "none" : "auto";
+    };
+
+    scroll.addEventListener("scroll", update);
+    update();
+  }
+</script>
