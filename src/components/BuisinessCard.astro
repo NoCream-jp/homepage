@@ -8,7 +8,14 @@ interface Props {
   image?: string;
 }
 
-const { name, age, location, pronoun, study, image = "" } = Astro.props;
+const {
+  name,
+  age,
+  location,
+  pronoun,
+  study,
+  image = "/images/brand/logo.png",
+} = Astro.props;
 ---
 
 <div class="relative aspect-8/5 w-100 rounded-xl border bg-white p-6">
@@ -25,27 +32,28 @@ const { name, age, location, pronoun, study, image = "" } = Astro.props;
   <!-- 右下寄せ：テキスト -->
   <div class="absolute right-8 bottom-6 flex flex-col gap-1 text-sm">
     <div class="flex gap-2">
-      <span class="text-zinc-500">name :</span>
+      <!-- ラベルに幅と右揃えを付与してコロンを揃える -->
+      <span class="w-24 text-right text-zinc-500">name :</span>
       <span class="font-semibold">{name}</span>
     </div>
 
     <div class="flex gap-2">
-      <span class="text-zinc-500">age :</span>
+      <span class="w-24 text-right text-zinc-500">age :</span>
       <span>{age}</span>
     </div>
 
     <div class="flex gap-2">
-      <span class="text-zinc-500">location :</span>
+      <span class="w-24 text-right text-zinc-500">location :</span>
       <span>{location}</span>
     </div>
 
     <div class="flex gap-2">
-      <span class="text-zinc-500">pronoun :</span>
+      <span class="w-24 text-right text-zinc-500">pronoun :</span>
       <span>{pronoun}</span>
     </div>
 
     <div class="flex gap-2">
-      <span class="text-zinc-500">study :</span>
+      <span class="w-24 text-right text-zinc-500">study :</span>
       <span>{study}</span>
     </div>
   </div>
