@@ -1,12 +1,14 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import WordCloud from "../components/WordCloud.astro";
-import ImageStack from "../components/ImageStack.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
+import BuisinessCard from "../components/BuisinessCard.astro";
+import LinkCard from "../components/LinkCard.astro";
 import ActionLog from "../components/ActionLog.astro";
+import ImageStack from "../components/ImageStack.astro";
+import NotificationStrip from "../components/NotificationStrip.astro";
 
 const title = "Minato Hayashi";
-const description = "Minato Hayashi's portfolio and blog";
+const description = "bio page";
 
 const sampleImages = [
   "/images/cat.webp",
@@ -15,92 +17,112 @@ const sampleImages = [
   "/images/spotify.webp",
 ];
 
-const cwords = [
-  "AtCoder",
-  "学園アイドルマスター",
-  "東野圭吾",
-  "QuizKnock",
-  "星街すいせい",
-  "KALDI",
-  "ハリー・ポッター",
-  "ポケットモンスターチャンピオンズ",
-  "Spotify",
-  "Arena Breakout",
-  "Anker",
-  "ナナホシ管弦楽団",
-  "Orangestar",
-  "米津玄師",
-  "The Amasing Degital Circus",
+const notificationItems = [
+  {
+    section: "blog",
+    date: "2026/09/15",
+    title: "最近考えていること",
+    href: "/blog/20260915_diary",
+    banner: false,
+  },
+  {
+    section: "blog",
+    date: "2026/09/15",
+    title: "ホームページをリニューアルしました",
+    href: "/blog/20260915_renew-site",
+    banner: false,
+  },
 ];
 ---
 
 <Layout title={title} description={description}>
-  <div class="mx-auto mt-8 w-full max-w-3xl px-4 md:px-6">
-    <Breadcrumbs
-      items={[
-        { label: "TOP", href: "/" },
-        { label: "bio", href: "/bio" },
-      ]}
-    />
+  <NotificationStrip items={notificationItems} />
+  <div class="flex min-h-0 w-full flex-1 flex-col lg:flex-row">
+    <aside
+      class="flex w-full shrink-0 flex-col gap-4 p-4 lg:w-110 lg:justify-around lg:gap-5 lg:p-5"
+    >
+      <div class="text-3xl"></div>
 
-    <section class="my-10 w-full space-y-12">
-      <h1 class="text-2xl font-semibold text-zinc-800">bio</h1>
+      <BuisinessCard
+        name="Minato Hayashi"
+        age="23+"
+        location="Osaka, Japan"
+        pronoun="He / Him"
+        study="reinforcement learning"
+      />
 
-      <!-- Who I am -->
-      <div>
-        <div class="mb-4 text-sm text-zinc-500">Who I am</div>
-
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-10">
-          <p class="leading-relaxed text-zinc-900">
-            こんにちは。みなとといいます。大学4回生で、AIや機械学習、ブロックチェーン、ネットワークについて学んでいます。
-            webサイトを作ったり、競技プログラミングに参加したりしています。現在は、英語でアニメを見るのに熱中しています。
-            寝ること、食べること、音楽を聴くこと、猫とお話することが好きです。美しいと思ったものはなんでも勉強します。どうぞよろしく。
-          </p>
-
-          <p class="leading-relaxed text-zinc-900">
-            Hi. I'm Minato Hayashi, a senior university student in Japan. I'm
-            learning AI, machine learning, blockchain, network, and more. I
-            recently make websites and articles, participate in competitive
-            programming. I love eating, sleeping, and talking with cats. Have
-            fun everything with me !!
-          </p>
-        </div>
-      </div>
-
-      <!-- What I saw -->
-      <div>
-        <div class="mb-4 text-sm text-zinc-500">What I saw</div>
-
-        <div
-          class="flex flex-col items-center gap-6 md:flex-row md:items-center md:gap-10"
-        >
-          <ImageStack images={sampleImages} />
-
-          <p class="text-zinc-900">
-            各種SNSには猫の画像、外食の際撮影した写真、その他趣味関連の画像を投稿しています。
-          </p>
-        </div>
-      </div>
-
-      <!-- What I like -->
-      <div>
-        <div class="mb-4 text-sm text-zinc-500">What I like</div>
-
-        <WordCloud
-          words={cwords}
-          width="100%"
-          height="250px"
-          maxFont={50}
-          minFont={35}
+      <div class="grid w-full max-w-100 grid-cols-2 gap-1">
+        <LinkCard
+          title="GitHub"
+          username="NoCream-jp"
+          href="https://github.com/NoCream-jp"
         />
+        <LinkCard
+          title="X (Twitter)"
+          username="Cafe"
+          href="https://x.com/sXMN1au45a68174"
+        />
+        <LinkCard
+          title="LinkedIn"
+          username="Minato Hayashi"
+          href="https://www.linkedin.com/in/m-hayashi/"
+        />
+        <LinkCard
+          title="Instagram"
+          href="https://www.instagram.com/koshi2055"
+        />
+        <LinkCard
+          title="AtCoder"
+          username="Caffeineholic"
+          href="https://atcoder.jp/users/Caffeineholic"
+        />
+        <LinkCard title="occ3710@outlook.jp" disabled />
       </div>
+    </aside>
 
-      <!-- What I did -->
-      <div>
-        <div class="mb-4 text-sm text-zinc-500">What I did</div>
+    <!-- =========================
+      RIGHT（bio専用2カラム）
+    ========================== -->
+    <main class="flex w-full flex-1 flex-col p-4 lg:min-h-0 lg:p-7">
+      <Breadcrumbs
+        items={[
+          { label: "TOP", href: "/" },
+          { label: "bio", href: "/bio" },
+        ]}
+      />
 
-        <ActionLog limit={10} />
+      <!-- 右側をさらに2分割 -->
+      <div
+        class="mt-10 flex w-full flex-1 flex-col gap-10 lg:flex-row lg:gap-8"
+      >
+        <!-- LEFT: intro + images -->
+        <section class="flex flex-1 flex-col gap-8">
+          <div>
+            <h1 class="mb-4 text-2xl font-semibold text-zinc-800">bio</h1>
+
+            <p class="leading-relaxed text-zinc-900">
+              こんにちは。みなとです。AI・競プロ・Web開発を中心に活動しています。
+              研究やシステムにも興味があります。
+            </p>
+          </div>
+
+          <div class="flex items-center gap-6">
+            <ImageStack images={sampleImages} />
+            <p class="text-sm leading-relaxed text-zinc-700">
+              猫・食事・趣味の写真を記録しています。
+            </p>
+          </div>
+        </section>
+
+        <!-- RIGHT: ActionLog -->
+        <aside class="flex flex-1 flex-col">
+          <h2 class="mb-4 text-sm text-zinc-500">Activity Log</h2>
+
+          <div class="lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+            <ActionLog limit={10} />
+          </div>
+        </aside>
       </div>
-    </section>
+    </main>
   </div>
 </Layout>
