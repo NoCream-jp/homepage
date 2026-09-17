@@ -24,13 +24,24 @@ const Tag = disabled ? "div" : "a";
     target: "_blank",
     rel: "noopener noreferrer",
   }}
-  class={`group max-h-15 h-full w-auto self-stretch rounded-md border px-3 py-2 ${bg} ${disabled ? "cursor-default " : "hover:border-zinc-500"}`}
+  class:list={[
+    "group h-full max-h-15 w-auto self-stretch rounded-md border px-3 py-2",
+    disabled ? "cursor-default bg-zinc-100" : `${bg} hover:border-zinc-600`,
+  ]}
 >
-  <div class="flex h-full items-center justify-between">
+  <div
+    class:list={[
+      "flex h-full items-center",
+      disabled ? "justify-center" : "justify-between",
+    ]}
+  >
     <!-- 左側 -->
-    <div class="flex flex-col">
+    <div class:list={[disabled ? "text-center" : "flex flex-col"]}>
       <span
-        class={`text-sm font-medium text-zinc-800  ${disabled ? "" : "group-hover:text-zinc-400"}`}
+        class:list={[
+          "text-sm font-medium",
+          !disabled && "group-hover:text-zinc-600",
+        ]}
       >
         {title}
       </span>
@@ -43,22 +54,25 @@ const Tag = disabled ? "div" : "a";
     </div>
 
     <!-- 右側アイコン -->
-    <div
-      class={`flex justify-center text-zinc-700 transition ${disabled ? "hidden" : "group-hover:text-zinc-400"}`}
-    >
-      <svg
-        class="h-5 w-5"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        stroke-width="1.5"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M7 17L17 7M17 7H9M17 7v8"></path>
-      </svg>
-    </div>
+    {
+      !disabled && (
+        <div class="flex justify-center text-zinc-700 transition group-hover:text-zinc-600">
+          <svg
+            class="h-5 w-5"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M7 17L17 7M17 7H9M17 7v8"
+            />
+          </svg>
+        </div>
+      )
+    }
   </div>
 </Tag>

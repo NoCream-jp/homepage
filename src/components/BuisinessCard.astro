@@ -22,10 +22,8 @@ const {
   class="relative aspect-8/5 w-full max-w-100 rounded-xl border bg-white p-4 md:p-6"
 >
   <!-- 左上：画像 -->
-  <div class="absolute top-4 left-4 md:top-6 md:left-6">
-    <div
-      class="h-20 w-20 overflow-hidden rounded-full border bg-white md:h-32 md:w-32"
-    >
+  <div class="absolute top-6 left-6">
+    <div class="h-32 w-32 overflow-hidden rounded-full border bg-white">
       {image && <img src={image} alt="" class="h-full w-full object-cover" />}
     </div>
   </div>
@@ -37,9 +35,7 @@ const {
   </div>
 
   <!-- 右下寄せ：テキスト -->
-  <div
-    class="absolute right-4 bottom-4 flex flex-col gap-1 text-sm md:right-8 md:bottom-6"
-  >
+  <div class="absolute right-4 bottom-4 flex flex-col gap-1 text-sm">
     <div class="flex gap-2 whitespace-nowrap">
       <span class="w-20 text-right text-zinc-500 md:w-24">name :</span>
       <span class="font-semibold">{name}</span>

@@ -49,20 +49,20 @@ const bannerItem = {
                   ) : (
                     <a
                       href={it.href || null}
-                      class="notif-link inline-flex h-10 items-center gap-4 border-r bg-white px-4 py-2"
+                      class="notif-link group inline-flex h-10 items-center gap-4 border-r bg-white px-4 py-2"
                       aria-label={`${it.section} ${it.title}`}
                     >
-                      <span class="block text-xs tracking-wide text-zinc-600">
+                      <span class="block text-xs tracking-wide text-zinc-400">
                         {it.section}
                       </span>
-                      <span class="block text-xs text-zinc-600">
+                      <span class="block text-xs text-zinc-400">
                         {it.date ?? ""}
                       </span>
-                      <span class="block text-sm font-medium text-zinc-800">
+                      <span class="block text-sm font-medium text-zinc-800 group-hover:text-zinc-600">
                         {it.title}
                       </span>
                       {it.href && it.href !== "" && (
-                        <span class="ml-3 inline-flex items-center justify-center rounded-full border-none p-1">
+                        <span class="ml-3 inline-flex items-center justify-center rounded-full border-none p-1 group-hover:text-zinc-600">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             class="h-4 w-4 text-zinc-600"
