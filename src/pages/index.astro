@@ -9,6 +9,7 @@ import NotificationStrip from "../components/NotificationStrip.astro";
 
 const posts = await getCollection("blog", ({ data }) => !data.draft);
 posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const latestPosts = posts.slice(0, 5);
 
 const allTags = Array.from(
   new Set(posts.flatMap((p) => p.data.tags ?? []))
@@ -88,7 +89,7 @@ const description = "Minato Hayashi's portfolio and blog";
 
       <div class="relative flex-none lg:min-h-0 lg:flex-1">
         <!-- 上スクロールボタン -->
-        <button
+        <!-- <button
           id="scroll-up-btn"
           class="group absolute top-2 left-1/2 z-10 hidden h-6 w-25 -translate-x-1/2 cursor-pointer items-center justify-center rounded-full border bg-white transition hover:border-zinc-500 lg:flex"
         >
@@ -105,18 +106,18 @@ const description = "Minato Hayashi's portfolio and blog";
               stroke-linejoin="round"
               d="M18 15l-6-6-6 6"></path>
           </svg>
-        </button>
+        </button> -->
 
         <!-- スクロール本体 -->
         <div
           id="post-scroll"
           class="no-scrollbar h-auto overflow-visible pt-3 pb-10 lg:h-full lg:overflow-y-auto"
         >
-          <ArticleCardList posts={posts} />
+          <ArticleCardList posts={latestPosts} />
         </div>
 
         <!-- 下スクロールボタン -->
-        <button
+        <!-- <button
           id="scroll-down-btn"
           class="group absolute bottom-2 left-1/2 z-10 hidden h-6 w-25 -translate-x-1/2 cursor-pointer items-center justify-center rounded-full border bg-white transition hover:border-zinc-500 lg:flex"
         >
@@ -133,7 +134,7 @@ const description = "Minato Hayashi's portfolio and blog";
               stroke-linejoin="round"
               d="M6 9l6 6 6-6"></path>
           </svg>
-        </button>
+        </button> -->
       </div>
     </main>
   </div>
