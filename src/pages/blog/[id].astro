@@ -5,6 +5,7 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import BackButton from "../../components/BackButton.astro";
 import Highlight from "../../components/Highlight.astro";
 import LikeButton from "../../components/LikeButton.astro";
+import LeftNan from "../../components/LeftNav.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog", ({ data }) => {

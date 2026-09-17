@@ -76,7 +76,7 @@ const safeImages = (images || []).filter(Boolean);
 </style>
 
 <div
-  class="image-stack-container relative mx-auto aspect-3/2 w-full max-w-40 cursor-pointer outline-none select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:ring-offset-2"
+  class="image-stack-container relative mx-auto aspect-3/2 w-full max-w-30 -translate-y-1.5 cursor-pointer outline-none select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:ring-offset-2"
   role="button"
   tabindex="0"
   aria-label="image stack"
@@ -99,7 +99,7 @@ const safeImages = (images || []).filter(Boolean);
             alt={`Stack image ${index + 1}`}
             loading="lazy"
             decoding="async"
-            class="pointer-events-none block h-full w-full rounded-xl object-cover shadow-lg"
+            class="pointer-events-none block h-full w-full rounded-xl border object-cover shadow-lg"
           />
         </div>
       );

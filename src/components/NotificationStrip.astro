@@ -170,92 +170,126 @@ const bannerItem = {
 </style>
 
 <script>
-  // クライアントサイドでの自動スクロール制御
-  // 複数配置されても正常に動くよう querySelectorAll で初期化します
-  document.querySelectorAll(".notif-scroll").forEach((el) => {
-    // data属性から速度を取得
-    const speedPxPerSec = parseFloat(el.getAttribute("data-speed") ?? "40");
+  let cleanup = () => {};
 
-    const list = el.querySelector(".notif-list");
-    if (!list) return;
+  function initNotificationStrips() {
+    cleanup();
 
-    // 半分の幅がコンテナより大きい場合のみスクロールさせる
-    function needsScroll() {
-      return el.scrollWidth / 2 > el.clientWidth + 1;
-    }
+    const cleanups = Array.from(document.querySelectorAll(".notif-scroll")).map(
+      (el) => {
+        const speedPxPerSec = parseFloat(el.getAttribute("data-speed") ?? "40");
 
-    let running = false;
-    let lastTime: number | null = null;
-    let rafId: number | null = null;
-    let paused = false;
+        const list = el.querySelector(".notif-list");
+        if (!list) return () => {};
 
-    function step(time: number) {
-      if (paused) {
-        lastTime = time;
-        rafId = requestAnimationFrame(step);
-        return;
+        let running = false;
+        let lastTime: number | null = null;
+        let rafId: number | null = null;
+        let paused = false;
+
+        function step(time: number) {
+          if (paused) {
+            lastTime = time;
+            rafId = requestAnimationFrame(step);
+            return;
+          }
+
+          if (lastTime == null) {
+            lastTime = time;
+          }
+
+          const dt = (time - lastTime) / 1000;
+          lastTime = time;
+
+          el.scrollLeft += speedPxPerSec * dt;
+
+          const singleWidth = el.scrollWidth / 2;
+
+          if (el.scrollLeft >= singleWidth) {
+            el.scrollLeft -= singleWidth;
+          }
+
+          rafId = requestAnimationFrame(step);
+        }
+
+        function start() {
+          if (running) return;
+
+          running = true;
+          lastTime = null;
+          rafId = requestAnimationFrame(step);
+        }
+
+        function stop() {
+          running = false;
+
+          if (rafId !== null) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+          }
+        }
+
+        function handleMouseEnter() {
+          paused = true;
+        }
+
+        function handleMouseLeave() {
+          paused = false;
+        }
+
+        function handleFocusIn() {
+          paused = true;
+        }
+
+        function handleFocusOut() {
+          paused = false;
+        }
+
+        function handlePointerDown() {
+          paused = true;
+        }
+
+        function handlePointerUp() {
+          paused = false;
+        }
+
+        el.addEventListener("mouseenter", handleMouseEnter);
+        el.addEventListener("mouseleave", handleMouseLeave);
+        el.addEventListener("focusin", handleFocusIn);
+        el.addEventListener("focusout", handleFocusOut);
+        el.addEventListener("pointerdown", handlePointerDown);
+        el.addEventListener("pointerup", handlePointerUp);
+
+        const resizeObserver = new ResizeObserver(() => {
+          if (!running) {
+            start();
+          }
+        });
+
+        resizeObserver.observe(el);
+
+        start();
+
+        return () => {
+          stop();
+          resizeObserver.disconnect();
+
+          el.removeEventListener("mouseenter", handleMouseEnter);
+          el.removeEventListener("mouseleave", handleMouseLeave);
+          el.removeEventListener("focusin", handleFocusIn);
+          el.removeEventListener("focusout", handleFocusOut);
+          el.removeEventListener("pointerdown", handlePointerDown);
+          el.removeEventListener("pointerup", handlePointerUp);
+        };
       }
+    );
 
-      if (lastTime == null) lastTime = time;
-      const dt = (time - lastTime) / 1000;
-      lastTime = time;
+    cleanup = () => {
+      cleanups.forEach((cleanup) => cleanup());
+    };
+  }
 
-      el.scrollLeft += speedPxPerSec * dt;
+  document.addEventListener("astro:page-load", initNotificationStrips);
 
-      // 半分（1ループ分）スクロールしたら位置をリセット
-      const singleWidth = el.scrollWidth / 2;
-      if (el.scrollLeft >= singleWidth) {
-        el.scrollLeft -= singleWidth;
-      }
-
-      rafId = requestAnimationFrame(step);
-    }
-
-    function start() {
-      if (running) return;
-      // if (!needsScroll()) return;
-      running = true;
-      lastTime = null;
-      rafId = requestAnimationFrame(step);
-    }
-
-    function stop() {
-      running = false;
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
-      }
-    }
-
-    // Hover / Focus による一時停止
-    el.addEventListener("mouseenter", () => {
-      paused = true;
-    });
-    el.addEventListener("mouseleave", () => {
-      paused = false;
-    });
-    el.addEventListener("focusin", () => {
-      paused = true;
-    });
-    el.addEventListener("focusout", () => {
-      paused = false;
-    });
-
-    let isPointerDown = false;
-    el.addEventListener("pointerdown", () => {
-      isPointerDown = true;
-      paused = true;
-    });
-    el.addEventListener("pointerup", () => {
-      isPointerDown = false;
-      paused = false;
-    });
-
-    const ro = new ResizeObserver(() => {
-      start();
-    });
-    ro.observe(el);
-
-    start();
-  });
+  initNotificationStrips();
 </script>

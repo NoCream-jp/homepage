@@ -1,0 +1,91 @@
+---
+import BuisinessCard from "./BuisinessCard.astro";
+import LinkCard from "./LinkCard.astro";
+
+const pathname = Astro.url.pathname;
+
+const navigation = [
+  { label: "home", href: "/" },
+  { label: "blog", href: "/blog" },
+  { label: "bio", href: "/bio" },
+  { label: "work", href: "/work" },
+];
+
+const isActive = (href: string) => {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+};
+---
+
+<div class="flex flex-col gap-7">
+  <!-- ページナビゲーション -->
+  <nav
+    class="flex w-full max-w-100 items-center gap-1"
+    aria-label="page navigation"
+  >
+    {
+      navigation.map((item) => {
+        const active = isActive(item.href);
+
+        return (
+          <a
+            href={item.href}
+            aria-current={active ? "page" : undefined}
+            class:list={[
+              "relative flex-1 rounded-md px-2 py-1.5 text-center text-sm transition-colors",
+              active ? "text-zinc-900" : "text-zinc-500 hover:text-zinc-900",
+            ]}
+          >
+            {item.label}
+
+            {active && (
+              <span
+                aria-hidden="true"
+                transition:name="nav-active-border"
+                class="pointer-events-none absolute inset-0 rounded-md border"
+              />
+            )}
+          </a>
+        );
+      })
+    }
+  </nav>
+
+  <!-- Business Card -->
+  <div class="hidden lg:block">
+    <BuisinessCard
+      name="Minato Hayashi"
+      age="23+"
+      location="Osaka, Japan"
+      pronoun="He / Him"
+      study="reinforcement learning"
+    />
+  </div>
+
+  <!-- External Links -->
+  <div class="hidden w-full max-w-100 grid-cols-2 gap-1 lg:grid">
+    <LinkCard
+      title="GitHub"
+      username="NoCream-jp"
+      href="https://github.com/NoCream-jp"
+    />
+
+    <LinkCard title="X" username="Cafe" href="https://x.com/sXMN1au45a68174" />
+
+    <LinkCard
+      title="LinkedIn"
+      username="Minato Hayashi"
+      href="https://www.linkedin.com/in/m-hayashi/"
+    />
+
+    <LinkCard title="Instagram" href="https://www.instagram.com/koshi2055" />
+
+    <LinkCard
+      title="AtCoder"
+      username="Caffeineholic"
+      href="https://atcoder.jp/users/Caffeineholic"
+    />
+
+    <LinkCard title="occ3710@outlook.jp" disabled />
+  </div>
+</div>

@@ -2,8 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import { getCollection } from "astro:content";
 import ArticleCardList from "../components/ArticleCardList.astro";
-import BuisinessCard from "../components/BuisinessCard.astro";
-import LinkCard from "../components/LinkCard.astro";
+import LeftNav from "../components/LeftNav.astro";
 import NotificationStrip from "../components/NotificationStrip.astro";
 import ViewMoreButton from "../components/ViewMoreButton.astro";
 
@@ -33,86 +32,31 @@ const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
 ---
 
-<Layout title={title} description={description} lockScroll={true}>
-  <NotificationStrip items={notificationItems} />
-
-  <div class="flex min-h-0 w-full flex-1 flex-col lg:flex-row">
-    <!-- 左 -->
-    <aside
-      class="flex w-full shrink-0 flex-col gap-4 p-4 lg:w-110 lg:justify-around lg:gap-5 lg:p-5"
-    >
-      <div class="text-3xl"></div>
-
-      <BuisinessCard
-        name="Minato Hayashi"
-        age="23+"
-        location="Osaka, Japan"
-        pronoun="He / Him"
-        study="reinforcement learning"
-      />
-
-      <div class="grid w-full max-w-100 grid-cols-2 gap-1">
-        <LinkCard
-          title="GitHub"
-          username="NoCream-jp"
-          href="https://github.com/NoCream-jp"
-        />
-        <LinkCard
-          title="X (Twitter)"
-          username="Cafe"
-          href="https://x.com/sXMN1au45a68174"
-        />
-        <LinkCard
-          title="LinkedIn"
-          username="Minato Hayashi"
-          href="https://www.linkedin.com/in/m-hayashi/"
-        />
-        <LinkCard
-          title="Instagram"
-          href="https://www.instagram.com/koshi2055"
-        />
-        <LinkCard
-          title="AtCoder"
-          username="Caffeineholic"
-          href="https://atcoder.jp/users/Caffeineholic"
-        />
-        <LinkCard title="occ3710@outlook.jp" disabled />
-      </div>
-    </aside>
-
-    <!-- 右 -->
-    <main
-      class="flex w-full flex-1 flex-col items-stretch p-4 lg:min-h-0 lg:p-7"
-    >
-      <!-- 上：ページへの導線 -->
-      <nav
-        class="flex shrink-0 items-center justify-end gap-8 px-1 py-2 lg:px-3"
-        aria-label="page navigation"
+<Layout title={title} description={description}>
+  <div class="flex h-full min-h-0 flex-col pt-10">
+    <!-- NotificationStripより下 -->
+    <div class="flex min-h-0 flex-1 flex-col lg:flex-row">
+      <!-- 左 -->
+      <aside
+        class="flex w-full shrink-0 flex-col gap-4 p-4 lg:w-110 lg:justify-around lg:gap-5 lg:p-5"
       >
-        <a
-          href="/bio"
-          class="text-xl font-medium tracking-wide text-zinc-800 transition-colors hover:text-zinc-600 lg:text-2xl"
-        >
-          bio
-        </a>
+        <LeftNav />
+      </aside>
 
-        <a
-          href="/link"
-          class="text-xl font-medium tracking-wide text-zinc-800 transition-colors hover:text-zinc-600 lg:text-2xl"
-        >
-          link
-        </a>
-      </nav>
+      <!-- 右 -->
+      <main class="flex min-h-0 w-full min-w-0 flex-1 flex-col p-4 lg:p-7">
+        <!-- ここだけスクロール可能 -->
+        <div class="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <!-- 下：最新記事 -->
+          <section class="mt-10 w-full lg:mt-auto lg:pt-10">
+            <ArticleCardList posts={latestPosts} />
 
-      <!-- 下：最新記事 -->
-      <section class="mt-10 w-full lg:mt-auto lg:pt-10">
-        <ArticleCardList posts={latestPosts} />
-
-        <!-- Blogへの導線 -->
-        <div class="mt-4 flex justify-end">
-          <ViewMoreButton href="/blog" />
+            <div class="mt-4 flex justify-end">
+              <ViewMoreButton href="/blog" />
+            </div>
+          </section>
         </div>
-      </section>
-    </main>
+      </main>
+    </div>
   </div>
 </Layout>

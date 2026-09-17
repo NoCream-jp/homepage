@@ -1,14 +1,13 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
-import BuisinessCard from "../components/BuisinessCard.astro";
-import LinkCard from "../components/LinkCard.astro";
 import ActionLog from "../components/ActionLog.astro";
 import ImageStack from "../components/ImageStack.astro";
+import LeftNav from "../components/LeftNav.astro";
 import NotificationStrip from "../components/NotificationStrip.astro";
 
 const title = "Minato Hayashi";
-const description = "bio page";
+const description = "Minato Hayashi's portfolio and blog";
 
 const sampleImages = [
   "/images/cat.webp",
@@ -36,93 +35,51 @@ const notificationItems = [
 ---
 
 <Layout title={title} description={description}>
-  <NotificationStrip items={notificationItems} />
-  <div class="flex min-h-0 w-full flex-1 flex-col lg:flex-row">
-    <aside
-      class="flex w-full shrink-0 flex-col gap-4 p-4 lg:w-110 lg:justify-around lg:gap-5 lg:p-5"
-    >
-      <div class="text-3xl"></div>
-
-      <BuisinessCard
-        name="Minato Hayashi"
-        age="23+"
-        location="Osaka, Japan"
-        pronoun="He / Him"
-        study="reinforcement learning"
-      />
-
-      <div class="grid w-full max-w-100 grid-cols-2 gap-1">
-        <LinkCard
-          title="GitHub"
-          username="NoCream-jp"
-          href="https://github.com/NoCream-jp"
-        />
-        <LinkCard
-          title="X (Twitter)"
-          username="Cafe"
-          href="https://x.com/sXMN1au45a68174"
-        />
-        <LinkCard
-          title="LinkedIn"
-          username="Minato Hayashi"
-          href="https://www.linkedin.com/in/m-hayashi/"
-        />
-        <LinkCard
-          title="Instagram"
-          href="https://www.instagram.com/koshi2055"
-        />
-        <LinkCard
-          title="AtCoder"
-          username="Caffeineholic"
-          href="https://atcoder.jp/users/Caffeineholic"
-        />
-        <LinkCard title="occ3710@outlook.jp" disabled />
-      </div>
-    </aside>
-
-    <!-- =========================
-      RIGHT（bio専用2カラム）
-    ========================== -->
-    <main class="flex w-full flex-1 flex-col p-4 lg:min-h-0 lg:p-7">
-      <Breadcrumbs
-        items={[
-          { label: "TOP", href: "/" },
-          { label: "bio", href: "/bio" },
-        ]}
-      />
-
-      <!-- 右側をさらに2分割 -->
-      <div
-        class="mt-10 flex w-full flex-1 flex-col gap-10 lg:flex-row lg:gap-8"
+  <div class="flex h-full min-h-0 flex-col pt-10">
+    <div class="flex min-h-0 flex-1 flex-col lg:flex-row">
+      <!-- 左 -->
+      <aside
+        class="flex w-full shrink-0 flex-col gap-4 p-4 lg:w-110 lg:justify-around lg:gap-5 lg:p-5"
       >
-        <!-- LEFT: intro + images -->
-        <section class="flex flex-1 flex-col gap-8">
-          <div>
-            <h1 class="mb-4 text-2xl font-semibold text-zinc-800">bio</h1>
+        <LeftNav />
+      </aside>
 
-            <p class="leading-relaxed text-zinc-900">
-              こんにちは。みなとです。AI・競プロ・Web開発を中心に活動しています。
-              研究やシステムにも興味があります。
-            </p>
+      <!-- 右 -->
+      <main
+        class="flex min-h-0 w-full min-w-0 flex-1 flex-col px-4 py-10 lg:px-7 lg:py-15"
+      >
+        <h1 class="mb-6 text-2xl font-semibold text-zinc-800">bio</h1>
+        <div class="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <div class="w-full">
+            <section class="mt-10 mb-10 flex w-full flex-col gap-4">
+              <h2 class="">Who I am</h2>
+              <div class="rounded-md border p-5">
+                <div class="">
+                  こんにちは。みなとといいます。大学4回生で、AIや機械学習、ブロックチェーン、ネットワークについて学んでいます。
+                  ウェブサイトを作ったり、競技プログラミングに参加したりしています。現在は、英語でアニメを見るのに熱中しています。
+                  寝ること、食べること、音楽を聴くこと、猫とお話することが好きです。美しいと思ったものはなんでも勉強します。どうぞよろしく。
+                </div>
+              </div>
+
+              <h2 class="">What I saw</h2>
+              <div class="rounded-md border p-5">
+                <div class="flex items-center gap-10">
+                  <ImageStack images={sampleImages} />
+                  <div>
+                    各種SNSには、猫の画像や外出時に撮影した写真、その他趣味関連のお気に入りの画像を投稿しています。
+                    外食時には、後から見返せるように食べた料理を記録しています。
+                  </div>
+                </div>
+              </div>
+
+              <h2 class="">What I'm learning</h2>
+              <div class="rounded-md border p-5">
+                <div class="flex items-center gap-10"></div>
+              </div>
+            </section>
           </div>
-
-          <div class="flex items-center gap-6">
-            <ImageStack images={sampleImages} />
-            <p class="text-sm leading-relaxed text-zinc-700">
-              猫・食事・趣味の写真を記録しています。
-            </p>
-          </div>
-        </section>
-
-        <!-- RIGHT: ActionLog -->
-        <aside class="flex flex-1 flex-col">
-          <h2 class="mb-4 text-sm text-zinc-500">Activity Log</h2>
-
-          <div class="lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
-            <ActionLog limit={10} />
-          </div>
-        </aside>
-      </div>
-    </main>
+        </div>
+      </main>
+    </div>
   </div>
 </Layout>
