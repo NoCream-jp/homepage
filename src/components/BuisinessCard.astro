@@ -80,14 +80,37 @@ const {
       </div>
     </div>
 
-    <!-- 裏 -->
+    <!-- 裏（Tailwind + 中央罫線） -->
     <div
-      class="absolute inset-0 rounded-xl border bg-white p-4 md:p-6"
-      style="
-        backface-visibility: hidden;
-        transform: rotateY(180deg);
-      "
+      class="absolute inset-0 rounded-xl border bg-white p-4 lg:p-10"
+      style="backface-visibility: hidden; transform: rotateY(180deg);"
     >
+      <div class="h-full w-full overflow-hidden rounded-sm bg-zinc-50">
+        <span
+          contenteditable="true"
+          spellcheck="true"
+          class="block h-full w-full overflow-auto p-3 text-sm leading-8 text-zinc-800 outline-none"
+          style="
+        line-height: 36px;
+
+        background-image:
+          repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent calc(50% - 0.5px),
+            rgba(0,0,0,0.07) calc(50% - 0.5px),
+            rgba(0,0,0,0.07) calc(50% + 0.5px),
+            transparent calc(50% + 0.5px),
+            transparent 34px
+          );
+        background-size: 100% 34px;
+        background-repeat: repeat;
+        -webkit-background-clip: padding-box;
+      "
+        >
+          文章を書けるようにしたかったが書く内容がない。臓器提供の意志でも明記しておこうか…？
+        </span>
+      </div>
     </div>
   </div>
 </div>
