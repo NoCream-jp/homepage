@@ -47,16 +47,13 @@ const description = "Minato Hayashi's portfolio and blog";
       <main
         class="flex min-h-0 w-full min-w-0 flex-1 flex-col px-4 py-3 lg:px-7 lg:py-10"
       >
-        <!-- ここだけスクロール可能 -->
+        <h1 class="mb-6 text-2xl font-semibold text-zinc-800">home</h1>
         <div class="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto">
-          <!-- 下：最新記事 -->
-          <section class="mt-10 w-full lg:mt-auto lg:pt-10">
-            <ArticleCardList posts={latestPosts} />
-
-            <div class="mt-4 flex justify-end">
-              <ViewMoreButton href="/blog" />
-            </div>
-          </section>
+          <div class="w-full">
+            <section class="mt-10 mb-10 flex w-full flex-col gap-4">
+              ここに何を書こうか
+            </section>
+          </div>
         </div>
       </main>
     </div>
