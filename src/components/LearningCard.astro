@@ -1,18 +1,42 @@
 ---
-// src/components/LearnigCard.astro
+// src/components/LearningCard.astro
 import type { CollectionEntry } from "astro:content";
 
 interface Props {
   item: CollectionEntry<"learning">;
 }
-
 const { item } = Astro.props as Props;
 
-// 最低限の表示データを正しく取得（frontmatter が最小でも安全）
+// 表示文字列
 const title = (item.data as any)?.title ?? item.id;
-const logo = (item.data as any)?.logo ?? null;
 
-// ロゴがない場合に使うイニシャル（2文字まで）
+// raw logo（frontmatter の値そのまま）
+const rawLogo = (item.data as any)?.logo ?? null;
+
+/** logo 値から実際に img src に使える文字列を取り出す */
+function resolveLogo(val: any): string | null {
+  if (!val) return null;
+  if (typeof val === "string") return val;
+  if (Array.isArray(val) && val.length > 0) return resolveLogo(val[0]);
+  if (typeof val === "object") {
+    // common fields observed in various bundler/astro outputs
+    if (typeof val.src === "string") return val.src;
+    if (typeof val.url === "string") return val.url;
+    // sometimes `default` is a string or object with src
+    if (val.default) {
+      if (typeof val.default === "string") return val.default;
+      if (typeof val.default === "object" && typeof val.default.src === "string") return val.default.src;
+    }
+    // webpack-like: value may itself be a module with a `pathname`/`href`
+    if (typeof val.pathname === "string") return val.pathname;
+    if (typeof val.href === "string") return val.href;
+  }
+  return null;
+}
+
+const logoSrc = resolveLogo(rawLogo);
+
+// ロゴが無いときのイニシャル
 function initialsOf(s: string) {
   if (!s) return "";
   const parts = s.trim().split(/\s+/);
@@ -21,33 +45,41 @@ function initialsOf(s: string) {
 }
 const initials = initialsOf(String(title));
 ---
-
 <article
   class="cert-card group relative flex w-full items-center gap-4 overflow-hidden rounded-md border bg-white px-4 py-3 transition-colors duration-150 ease-out focus-within:outline-none"
   role="article"
   aria-labelledby={`learning-title-${item.id}`}
   data-tags={(item.data as any).tags?.join(",") ?? ""}
 >
-  <!-- ロゴ（あれば画像、なければイニシャル丸） -->
-  {
-    logo ? (
-      <div class="shrink-0">
-        <img
-          src={logo}
-          alt={`${title} logo`}
-          class="h-10 w-10 rounded-md object-contain"
-          loading="lazy"
-        />
-      </div>
-    ) : (
-      <div
-        class="flex h-10 w-10 items-center justify-center rounded-md border border-black/5 bg-black/5 text-sm font-medium text-zinc-900"
-        aria-hidden="true"
-      >
-        {initials}
-      </div>
-    )
-  }
+  <div class="shrink-0">
+    {
+      logoSrc ? (
+        <>
+          <img
+            src={logoSrc}
+            alt={`${title} logo`}
+            class="h-10 w-10 rounded-md object-contain"
+            loading="lazy"
+            onerror="this.style.display='none'; const fb = this.nextElementSibling; if(fb) fb.style.display='flex';"
+            />
+          <div
+            style="display:none"
+            class="flex h-10 w-10 items-center justify-center rounded-md border border-black/5 bg-black/5 text-sm font-medium text-zinc-900"
+            aria-hidden="true"
+          >
+            {initials}
+          </div>
+        </>
+      ) : (
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-md border border-black/5 bg-black/5 text-sm font-medium text-zinc-900"
+          aria-hidden="true"
+        >
+          {initials}
+        </div>
+      )
+    }
+  </div>
 
   <!-- タイトル -->
   <div class="min-w-0">
@@ -59,6 +91,13 @@ const initials = initialsOf(String(title));
       {title}
     </h3>
   </div>
+
+  <!-- 開発時デバッグ（不要なら消す） -->
+  {import.meta.env.DEV ? (
+    <pre class="ml-4 text-xs text-zinc-400" aria-hidden="true">
+{JSON.stringify({ id: item.id, rawLogo, resolved: logoSrc }, null, 2)}
+    </pre>
+  ) : null}
 
   <style>
     :global(.cert-card:focus-within),
