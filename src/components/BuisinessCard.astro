@@ -20,7 +20,7 @@ const {
 
 <div
   id="profile-card"
-  class="relative aspect-8/5 w-full max-w-100 cursor-pointer"
+  class="relative z-10 aspect-8/5 w-full max-w-100 cursor-pointer touch-manipulation @container"
 >
   <div
     id="profile-card-inner"
@@ -29,15 +29,22 @@ const {
   >
     <!-- 表 -->
     <div
-      class="absolute inset-0 rounded-xl border bg-white p-4 md:p-6"
+      class="absolute inset-0 rounded-[3cqw] border-[0.25cqw] bg-white p-[6cqw]"
       style="backface-visibility: hidden;"
     >
       <!-- 左上：画像 -->
-      <div class="absolute top-6 left-6">
-        <div class="h-32 w-32 overflow-hidden rounded-full border bg-white">
+      <div class="absolute top-[6cqw] left-[6cqw]">
+        <div
+          class="h-[32cqw] w-[32cqw] overflow-hidden rounded-full border-[0.25cqw] bg-white"
+        >
           {
             image && (
-              <img src={image} alt="" class="h-full w-full object-cover" />
+              <img
+                src={image}
+                alt=""
+                class="h-full w-full object-cover"
+                draggable="false"
+              />
             )
           }
         </div>
@@ -45,36 +52,46 @@ const {
 
       <!-- 右上：装飾 -->
       <div
-        class="absolute top-4 right-4 h-8 w-8 rounded-full bg-zinc-100 md:top-6 md:right-6 md:h-10 md:w-10"
+        class="absolute top-[4cqw] right-[4cqw] h-[10cqw] w-[10cqw] rounded-full bg-zinc-100"
       >
       </div>
 
       <!-- 右下寄せ：テキスト -->
-      <div class="absolute right-4 bottom-4 flex flex-col gap-1 text-sm">
-        <div class="flex gap-2 whitespace-nowrap">
-          <span class="w-20 text-right text-zinc-500 md:w-24"> name : </span>
+      <div
+        class="absolute right-[4cqw] bottom-[4cqw] flex flex-col gap-[2cqw] text-[3.5cqw]"
+      >
+        <div class="flex gap-[2cqw] whitespace-nowrap">
+          <span class="w-[20cqw] text-right text-zinc-500">
+            name :
+          </span>
           <span class="font-semibold">{name}</span>
         </div>
 
-        <div class="flex gap-2 whitespace-nowrap">
-          <span class="w-20 text-right text-zinc-500 md:w-24"> age : </span>
+        <div class="flex gap-[2cqw] whitespace-nowrap">
+          <span class="w-[20cqw] text-right text-zinc-500">
+            age :
+          </span>
           <span>{age}</span>
         </div>
 
-        <div class="flex gap-2 whitespace-nowrap">
-          <span class="w-20 text-right text-zinc-500 md:w-24">
+        <div class="flex gap-[2cqw] whitespace-nowrap">
+          <span class="w-[20cqw] text-right text-zinc-500">
             location :
           </span>
           <span>{location}</span>
         </div>
 
-        <div class="flex gap-2 whitespace-nowrap">
-          <span class="w-20 text-right text-zinc-500 md:w-24"> pronoun : </span>
+        <div class="flex gap-[2cqw] whitespace-nowrap">
+          <span class="w-[20cqw] text-right text-zinc-500">
+            pronoun :
+          </span>
           <span>{pronoun}</span>
         </div>
 
-        <div class="flex gap-2 whitespace-nowrap">
-          <span class="w-20 text-right text-zinc-500 md:w-24"> study : </span>
+        <div class="flex gap-[2cqw] whitespace-nowrap">
+          <span class="w-[20cqw] text-right text-zinc-500">
+            study :
+          </span>
           <span>{study}</span>
         </div>
       </div>
@@ -82,30 +99,39 @@ const {
 
     <!-- 裏 -->
     <div
-      class="absolute inset-0 flex flex-row items-center justify-between gap-4 rounded-xl border bg-white p-4 sm:gap-6 sm:p-6 md:p-8"
+      class="absolute inset-0 flex flex-row items-center justify-between gap-[6cqw] rounded-[3cqw] border-[0.25cqw] bg-white p-[8cqw]"
       style="backface-visibility: hidden; transform: rotateY(180deg);"
     >
       <!-- 左 -->
-      <div class="flex flex-1 flex-col justify-center gap-2 sm:gap-3">
-        <h3 class="text-base font-bold text-zinc-800 md:text-lg">About Me</h3>
-        <p class="text-[10px] leading-4 text-zinc-600 sm:text-xs md:text-sm">
-          大学で強化学習について研究しています。<br class="hidden sm:block" />
+      <div class="flex flex-1 flex-col justify-center gap-[3cqw]">
+        <h3 class="text-[4.5cqw] font-bold text-zinc-800">
+          About Me
+        </h3>
+
+        <p
+          class="text-[3.5cqw] leading-[5cqw] text-zinc-600"
+        >
+          大学で強化学習について研究しています。<br />
           コーヒーが好きです。猫が好きです。息抜きの達人です。
         </p>
-        <p class="mt-1 text-[10px] font-medium text-zinc-500 sm:text-xs">
+
+        <p
+          class="mt-[1cqw] text-[3cqw] leading-[4cqw] font-medium text-zinc-500"
+        >
           Thanks for visiting my portfolio!
         </p>
       </div>
 
       <!-- 右 -->
-      <div class="flex shrink-0 flex-col items-center gap-1 sm:gap-2">
+      <div class="flex shrink-0 flex-col items-center gap-[2cqw]">
         <div
-          class="h-20 w-20 overflow-hidden rounded-md border bg-white p-1.5 sm:h-24 sm:w-24 md:h-28 md:w-28"
+          class="h-[28cqw] w-[28cqw] overflow-hidden rounded-[1.5cqw] border-[0.25cqw] bg-white p-[1.5cqw]"
         >
           <img
             src="/images/brand/qrcode.png"
             alt="QR Code"
             class="h-full w-full object-contain"
+            draggable="false"
           />
         </div>
       </div>
@@ -117,49 +143,54 @@ const {
   const PROFILE_CARD_STORAGE_KEY = "profile-card-flipped";
 
   const setupProfileCard = () => {
-    const card = document.querySelector<HTMLElement>(/**/ "#profile-card");
+    const card = document.querySelector<HTMLElement>("#profile-card");
     const inner = document.querySelector<HTMLElement>(
-      /**/ "#profile-card-inner"
+      "#profile-card-inner"
     );
 
     if (!card || !inner) return;
     if (card.dataset.initialized === "true") return;
+
     card.dataset.initialized = "true";
 
-    // saved state
-    const savedState = sessionStorage.getItem(PROFILE_CARD_STORAGE_KEY);
+    // 保存済みの表裏状態
+    const savedState = sessionStorage.getItem(
+      PROFILE_CARD_STORAGE_KEY
+    );
+
     let flipped = savedState === "true";
 
-    // initial transform for inner (front/back)
+    // 初期状態
     inner.style.transform = flipped
-      ? "perspective(1200px) rotateY(180deg)"
-      : "perspective(1200px) rotateY(0deg)";
+      ? "perspective(300cqw) rotateY(180deg)"
+      : "perspective(300cqw) rotateY(0deg)";
+
     inner.dataset.flipped = String(flipped);
 
-    // reduced motion?
+    // reduced motion
     const prefersReduced =
       window.matchMedia &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // state for smooth interpolation
-    let currentX = 0,
-      currentY = 0,
-      currentZ = 0,
-      currentScale = 1;
-    let targetX = 0,
-      targetY = 0,
-      targetZ = 0,
-      targetScale = 1;
+    // マウス追従用の状態
+    let currentX = 0;
+    let currentY = 0;
+    let currentZ = 0;
+    let currentScale = 1;
+
+    let targetX = 0;
+    let targetY = 0;
+    let targetZ = 0;
+    let targetScale = 1;
+
     let rafId = 0;
 
-    // coefficients (調整可)
-    const yawFactor = 3.5; // 横（rotateY）強さ、正値（visualX の符号で方向決定）
-    const pitchFactor = -3.5; // 縦（rotateX）強さ
-    const twistFactor = 1.2; // 斜め（rotateZ）
+    const yawFactor = 3.5;
+    const pitchFactor = -3.5;
+    const twistFactor = 1.2;
     const easing = 0.12;
 
     const updateTilt = () => {
-      // if reduced motion requested, smoothly return to neutral without tilt
       if (prefersReduced) {
         currentX += (0 - currentX) * easing;
         currentY += (0 - currentY) * easing;
@@ -173,7 +204,7 @@ const {
       }
 
       card.style.transform = `
-        perspective(1000px)
+        perspective(250cqw)
         rotateX(${currentX}deg)
         rotateY(${currentY}deg)
         rotateZ(${currentZ}deg)
@@ -183,78 +214,78 @@ const {
       rafId = requestAnimationFrame(updateTilt);
     };
 
-    const handleMouseMove = (
-      event: Pick<MouseEvent, "clientX" | "clientY">
+    const handlePointerMove = (
+      event: Pick<PointerEvent, "clientX" | "clientY">
     ) => {
       const rect = card.getBoundingClientRect();
+
+      if (rect.width === 0 || rect.height === 0) return;
+
       const x = (event.clientX - rect.left) / rect.width;
       const y = (event.clientY - rect.top) / rect.height;
 
-      // normalized: -1 .. 1
-      const normalizedX = Math.max(-1, Math.min(1, x * 2 - 1));
-      const normalizedY = Math.max(-1, Math.min(1, y * 2 - 1));
+      const normalizedX = Math.max(
+        -1,
+        Math.min(1, x * 2 - 1)
+      );
 
-      // 重要：visualX は常に normalizedX（裏でも反転しない）
+      const normalizedY = Math.max(
+        -1,
+        Math.min(1, y * 2 - 1)
+      );
+
       const visualX = normalizedX;
 
-      // 計算（yawFactor は正。visualX の符号で向きを決定）
       targetY = visualX * yawFactor;
       targetX = normalizedY * pitchFactor;
-      targetZ = visualX * normalizedY * twistFactor;
+      targetZ =
+        visualX * normalizedY * twistFactor;
 
-      // 端へ行くほど軽くスケールアップ
       const distance = Math.min(
         1,
-        Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY)
+        Math.sqrt(
+          normalizedX * normalizedX +
+            normalizedY * normalizedY
+        )
       );
+
       targetScale = 1 + distance * 0.012;
     };
 
-    const handleMouseLeave = () => {
+    const handlePointerLeave = () => {
       targetX = 0;
       targetY = 0;
       targetZ = 0;
       targetScale = 1;
     };
 
-    // touch support: map touchmove to mousemove semantics
-    const handleTouchMove = (ev: TouchEvent) => {
-      if (!ev.touches || ev.touches.length === 0) return;
-      const t = ev.touches[0];
+    const handlePointerUp = (event: PointerEvent) => {
+      // マウスの右クリックなどでは反転しない
+      if (event.pointerType === "mouse" && event.button !== 0) {
+        return;
+      }
 
-      handleMouseMove({
-        clientX: t.clientX,
-        clientY: t.clientY,
-      });
-    };
-
-    // add listeners
-    card.addEventListener("mousemove", handleMouseMove);
-    card.addEventListener("mouseleave", handleMouseLeave);
-    card.addEventListener("touchmove", handleTouchMove, { passive: true });
-    card.addEventListener("touchend", handleMouseLeave);
-
-    // start RAF
-    rafId = requestAnimationFrame(updateTilt);
-
-    // click (flip) — update flipped state before animating so mouse handlers see correct state
-    card.addEventListener("click", () => {
-      // toggle flipped state first (so dataset reflects new state immediately)
       flipped = !flipped;
-      inner.dataset.flipped = String(flipped);
-      sessionStorage.setItem(PROFILE_CARD_STORAGE_KEY, String(flipped));
 
-      // cancel in-progress animations on inner
-      inner.getAnimations().forEach((animation) => animation.cancel());
+      inner.dataset.flipped = String(flipped);
+
+      sessionStorage.setItem(
+        PROFILE_CARD_STORAGE_KEY,
+        String(flipped)
+      );
+
+      inner.getAnimations().forEach((animation) => {
+        animation.cancel();
+      });
 
       const target = flipped ? 180 : 0;
-      const start = flipped ? 0 : 180; // note: we swapped start/target so animation goes the right direction
+      const start = flipped ? 0 : 180;
 
       inner.animate(
         [
           {
             transform: `
-              perspective(1200px)
+              perspective(300cqw)
               rotateY(${start}deg)
               rotateX(0deg)
               rotateZ(0deg)
@@ -264,27 +295,27 @@ const {
           },
           {
             transform: `
-              perspective(1200px)
+              perspective(300cqw)
               rotateY(${start + (target - start) * 0.4}deg)
               rotateX(2deg)
               rotateZ(${flipped ? "-0.5deg" : "0.5deg"})
-              translateY(-3px)
+              translateY(-0.75cqw)
               scale(1.02)
             `,
           },
           {
             transform: `
-              perspective(1200px)
+              perspective(300cqw)
               rotateY(${start + (target - start) * 0.58}deg)
               rotateX(-1deg)
               rotateZ(${flipped ? "0.25deg" : "-0.25deg"})
-              translateY(-2px)
+              translateY(-0.5cqw)
               scale(1.015)
             `,
           },
           {
             transform: `
-              perspective(1200px)
+              perspective(300cqw)
               rotateY(${target}deg)
               rotateX(0deg)
               rotateZ(0deg)
@@ -299,24 +330,60 @@ const {
           fill: "forwards",
         }
       );
-    });
+    };
 
-    // cleanup on page unload / astro navigation
+    card.addEventListener(
+      "pointermove",
+      handlePointerMove
+    );
+
+    card.addEventListener(
+      "pointerleave",
+      handlePointerLeave
+    );
+
+    card.addEventListener(
+      "pointerup",
+      handlePointerUp
+    );
+
+    rafId = requestAnimationFrame(updateTilt);
+
     const cleanup = () => {
-      card.removeEventListener("mousemove", handleMouseMove);
-      card.removeEventListener("mouseleave", handleMouseLeave);
-      card.removeEventListener("touchmove", handleTouchMove);
-      card.removeEventListener("touchend", handleMouseLeave);
+      card.removeEventListener(
+        "pointermove",
+        handlePointerMove
+      );
+
+      card.removeEventListener(
+        "pointerleave",
+        handlePointerLeave
+      );
+
+      card.removeEventListener(
+        "pointerup",
+        handlePointerUp
+      );
+
       cancelAnimationFrame(rafId);
     };
 
-    window.addEventListener("beforeunload", cleanup);
-    document.addEventListener("astro:page-unload", cleanup);
-    document.addEventListener("astro:page-load", () => {
-      // re-init only if needed (this component guards with dataset.initialized)
-    });
+    window.addEventListener(
+      "beforeunload",
+      cleanup
+    );
+
+    document.addEventListener(
+      "astro:page-unload",
+      cleanup
+    );
   };
 
   setupProfileCard();
-  document.addEventListener("astro:page-load", setupProfileCard);
+
+  document.addEventListener(
+    "astro:page-load",
+    setupProfileCard
+  );
 </script>
+
