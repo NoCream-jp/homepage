@@ -122,39 +122,19 @@ const {
 
     if (!card || !inner) return;
     if (card.dataset.initialized === "true") return;
-
     card.dataset.initialized = "true";
 
     const savedState = sessionStorage.getItem(PROFILE_CARD_STORAGE_KEY);
-
     let flipped = savedState === "true";
 
-    /*
-     * -------------------------
-     * 表裏の初期状態
-     * -------------------------
-     */
+    // 初期回転（表/裏）
     inner.style.transform = flipped
       ? "perspective(1200px) rotateY(180deg)"
       : "perspective(1200px) rotateY(0deg)";
-
     inner.dataset.flipped = String(flipped);
 
-    /*
-     * -------------------------
-     * マウス追従
-     * -------------------------
-     */
-    let currentX = 0;
-    let currentY = 0;
-    let currentZ = 0;
-    let currentScale = 1;
-
-    let targetX = 0;
-    let targetY = 0;
-    let targetZ = 0;
-    let targetScale = 1;
-
+    let currentX = 0, currentY = 0, currentZ = 0, currentScale = 1;
+    let targetX = 0, targetY = 0, targetZ = 0, targetScale = 1;
     let animationFrame = 0;
 
     const updateTilt = () => {
@@ -176,38 +156,27 @@ const {
 
     const handleMouseMove = (event: MouseEvent) => {
       const rect = card.getBoundingClientRect();
-
       const x = (event.clientX - rect.left) / rect.width;
       const y = (event.clientY - rect.top) / rect.height;
 
-      /*
-       * -1 ～ 1 に変換
-       */
+      // -1 .. 1 に正規化
       const normalizedX = x * 2 - 1;
       const normalizedY = y * 2 - 1;
 
-      /*
-       * マウス位置に応じて
-       * X・Y 両方向へ傾く
-       */
-      const flipDirection = flipped ? -1 : 1;
+      // visualX: "見た目上の左右"。裏面なら左右を反転して扱う（これが要点）
+      const domFlipped = inner.dataset.flipped === "true";
+      const visualX = domFlipped ? -normalizedX : normalizedX;
 
-      targetY = normalizedX * 3.5 * flipDirection;
-      targetX = normalizedY * -3.5;
+      // 係数は常に正にする。visualX の符号で方向を決める。
+      const yawFactor = 3.5;   // 左右（rotateY）強さ（正）
+      const pitchFactor = -3.5; // 上下（rotateX）強さ（負で見た目調整）
+      const twistFactor = 1.2; // 斜め捩り（rotateZ）
 
-      /*
-       * 斜め方向に少しだけ回転を加える
-       */
-      targetZ = normalizedX * normalizedY * 1.2;
+      targetY = visualX * yawFactor;
+      targetX = normalizedY * pitchFactor;
+      targetZ = visualX * normalizedY * twistFactor;
 
-      /*
-       * 外側に行くほどほんの少し浮く
-       */
-      const distance = Math.min(
-        1,
-        Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY)
-      );
-
+      const distance = Math.min(1, Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY));
       targetScale = 1 + distance * 0.012;
     };
 
@@ -223,18 +192,18 @@ const {
 
     animationFrame = requestAnimationFrame(updateTilt);
 
-    /*
-     * -------------------------
-     * 裏返し
-     * -------------------------
-     */
+    // 裏返し（クリック）
     card.addEventListener("click", () => {
-      inner.getAnimations().forEach((animation) => {
-        animation.cancel();
-      });
+      inner.getAnimations().forEach((animation) => animation.cancel());
 
       const target = flipped ? 0 : 180;
       const start = flipped ? 180 : 0;
+
+      // ここでアニメーションを再生する前に flipped の値を更新しておくと、
+      // 直後の mousemove から新しい向き（inner.dataset.flipped）で計算できる。
+      flipped = !flipped;
+      inner.dataset.flipped = String(flipped);
+      sessionStorage.setItem(PROFILE_CARD_STORAGE_KEY, String(flipped));
 
       inner.animate(
         [
@@ -285,16 +254,9 @@ const {
           fill: "forwards",
         }
       );
-
-      flipped = !flipped;
-
-      inner.dataset.flipped = String(flipped);
-
-      sessionStorage.setItem(PROFILE_CARD_STORAGE_KEY, String(flipped));
     });
   };
 
   setupProfileCard();
-
   document.addEventListener("astro:page-load", setupProfileCard);
 </script>
