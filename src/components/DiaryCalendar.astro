@@ -61,7 +61,7 @@ const labels = monthViews.map((mv) => mv.label);
 const initialIndex = Math.max(labels.length - 1, 0);
 ---
 
-<div class="flex h-full w-full flex-col bg-white" id="calendar-widget">
+<div class="flex h-full w-full flex-col bg-white" id="calendar-widget" data-initial-index={initialIndex}>
   <div class="z-10 shrink-0 bg-white pb-2">
     <div class="flex items-center justify-between pb-3">
       <ChevronButton
@@ -70,7 +70,11 @@ const initialIndex = Math.max(labels.length - 1, 0);
         class="h-10 w-10 cursor-pointer rounded-full border p-1 text-black transition-colors hover:border-zinc-600 disabled:pointer-events-none disabled:opacity-0"
         aria-label="前の月"
       />
-      <div id="cal-month-label" class="text-sm font-medium text-zinc-700"></div>
+
+      <div id="cal-month-label" class="text-sm font-medium text-zinc-700">
+        {labels[initialIndex] ?? "データなし"}
+      </div>
+
       <ChevronButton
         id="cal-next"
         direction="right"
@@ -79,13 +83,8 @@ const initialIndex = Math.max(labels.length - 1, 0);
       />
     </div>
 
-    <div
-      class="gap-1pb-2 grid grid-cols-7 py-1 text-center text-[11px] font-medium text-zinc-600"
-    >
-      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div
-      >
-        Fri
-      </div><div>Sat</div>
+    <div class="grid grid-cols-7 py-1 text-center text-[11px] font-medium text-zinc-600">
+      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
     </div>
   </div>
 
@@ -93,10 +92,14 @@ const initialIndex = Math.max(labels.length - 1, 0);
     <div
       id="cal-track"
       class="flex h-full w-full transition-transform duration-300 ease-out"
+      style={`transform: translateX(-${initialIndex * 100}%);`}
     >
       {
         monthViews.map((mv) => (
-          <div class="no-scrollbar h-full w-full shrink-0 overflow-y-auto pb-10">
+          <div
+            class="calendar-slide no-scrollbar h-full w-full shrink-0 overflow-y-auto pb-10"
+            data-label={mv.label}
+          >
             <div class="grid grid-cols-7 gap-1">
               {mv.cells.map((cell) =>
                 cell === null ? (
@@ -138,29 +141,40 @@ const initialIndex = Math.max(labels.length - 1, 0);
   </div>
 </div>
 
-<script define:vars={{ labels, initialIndex }}>
-  const widget = document.getElementById("calendar-widget");
+<script>
+  const setupCalendar = () => {
+    const widget = document.getElementById("calendar-widget");
+    if (!widget || widget.dataset.initialized === "true") return;
+    widget.dataset.initialized = "true";
 
-  if (widget) {
-    const track = widget.querySelector("#cal-track");
-    const label = widget.querySelector("#cal-month-label");
-    const prev = widget.querySelector("#cal-prev");
-    const next = widget.querySelector("#cal-next");
+    const track = widget.querySelector<HTMLElement>("#cal-track");
+    const label = widget.querySelector<HTMLElement>("#cal-month-label");
+    const prev = widget.querySelector<HTMLButtonElement>("#cal-prev");
+    const next = widget.querySelector<HTMLButtonElement>("#cal-next");
+    const slides = widget.querySelectorAll<HTMLElement>(".calendar-slide");
 
-    let currentIndex = initialIndex;
+    if (!track || !label || slides.length === 0) return;
+
+    let currentIndex = parseInt(widget.dataset.initialIndex || "0", 10);
+
+    const savedIndex = sessionStorage.getItem("calendar-current-index");
+    if (savedIndex !== null) {
+      currentIndex = parseInt(savedIndex, 10);
+      currentIndex = Math.max(0, Math.min(currentIndex, slides.length - 1));
+    }
 
     const updateView = () => {
-      if (track && label) {
-        track.style.transform = `translateX(-${currentIndex * 100}%)`;
-        label.textContent = labels[currentIndex] ?? "データなし";
+      track.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+      const currentSlide = slides[currentIndex];
+      if (currentSlide && currentSlide.dataset.label) {
+        label.textContent = currentSlide.dataset.label;
       }
 
-      if (prev) {
-        prev.disabled = currentIndex === 0;
-      }
-      if (next) {
-        next.disabled = currentIndex === labels.length - 1;
-      }
+      if (prev) prev.disabled = currentIndex === 0;
+      if (next) next.disabled = currentIndex === slides.length - 1;
+
+      sessionStorage.setItem("calendar-current-index", currentIndex.toString());
     };
 
     if (prev) {
@@ -172,7 +186,7 @@ const initialIndex = Math.max(labels.length - 1, 0);
 
     if (next) {
       next.addEventListener("click", () => {
-        currentIndex = Math.min(currentIndex + 1, labels.length - 1);
+        currentIndex = Math.min(currentIndex + 1, slides.length - 1);
         updateView();
       });
     }
@@ -180,10 +194,16 @@ const initialIndex = Math.max(labels.length - 1, 0);
     updateView();
 
     setTimeout(() => {
-      const todayEl = widget.querySelector('[data-today="true"]');
-      if (todayEl) {
-        todayEl.scrollIntoView({ block: "center", behavior: "smooth" });
+      const currentSlide = slides[currentIndex];
+      if (currentSlide) {
+        const todayEl = currentSlide.querySelector<HTMLElement>('[data-today="true"]');
+        if (todayEl) {
+          todayEl.scrollIntoView({ block: "center", behavior: "smooth" });
+        }
       }
     }, 100);
-  }
+  };
+
+  setupCalendar();
+  document.addEventListener("astro:page-load", setupCalendar);
 </script>
