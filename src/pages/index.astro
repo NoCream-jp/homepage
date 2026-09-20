@@ -1,40 +1,44 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { getCollection } from "astro:content";
-import ArticleCardList from "../components/ArticleCardList.astro";
 import LeftNav from "../components/LeftNav.astro";
-import NotificationStrip from "../components/NotificationStrip.astro";
-import ViewMoreButton from "../components/ViewMoreButton.astro";
+import DiaryCalendar from "../components/DiaryCalendar.astro";
 
 const posts = await getCollection("blog", ({ data }) => !data.draft);
 posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-const latestPosts = posts.slice(0, 5);
-
-const notificationItems = [
-  {
-    section: "blog",
-    date: "2026/09/15",
-    title: "最近考えていること",
-    href: "/blog/20260915_diary",
-    banner: false,
-  },
-  {
-    section: "blog",
-    date: "2026/09/15",
-    title: "ホームページをリニューアルしました",
-    href: "/blog/20260915_renew-site",
-    banner: false,
-  },
-];
-
 const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
+
+// --- calendar 連続月生成 ---
+const files = import.meta.glob("../content/calendar/*.json", { eager: true });
+const dataMap = new Map<string, any>();
+
+for (const path in files) {
+  const match = path.match(/(\d{4}_\d{2})\.json$/);
+  if (!match) continue;
+  const key = match[1];
+  dataMap.set(key, (files as any)[path].default ?? (files as any)[path]);
+}
+
+const now = new Date();
+const months: { key: string; data: any }[] = [];
+
+for (let i = 0; i < 12; i++) {
+  const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const key = `${y}_${m}`;
+
+  months.push({
+    key,
+    data: dataMap.get(key) ?? {},
+  });
+}
 ---
 
 <Layout title={title} description={description}>
   <div class="flex h-full min-h-0 flex-col pt-10">
-    <!-- NotificationStripより下 -->
     <div class="flex min-h-0 flex-1 flex-col lg:flex-row">
       <!-- 左 -->
       <aside
@@ -48,12 +52,11 @@ const description = "Minato Hayashi's portfolio and blog";
         class="flex min-h-0 w-full min-w-0 flex-1 flex-col px-4 py-3 lg:px-7 lg:py-10"
       >
         <h1 class="mb-6 text-2xl font-semibold text-zinc-800">home</h1>
-        <div class="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto">
-          <div class="w-full">
-            <section class="mt-10 mb-10 flex w-full flex-col gap-4">
-              ここにかっこいいものができる予定
-            </section>
-          </div>
+        <div class="no-scrollbar flex min-h-0 flex-1 flex-col">
+          <section class="mt-2 mb-10 flex min-h-0 w-full flex-1 flex-col gap-6">
+            <!-- カレンダーコンポーネントにすべてを委譲 -->
+            <DiaryCalendar months={months} />
+          </section>
         </div>
       </main>
     </div>

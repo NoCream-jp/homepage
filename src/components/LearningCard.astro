@@ -25,7 +25,11 @@ function resolveLogo(val: any): string | null {
     // sometimes `default` is a string or object with src
     if (val.default) {
       if (typeof val.default === "string") return val.default;
-      if (typeof val.default === "object" && typeof val.default.src === "string") return val.default.src;
+      if (
+        typeof val.default === "object" &&
+        typeof val.default.src === "string"
+      )
+        return val.default.src;
     }
     // webpack-like: value may itself be a module with a `pathname`/`href`
     if (typeof val.pathname === "string") return val.pathname;
@@ -45,6 +49,7 @@ function initialsOf(s: string) {
 }
 const initials = initialsOf(String(title));
 ---
+
 <article
   class="cert-card group relative flex w-full items-center gap-4 overflow-hidden rounded-md border bg-white px-4 py-3 transition-colors duration-150 ease-out focus-within:outline-none"
   role="article"
@@ -61,7 +66,7 @@ const initials = initialsOf(String(title));
             class="h-10 w-10 rounded-md object-contain"
             loading="lazy"
             onerror="this.style.display='none'; const fb = this.nextElementSibling; if(fb) fb.style.display='flex';"
-            />
+          />
           <div
             style="display:none"
             class="flex h-10 w-10 items-center justify-center rounded-md border border-black/5 bg-black/5 text-sm font-medium text-zinc-900"
@@ -91,13 +96,6 @@ const initials = initialsOf(String(title));
       {title}
     </h3>
   </div>
-
-  <!-- 開発時デバッグ（不要なら消す） -->
-  {import.meta.env.DEV ? (
-    <pre class="ml-4 text-xs text-zinc-400" aria-hidden="true">
-{JSON.stringify({ id: item.id, rawLogo, resolved: logoSrc }, null, 2)}
-    </pre>
-  ) : null}
 
   <style>
     :global(.cert-card:focus-within),

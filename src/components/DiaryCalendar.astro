@@ -1,0 +1,187 @@
+---
+interface MonthData {
+  key: string;
+  data: Record<string, { text?: string; emoji?: string }>;
+}
+
+interface Props {
+  months: MonthData[];
+}
+
+const { months } = Astro.props;
+
+function daysInMonth(y: number, m: number) {
+  return new Date(y, m, 0).getDate();
+}
+function startWeekday(y: number, m: number) {
+  return new Date(y, m - 1, 1).getDay();
+}
+
+const now = new Date();
+const currentYear = now.getFullYear();
+const currentMonth = now.getMonth() + 1;
+const currentDay = now.getDate();
+
+const displayMonths = [...months].reverse();
+
+const monthViews = displayMonths.map((m) => {
+  const [yStr, moStr] = m.key.split("_");
+  const year = Number(yStr);
+  const month = Number(moStr);
+  const days = daysInMonth(year, month);
+  const start = startWeekday(year, month);
+
+  const isCurrentMonth = currentYear === year && currentMonth === month;
+  const today = isCurrentMonth ? currentDay : -1;
+
+  const cells = [];
+  for (let i = 0; i < start; i++) cells.push(null);
+
+  for (let d = 1; d <= days; d++) {
+    const key = `${year}-${String(month).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    cells.push({
+      day: d,
+      key,
+      entry: m.data[key],
+      isToday: d === today,
+    });
+  }
+
+  return {
+    year,
+    month,
+    cells,
+    label: `${year}.${String(month).padStart(2, "0")}`,
+  };
+});
+
+const labels = monthViews.map((mv) => mv.label);
+const initialIndex = Math.max(labels.length - 1, 0);
+---
+
+<div class="flex h-full w-full flex-col bg-white" id="calendar-widget">
+  <div class="z-10 shrink-0 bg-white pb-2">
+    <div class="flex items-center justify-between pb-3">
+      <!-- ★ 修正点1: disabled:opacity-0 disabled:pointer-events-none を追加 -->
+      <button
+        id="cal-prev"
+        class="rounded px-3 py-1 text-zinc-500 transition-colors hover:bg-zinc-100 disabled:pointer-events-none disabled:opacity-0"
+        >&larr;</button
+      >
+      <div id="cal-month-label" class="text-sm font-medium text-zinc-700"></div>
+      <button
+        id="cal-next"
+        class="rounded px-3 py-1 text-zinc-500 transition-colors hover:bg-zinc-100 disabled:pointer-events-none disabled:opacity-0"
+        >&rarr;</button
+      >
+    </div>
+
+    <div
+      class="grid grid-cols-7 gap-1 border-b border-zinc-100 pb-2 text-center text-[11px] font-medium text-zinc-500"
+    >
+      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div
+      >
+        Fri
+      </div><div>Sat</div>
+    </div>
+  </div>
+
+  <div class="relative min-h-0 flex-1 overflow-hidden pt-2">
+    <div
+      id="cal-track"
+      class="flex h-full w-full transition-transform duration-300 ease-out"
+    >
+      {
+        monthViews.map((mv) => (
+          <div class="no-scrollbar h-full w-full shrink-0 overflow-y-auto pb-10">
+            <div class="grid grid-cols-7 gap-1">
+              {mv.cells.map((cell) =>
+                cell === null ? (
+                  <div class="aspect-square rounded bg-zinc-50" />
+                ) : (
+                  <div
+                    class="flex aspect-square flex-col rounded border p-1"
+                    data-today={cell.isToday ? "true" : "false"}
+                  >
+                    <div class="flex justify-start">
+                      <div
+                        class={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] ${
+                          cell.isToday
+                            ? "bg-cyan-700 text-white"
+                            : "text-zinc-500"
+                        }`}
+                      >
+                        {cell.day}
+                      </div>
+                    </div>
+                    <div class="mt-1 flex flex-col justify-start overflow-hidden bg-white pt-5">
+                      {cell.entry ? (
+                        <div class="line-clamp-3 text-[11px] leading-tight">
+                          {cell.entry.emoji ?? ""} {cell.entry.text}
+                        </div>
+                      ) : (
+                        <div class="text-[10px] text-zinc-300">—</div>
+                      )}
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ labels, initialIndex }}>
+  const widget = document.getElementById("calendar-widget");
+
+  if (widget) {
+    const track = widget.querySelector("#cal-track");
+    const label = widget.querySelector("#cal-month-label");
+    const prev = widget.querySelector("#cal-prev");
+    const next = widget.querySelector("#cal-next");
+
+    let currentIndex = initialIndex;
+
+    const updateView = () => {
+      if (track && label) {
+        track.style.transform = `translateX(-${currentIndex * 100}%)`;
+        label.textContent = labels[currentIndex] ?? "データなし";
+      }
+
+      // ★ 修正点2: 端に到達した場合はボタンに disabled 属性を付与する
+      if (prev) {
+        prev.disabled = currentIndex === 0;
+      }
+      if (next) {
+        next.disabled = currentIndex === labels.length - 1;
+      }
+    };
+
+    if (prev) {
+      prev.addEventListener("click", () => {
+        currentIndex = Math.max(currentIndex - 1, 0);
+        updateView();
+      });
+    }
+
+    if (next) {
+      next.addEventListener("click", () => {
+        currentIndex = Math.min(currentIndex + 1, labels.length - 1);
+        updateView();
+      });
+    }
+
+    // 初期化表示
+    updateView();
+
+    setTimeout(() => {
+      const todayEl = widget.querySelector('[data-today="true"]');
+      if (todayEl) {
+        todayEl.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+    }, 100);
+  }
+</script>
