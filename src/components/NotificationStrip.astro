@@ -27,42 +27,54 @@ const bannerItem = {
             {Array(10)
               .fill([bannerItem, ...items])
               .flat()
-              .map((it) => (
-                <li
-                  class="notif-item inline-flex"
-                  role="group"
-                  aria-roledescription="notification"
-                >
-                  {it.banner ? (
-                    <div class="notif-banner inline-flex h-10 items-center justify-center border-r bg-[repeating-linear-gradient(135deg,#0000_0px,#0000_6px,#d1d5db_6px,#d1d5db_7px)] px-4 text-black">
-                      <span class="notif-banner-title text-xs font-semibold tracking-wide">
-                        {it.title.split("").map((char: unknown, index: any) => (
-                          <span
-                            class="notif-banner-char"
-                            style={`--i: ${index}`}
-                          >
-                            {char === " " ? "\u00A0" : char}
-                          </span>
-                        ))}
-                      </span>
-                    </div>
-                  ) : (
-                    <a
-                      href={it.href || null}
-                      class="notif-link group inline-flex h-10 items-center gap-4 border-r bg-white px-4 py-2"
-                      aria-label={`${it.section} ${it.title}`}
-                    >
-                      <span class="block text-xs tracking-wide text-zinc-400">
-                        {it.section}
-                      </span>
-                      <span class="block text-xs text-zinc-400">
-                        {it.date ?? ""}
-                      </span>
-                      <span class="block text-sm font-medium text-zinc-800 group-hover:text-zinc-600">
-                        {it.title}
-                      </span>
-                      {it.href && it.href !== "" && (
-                        <span class="ml-3 inline-flex items-center justify-center rounded-full border-none p-1 group-hover:text-zinc-600">
+              .map((it) => {
+                const isBanner = !!it.banner;
+                const isLink = !!it.href && it.href !== "";
+
+                return (
+                  <li
+                    class="notif-item inline-flex"
+                    role="group"
+                    aria-roledescription="notification"
+                  >
+                    {isBanner ? (
+                      <div
+                        class="notif-banner inline-flex h-10 items-center justify-center border-r px-4 text-black"
+                        aria-hidden="false"
+                      >
+                        <span class="notif-banner-title text-xs font-semibold tracking-wide">
+                          {it.title
+                            .split("")
+                            .map((char: unknown, index: any) => (
+                              <span
+                                class="notif-banner-char"
+                                style={`--i: ${index}`}
+                                aria-hidden="true"
+                              >
+                                {char === " " ? "\u00A0" : char}
+                              </span>
+                            ))}
+                        </span>
+                      </div>
+                    ) : isLink ? (
+                      <a
+                        href={it.href}
+                        class="notif-link group inline-flex h-10 items-center gap-4 border-r bg-white px-4 py-2"
+                        aria-label={`${it.section} ${it.title}`}
+                      >
+                        <span class="block text-xs tracking-wide text-zinc-400">
+                          {it.section}
+                        </span>
+                        <span class="block text-xs text-zinc-400">
+                          {it.date ?? ""}
+                        </span>
+                        <span class="block text-sm font-medium text-zinc-800 group-hover:text-zinc-600">
+                          {it.title}
+                        </span>
+                        <span
+                          class="ml-3 inline-flex items-center justify-center rounded-full border-none p-1 group-hover:text-zinc-600"
+                          aria-hidden="true"
+                        >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             class="h-4 w-4 text-zinc-600"
@@ -72,17 +84,49 @@ const bannerItem = {
                             stroke-width="2"
                             stroke-linecap="round"
                             stroke-linejoin="round"
-                            aria-hidden="true"
                           >
                             <path d="M5 12h14" />
                             <path d="M12 5l7 7-7 7" />
                           </svg>
                         </span>
-                      )}
-                    </a>
-                  )}
-                </li>
-              ))}
+                      </a>
+                    ) : (
+                      <div
+                        class="notif-link group inline-flex h-10 items-center gap-4 border-r bg-white px-4 py-2"
+                        role="group"
+                        tabindex="0"
+                        aria-label={`${it.section} ${it.title}`}
+                      >
+                        <span class="block text-xs tracking-wide text-zinc-400">
+                          {it.section}
+                        </span>
+                        <span class="block text-xs text-zinc-400">
+                          {it.date ?? ""}
+                        </span>
+                        <span class="block text-sm font-medium text-zinc-800">
+                          {it.title}
+                        </span>
+
+                        <span
+                          class="invisible ml-3 inline-flex items-center justify-center rounded-full border-none p-1"
+                          aria-hidden="true"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="none"
+                            aria-hidden="true"
+                          >
+                            <path d="" />
+                          </svg>
+                        </span>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
           </ul>
         </div>
       </div>
