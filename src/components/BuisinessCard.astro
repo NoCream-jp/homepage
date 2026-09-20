@@ -117,31 +117,58 @@ const {
   const PROFILE_CARD_STORAGE_KEY = "profile-card-flipped";
 
   const setupProfileCard = () => {
-    const card = document.querySelector<HTMLElement>("#profile-card");
-    const inner = document.querySelector<HTMLElement>("#profile-card-inner");
+    const card = document.querySelector(/**/ "#profile-card");
+    const inner = document.querySelector(/**/ "#profile-card-inner");
 
     if (!card || !inner) return;
     if (card.dataset.initialized === "true") return;
     card.dataset.initialized = "true";
 
+    // saved state
     const savedState = sessionStorage.getItem(PROFILE_CARD_STORAGE_KEY);
     let flipped = savedState === "true";
 
-    // 初期回転（表/裏）
+    // initial transform for inner (front/back)
     inner.style.transform = flipped
       ? "perspective(1200px) rotateY(180deg)"
       : "perspective(1200px) rotateY(0deg)";
     inner.dataset.flipped = String(flipped);
 
-    let currentX = 0, currentY = 0, currentZ = 0, currentScale = 1;
-    let targetX = 0, targetY = 0, targetZ = 0, targetScale = 1;
-    let animationFrame = 0;
+    // reduced motion?
+    const prefersReduced =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // state for smooth interpolation
+    let currentX = 0,
+      currentY = 0,
+      currentZ = 0,
+      currentScale = 1;
+    let targetX = 0,
+      targetY = 0,
+      targetZ = 0,
+      targetScale = 1;
+    let rafId = 0;
+
+    // coefficients (調整可)
+    const yawFactor = 3.5; // 横（rotateY）強さ、正値（visualX の符号で方向決定）
+    const pitchFactor = -3.5; // 縦（rotateX）強さ
+    const twistFactor = 1.2; // 斜め（rotateZ）
+    const easing = 0.12;
 
     const updateTilt = () => {
-      currentX += (targetX - currentX) * 0.12;
-      currentY += (targetY - currentY) * 0.12;
-      currentZ += (targetZ - currentZ) * 0.12;
-      currentScale += (targetScale - currentScale) * 0.12;
+      // if reduced motion requested, smoothly return to neutral without tilt
+      if (prefersReduced) {
+        currentX += (0 - currentX) * easing;
+        currentY += (0 - currentY) * easing;
+        currentZ += (0 - currentZ) * easing;
+        currentScale += (1 - currentScale) * easing;
+      } else {
+        currentX += (targetX - currentX) * easing;
+        currentY += (targetY - currentY) * easing;
+        currentZ += (targetZ - currentZ) * easing;
+        currentScale += (targetScale - currentScale) * easing;
+      }
 
       card.style.transform = `
         perspective(1000px)
@@ -151,32 +178,31 @@ const {
         scale(${currentScale})
       `;
 
-      animationFrame = requestAnimationFrame(updateTilt);
+      rafId = requestAnimationFrame(updateTilt);
     };
 
-    const handleMouseMove = (event: MouseEvent) => {
+    const handleMouseMove = (event) => {
       const rect = card.getBoundingClientRect();
       const x = (event.clientX - rect.left) / rect.width;
       const y = (event.clientY - rect.top) / rect.height;
 
-      // -1 .. 1 に正規化
-      const normalizedX = x * 2 - 1;
-      const normalizedY = y * 2 - 1;
+      // normalized: -1 .. 1
+      const normalizedX = Math.max(-1, Math.min(1, x * 2 - 1));
+      const normalizedY = Math.max(-1, Math.min(1, y * 2 - 1));
 
-      // visualX: "見た目上の左右"。裏面なら左右を反転して扱う（これが要点）
-      const domFlipped = inner.dataset.flipped === "true";
-      const visualX = domFlipped ? -normalizedX : normalizedX;
+      // 重要：visualX は常に normalizedX（裏でも反転しない）
+      const visualX = normalizedX;
 
-      // 係数は常に正にする。visualX の符号で方向を決める。
-      const yawFactor = 3.5;   // 左右（rotateY）強さ（正）
-      const pitchFactor = -3.5; // 上下（rotateX）強さ（負で見た目調整）
-      const twistFactor = 1.2; // 斜め捩り（rotateZ）
-
+      // 計算（yawFactor は正。visualX の符号で向きを決定）
       targetY = visualX * yawFactor;
       targetX = normalizedY * pitchFactor;
       targetZ = visualX * normalizedY * twistFactor;
 
-      const distance = Math.min(1, Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY));
+      // 端へ行くほど軽くスケールアップ
+      const distance = Math.min(
+        1,
+        Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY)
+      );
       targetScale = 1 + distance * 0.012;
     };
 
@@ -187,23 +213,34 @@ const {
       targetScale = 1;
     };
 
+    // touch support: map touchmove to mousemove semantics
+    const handleTouchMove = (ev) => {
+      if (!ev.touches || ev.touches.length === 0) return;
+      const t = ev.touches[0];
+      handleMouseMove({ clientX: t.clientX, clientY: t.clientY });
+    };
+
+    // add listeners
     card.addEventListener("mousemove", handleMouseMove);
     card.addEventListener("mouseleave", handleMouseLeave);
+    card.addEventListener("touchmove", handleTouchMove, { passive: true });
+    card.addEventListener("touchend", handleMouseLeave);
 
-    animationFrame = requestAnimationFrame(updateTilt);
+    // start RAF
+    rafId = requestAnimationFrame(updateTilt);
 
-    // 裏返し（クリック）
+    // click (flip) — update flipped state before animating so mouse handlers see correct state
     card.addEventListener("click", () => {
-      inner.getAnimations().forEach((animation) => animation.cancel());
-
-      const target = flipped ? 0 : 180;
-      const start = flipped ? 180 : 0;
-
-      // ここでアニメーションを再生する前に flipped の値を更新しておくと、
-      // 直後の mousemove から新しい向き（inner.dataset.flipped）で計算できる。
+      // toggle flipped state first (so dataset reflects new state immediately)
       flipped = !flipped;
       inner.dataset.flipped = String(flipped);
       sessionStorage.setItem(PROFILE_CARD_STORAGE_KEY, String(flipped));
+
+      // cancel in-progress animations on inner
+      inner.getAnimations().forEach((animation) => animation.cancel());
+
+      const target = flipped ? 180 : 0;
+      const start = flipped ? 0 : 180; // note: we swapped start/target so animation goes the right direction
 
       inner.animate(
         [
@@ -254,6 +291,21 @@ const {
           fill: "forwards",
         }
       );
+    });
+
+    // cleanup on page unload / astro navigation
+    const cleanup = () => {
+      card.removeEventListener("mousemove", handleMouseMove);
+      card.removeEventListener("mouseleave", handleMouseLeave);
+      card.removeEventListener("touchmove", handleTouchMove);
+      card.removeEventListener("touchend", handleMouseLeave);
+      cancelAnimationFrame(rafId);
+    };
+
+    window.addEventListener("beforeunload", cleanup);
+    document.addEventListener("astro:page-unload", cleanup);
+    document.addEventListener("astro:page-load", () => {
+      // re-init only if needed (this component guards with dataset.initialized)
     });
   };
 
