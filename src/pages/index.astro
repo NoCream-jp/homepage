@@ -10,7 +10,7 @@ posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
 
-// --- calendar 連続月生成 ---
+// --- calendar用 連続月生成 ---
 const files = import.meta.glob("../content/calendar/*.json", { eager: true });
 const dataMap = new Map<string, any>();
 
@@ -54,7 +54,6 @@ for (let i = 0; i < 12; i++) {
         <h1 class="mb-6 text-2xl font-semibold text-zinc-800">home</h1>
         <div class="no-scrollbar flex min-h-0 flex-1 flex-col">
           <section class="mt-2 mb-10 flex min-h-0 w-full flex-1 flex-col gap-6">
-            <!-- カレンダーコンポーネントにすべてを委譲 -->
             <DiaryCalendar months={months} />
           </section>
         </div>

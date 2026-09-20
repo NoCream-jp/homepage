@@ -6,6 +6,7 @@ import TagFilter from "../components/TagFilter.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
 import LeftNav from "../components/LeftNav.astro";
 import NotificationStrip from "../components/NotificationStrip.astro";
+import ChevronButton from "../components/ChevronButton.astro";
 
 const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
@@ -74,50 +75,21 @@ const notificationItems = [
           </div>
 
           <!-- 上へ -->
-          <button
+          <ChevronButton
             id="article-scroll-up"
-            type="button"
+            direction="up"
             aria-label="上へスクロール"
-            class="absolute top-2 left-1/2 z-10 -translate-x-1/2 rounded-full border bg-white/40 p-2 text-zinc-700 transition hover:bg-zinc-100"
+            class="absolute top-2 left-1/2 z-10 -translate-x-1/2 cursor-pointer hover:border-zinc-600 hover:text-zinc-600"
             hidden
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="h-5 w-5"
-              aria-hidden="true"
-            >
-              <path d="m18 15-6-6-6 6"></path>
-            </svg>
-          </button>
-
+          />
           <!-- 下へ -->
-          <button
+          <ChevronButton
             id="article-scroll-down"
-            type="button"
+            direction="down"
             aria-label="下へスクロール"
-            class="absolute bottom-2 left-1/2 z-10 -translate-x-1/2 rounded-full border bg-white/40 p-2 text-zinc-700 transition hover:bg-zinc-100"
+            class="absolute bottom-2 left-1/2 z-10 -translate-x-1/2 cursor-pointer hover:border-zinc-600 hover:text-zinc-600"
             hidden
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="h-5 w-5"
-              aria-hidden="true"
-            >
-              <path d="m6 9 6 6 6-6"></path>
-            </svg>
-          </button>
+          />
         </div>
       </main>
     </div>

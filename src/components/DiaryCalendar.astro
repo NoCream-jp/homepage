@@ -1,4 +1,6 @@
 ---
+import ChevronButton from "./ChevronButton.astro";
+
 interface MonthData {
   key: string;
   data: Record<string, { text?: string; emoji?: string }>;
@@ -62,18 +64,19 @@ const initialIndex = Math.max(labels.length - 1, 0);
 <div class="flex h-full w-full flex-col bg-white" id="calendar-widget">
   <div class="z-10 shrink-0 bg-white pb-2">
     <div class="flex items-center justify-between pb-3">
-      <!-- ★ 修正点1: disabled:opacity-0 disabled:pointer-events-none を追加 -->
-      <button
+      <ChevronButton
         id="cal-prev"
-        class="rounded px-3 py-1 text-zinc-500 transition-colors hover:bg-zinc-100 disabled:pointer-events-none disabled:opacity-0"
-        >&larr;</button
-      >
+        direction="left"
+        class="h-10 w-10 cursor-pointer rounded-full border p-1 text-black transition-colors hover:border-zinc-600 disabled:pointer-events-none disabled:opacity-0"
+        aria-label="前の月"
+      />
       <div id="cal-month-label" class="text-sm font-medium text-zinc-700"></div>
-      <button
+      <ChevronButton
         id="cal-next"
-        class="rounded px-3 py-1 text-zinc-500 transition-colors hover:bg-zinc-100 disabled:pointer-events-none disabled:opacity-0"
-        >&rarr;</button
-      >
+        direction="right"
+        class="h-10 w-10 cursor-pointer rounded-full border p-1 text-black transition-colors hover:border-zinc-600 disabled:pointer-events-none disabled:opacity-0"
+        aria-label="次の月"
+      />
     </div>
 
     <div
@@ -100,10 +103,10 @@ const initialIndex = Math.max(labels.length - 1, 0);
                   <div class="aspect-square rounded bg-zinc-50" />
                 ) : (
                   <div
-                    class="flex aspect-square flex-col rounded border p-1"
+                    class="flex aspect-square flex-col overflow-hidden rounded border p-1"
                     data-today={cell.isToday ? "true" : "false"}
                   >
-                    <div class="flex justify-start">
+                    <div class="flex shrink-0 justify-start">
                       <div
                         class={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] ${
                           cell.isToday
@@ -114,9 +117,10 @@ const initialIndex = Math.max(labels.length - 1, 0);
                         {cell.day}
                       </div>
                     </div>
-                    <div class="mt-1 flex flex-col justify-start overflow-hidden bg-white pt-5">
+
+                    <div class="mt-1 flex min-h-0 flex-1 flex-col justify-start overflow-hidden bg-white lg:pt-4">
                       {cell.entry ? (
-                        <div class="line-clamp-3 text-[11px] leading-tight">
+                        <div class="line-clamp-3 text-[11px] leading-tight wrap-break-word">
                           {cell.entry.emoji ?? ""} {cell.entry.text}
                         </div>
                       ) : (
@@ -151,7 +155,6 @@ const initialIndex = Math.max(labels.length - 1, 0);
         label.textContent = labels[currentIndex] ?? "データなし";
       }
 
-      // ★ 修正点2: 端に到達した場合はボタンに disabled 属性を付与する
       if (prev) {
         prev.disabled = currentIndex === 0;
       }
@@ -174,7 +177,6 @@ const initialIndex = Math.max(labels.length - 1, 0);
       });
     }
 
-    // 初期化表示
     updateView();
 
     setTimeout(() => {
