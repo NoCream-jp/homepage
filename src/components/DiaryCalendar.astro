@@ -167,19 +167,31 @@ const initialIndex = Math.max(labels.length - 1, 0);
     if (!track || !label || slides.length === 0) return;
 
     const initialIndexAttr = parseInt(widget.dataset.initialIndex || "0", 10);
+
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+    const currentMonthLabel = `${currentYear}.${String(currentMonth).padStart(2, "0")}`;
+
+    // savedIndex が有り、かつ戻る/進むで復帰している場合は saved を優先
     let currentIndex = Math.max(
       0,
       Math.min(initialIndexAttr, slides.length - 1)
     );
+    const savedIndex = sessionStorage.getItem("calendar-current-index");
 
+    // ブラウザのナビタイプ判定（navigate | reload | back_forward）
     let navType = "navigate";
     try {
-      const entries = performance.getEntriesByType("navigation") as
-        | PerformanceNavigationTiming[]
-        | undefined;
-
-      if (entries && entries.length > 0 && entries[0].type) {
-        navType = entries[0].type;
+      const entries =
+        performance.getEntriesByType &&
+        performance.getEntriesByType("navigation");
+      if (
+        entries &&
+        entries.length > 0 &&
+        (entries[0] as PerformanceNavigationTiming).type
+      ) {
+        navType = (entries[0] as PerformanceNavigationTiming).type;
       } else if (
         (performance as any).navigation &&
         typeof (performance as any).navigation.type === "number"
@@ -187,13 +199,30 @@ const initialIndex = Math.max(labels.length - 1, 0);
         const t = (performance as any).navigation.type;
         navType = t === 1 ? "reload" : t === 2 ? "back_forward" : "navigate";
       }
-    } catch (e) {}
+    } catch (e) {
+      // ignore
+    }
 
-    const savedIndex = sessionStorage.getItem("calendar-current-index");
+    // index of current month slide if exists
+    const slidesArr = Array.from(slides);
+    const currentMonthIndex = slidesArr.findIndex(
+      (s) => s.dataset.label === currentMonthLabel
+    );
+
     if (savedIndex !== null && navType === "back_forward") {
       const idx = parseInt(savedIndex, 10);
       if (!Number.isNaN(idx))
         currentIndex = Math.max(0, Math.min(idx, slides.length - 1));
+    } else {
+      // 通常の初回表示またはリロード：現在月があれば優先して表示（「今日に戻る」要件）
+      if (currentMonthIndex !== -1) {
+        currentIndex = currentMonthIndex;
+      } else {
+        currentIndex = Math.max(
+          0,
+          Math.min(initialIndexAttr, slides.length - 1)
+        );
+      }
     }
 
     const updateView = (opts = { save: true, scrollToday: false }) => {
@@ -212,13 +241,26 @@ const initialIndex = Math.max(labels.length - 1, 0);
       }
 
       if (opts.scrollToday) {
+        // レイアウトが固まってからスクロールする（二重 rAF で安定化）
         const currentSlideEl = slides[currentIndex];
         if (currentSlideEl) {
-          const todayEl = currentSlideEl.querySelector('[data-today="true"]');
+          const todayEl = currentSlideEl.querySelector<HTMLElement>(
+            '[data-today="true"]'
+          );
           if (todayEl) {
-            (todayEl as HTMLElement).scrollIntoView({
-              block: "center",
-              behavior: "smooth",
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                // use smooth on initial display; if you prefer instant use behavior: 'auto'
+                try {
+                  todayEl.scrollIntoView({
+                    block: "center",
+                    behavior: "smooth",
+                  });
+                } catch (e) {
+                  // 一部ブラウザでオプションがエラーになる可能性に備える
+                  todayEl.scrollIntoView();
+                }
+              });
             });
           }
         }
@@ -261,7 +303,7 @@ const initialIndex = Math.max(labels.length - 1, 0);
     });
 
     window.addEventListener("pageshow", (ev) => {
-      if (ev && ev.persisted) {
+      if (ev && (ev as PageTransitionEvent).persisted) {
         const s = sessionStorage.getItem("calendar-current-index");
         if (s !== null) {
           const idx = parseInt(s, 10);
@@ -270,16 +312,22 @@ const initialIndex = Math.max(labels.length - 1, 0);
         }
         updateView({ save: true, scrollToday: true });
       } else {
+        // reload のときは今日優先（navType 判定により）
         if (navType === "reload") {
-          currentIndex = Math.max(
-            0,
-            Math.min(initialIndexAttr, slides.length - 1)
-          );
+          if (currentMonthIndex !== -1) {
+            currentIndex = currentMonthIndex;
+          } else {
+            currentIndex = Math.max(
+              0,
+              Math.min(initialIndexAttr, slides.length - 1)
+            );
+          }
           updateView({ save: true, scrollToday: true });
         }
       }
     });
 
+    // 初回表示：今日が含まれるスライドに移動し、今日要素をスクロールする
     updateView({ save: true, scrollToday: true });
   };
 
