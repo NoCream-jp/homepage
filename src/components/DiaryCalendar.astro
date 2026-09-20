@@ -19,22 +19,15 @@ function startWeekday(y: number, m: number) {
   return new Date(y, m - 1, 1).getDay();
 }
 
-const now = new Date();
-const currentYear = now.getFullYear();
-const currentMonth = now.getMonth() + 1;
-const currentDay = now.getDate();
-
 const displayMonths = [...months].reverse();
 
+// サーバー側での「今日」の計算を削除
 const monthViews = displayMonths.map((m) => {
   const [yStr, moStr] = m.key.split("_");
   const year = Number(yStr);
   const month = Number(moStr);
   const days = daysInMonth(year, month);
   const start = startWeekday(year, month);
-
-  const isCurrentMonth = currentYear === year && currentMonth === month;
-  const today = isCurrentMonth ? currentDay : -1;
 
   const cells = [];
   for (let i = 0; i < start; i++) cells.push(null);
@@ -45,7 +38,6 @@ const monthViews = displayMonths.map((m) => {
       day: d,
       key,
       entry: m.data[key],
-      isToday: d === today,
     });
   }
 
@@ -87,13 +79,8 @@ const initialIndex = Math.max(labels.length - 1, 0);
       />
     </div>
 
-    <div
-      class="grid grid-cols-7 py-1 text-center text-[11px] font-medium text-zinc-600"
-    >
-      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div
-      >
-        Fri
-      </div><div>Sat</div>
+    <div class="grid grid-cols-7 py-1 text-center text-[11px] font-medium text-zinc-600">
+      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
     </div>
   </div>
 
@@ -116,16 +103,11 @@ const initialIndex = Math.max(labels.length - 1, 0);
                 ) : (
                   <div
                     class="flex aspect-square flex-col overflow-hidden rounded border p-1"
-                    data-today={cell.isToday ? "true" : "false"}
+                    data-date={cell.key}
                   >
                     <div class="flex shrink-0 justify-start">
-                      <div
-                        class={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] ${
-                          cell.isToday
-                            ? "bg-cyan-700 text-white"
-                            : "text-zinc-500"
-                        }`}
-                      >
+                      <!-- サーバーレンダリング時はすべてデフォルトの色（text-zinc-500）にしておく -->
+                      <div class="day-number flex h-6 w-6 items-center justify-center rounded-full text-[10px] text-zinc-500">
                         {cell.day}
                       </div>
                     </div>
@@ -156,46 +138,45 @@ const initialIndex = Math.max(labels.length - 1, 0);
     if (!widget || widget.dataset.initialized === "true") return;
     widget.dataset.initialized = "true";
 
-    // --- 型注釈 ---
     const track = widget.querySelector<HTMLElement>("#cal-track");
     const label = widget.querySelector<HTMLElement>("#cal-month-label");
     const prev = widget.querySelector<HTMLButtonElement>("#cal-prev");
     const next = widget.querySelector<HTMLButtonElement>("#cal-next");
     const slides = widget.querySelectorAll<HTMLElement>(".calendar-slide");
-    // --------------------
 
     if (!track || !label || slides.length === 0) return;
 
-    const initialIndexAttr = parseInt(widget.dataset.initialIndex || "0", 10);
-
+    // --- ブラウザの現在時刻から「今日」を判定 ---
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth() + 1;
-    const currentMonthLabel = `${currentYear}.${String(currentMonth).padStart(2, "0")}`;
+    const currentDay = now.getDate();
 
-    // savedIndex が有り、かつ戻る/進むで復帰している場合は saved を優先
-    let currentIndex = Math.max(
-      0,
-      Math.min(initialIndexAttr, slides.length - 1)
-    );
+    const currentMonthLabel = `${currentYear}.${String(currentMonth).padStart(2, "0")}`;
+    const todayStr = `${currentYear}-${String(currentMonth).padStart(2, "0")}-${String(currentDay).padStart(2, "0")}`;
+
+    // 「今日」のセルをクライアント側でハイライト
+    const todayCell = widget.querySelector<HTMLElement>(`[data-date="${todayStr}"]`);
+    if (todayCell) {
+      todayCell.dataset.today = "true";
+      const numberEl = todayCell.querySelector<HTMLElement>(".day-number");
+      if (numberEl) {
+        numberEl.classList.remove("text-zinc-500");
+        numberEl.classList.add("bg-cyan-700", "text-white");
+      }
+    }
+    // ------------------------------------------
+
+    const initialIndexAttr = parseInt(widget.dataset.initialIndex || "0", 10);
+    let currentIndex = Math.max(0, Math.min(initialIndexAttr, slides.length - 1));
     const savedIndex = sessionStorage.getItem("calendar-current-index");
 
-    // ブラウザのナビタイプ判定（navigate | reload | back_forward）
     let navType = "navigate";
     try {
-      const entries =
-        performance.getEntriesByType &&
-        performance.getEntriesByType("navigation");
-      if (
-        entries &&
-        entries.length > 0 &&
-        (entries[0] as PerformanceNavigationTiming).type
-      ) {
+      const entries = performance.getEntriesByType && performance.getEntriesByType("navigation");
+      if (entries && entries.length > 0 && (entries[0] as PerformanceNavigationTiming).type) {
         navType = (entries[0] as PerformanceNavigationTiming).type;
-      } else if (
-        (performance as any).navigation &&
-        typeof (performance as any).navigation.type === "number"
-      ) {
+      } else if ((performance as any).navigation && typeof (performance as any).navigation.type === "number") {
         const t = (performance as any).navigation.type;
         navType = t === 1 ? "reload" : t === 2 ? "back_forward" : "navigate";
       }
@@ -203,25 +184,17 @@ const initialIndex = Math.max(labels.length - 1, 0);
       // ignore
     }
 
-    // index of current month slide if exists
     const slidesArr = Array.from(slides);
-    const currentMonthIndex = slidesArr.findIndex(
-      (s) => s.dataset.label === currentMonthLabel
-    );
+    const currentMonthIndex = slidesArr.findIndex((s) => s.dataset.label === currentMonthLabel);
 
     if (savedIndex !== null && navType === "back_forward") {
       const idx = parseInt(savedIndex, 10);
-      if (!Number.isNaN(idx))
-        currentIndex = Math.max(0, Math.min(idx, slides.length - 1));
+      if (!Number.isNaN(idx)) currentIndex = Math.max(0, Math.min(idx, slides.length - 1));
     } else {
-      // 通常の初回表示またはリロード：現在月があれば優先して表示（「今日に戻る」要件）
       if (currentMonthIndex !== -1) {
         currentIndex = currentMonthIndex;
       } else {
-        currentIndex = Math.max(
-          0,
-          Math.min(initialIndexAttr, slides.length - 1)
-        );
+        currentIndex = Math.max(0, Math.min(initialIndexAttr, slides.length - 1));
       }
     }
 
@@ -241,23 +214,15 @@ const initialIndex = Math.max(labels.length - 1, 0);
       }
 
       if (opts.scrollToday) {
-        // レイアウトが固まってからスクロールする（二重 rAF で安定化）
         const currentSlideEl = slides[currentIndex];
         if (currentSlideEl) {
-          const todayEl = currentSlideEl.querySelector<HTMLElement>(
-            '[data-today="true"]'
-          );
+          const todayEl = currentSlideEl.querySelector<HTMLElement>('[data-today="true"]');
           if (todayEl) {
             requestAnimationFrame(() => {
               requestAnimationFrame(() => {
-                // use smooth on initial display; if you prefer instant use behavior: 'auto'
                 try {
-                  todayEl.scrollIntoView({
-                    block: "center",
-                    behavior: "smooth",
-                  });
+                  todayEl.scrollIntoView({ block: "center", behavior: "smooth" });
                 } catch (e) {
-                  // 一部ブラウザでオプションがエラーになる可能性に備える
                   todayEl.scrollIntoView();
                 }
               });
@@ -288,16 +253,10 @@ const initialIndex = Math.max(labels.length - 1, 0);
         if (!Number.isNaN(idx)) {
           currentIndex = Math.max(0, Math.min(idx, slides.length - 1));
         } else {
-          currentIndex = Math.max(
-            0,
-            Math.min(initialIndexAttr, slides.length - 1)
-          );
+          currentIndex = Math.max(0, Math.min(initialIndexAttr, slides.length - 1));
         }
       } else {
-        currentIndex = Math.max(
-          0,
-          Math.min(initialIndexAttr, slides.length - 1)
-        );
+        currentIndex = Math.max(0, Math.min(initialIndexAttr, slides.length - 1));
       }
       updateView({ save: true, scrollToday: true });
     });
@@ -307,27 +266,21 @@ const initialIndex = Math.max(labels.length - 1, 0);
         const s = sessionStorage.getItem("calendar-current-index");
         if (s !== null) {
           const idx = parseInt(s, 10);
-          if (!Number.isNaN(idx))
-            currentIndex = Math.max(0, Math.min(idx, slides.length - 1));
+          if (!Number.isNaN(idx)) currentIndex = Math.max(0, Math.min(idx, slides.length - 1));
         }
         updateView({ save: true, scrollToday: true });
       } else {
-        // reload のときは今日優先（navType 判定により）
         if (navType === "reload") {
           if (currentMonthIndex !== -1) {
             currentIndex = currentMonthIndex;
           } else {
-            currentIndex = Math.max(
-              0,
-              Math.min(initialIndexAttr, slides.length - 1)
-            );
+            currentIndex = Math.max(0, Math.min(initialIndexAttr, slides.length - 1));
           }
           updateView({ save: true, scrollToday: true });
         }
       }
     });
 
-    // 初回表示：今日が含まれるスライドに移動し、今日要素をスクロールする
     updateView({ save: true, scrollToday: true });
   };
 
