@@ -80,36 +80,34 @@ const {
       </div>
     </div>
 
-    <!-- 裏（Tailwind + 中央罫線） -->
+    <!-- 裏 -->
     <div
-      class="absolute inset-0 rounded-xl border bg-white p-4 lg:p-10"
+      class="absolute inset-0 flex flex-row items-center justify-between gap-4 rounded-xl border bg-white p-4 sm:gap-6 sm:p-6 md:p-8"
       style="backface-visibility: hidden; transform: rotateY(180deg);"
     >
-      <div class="h-full w-full overflow-hidden rounded-sm bg-zinc-50">
-        <span
-          contenteditable="true"
-          spellcheck="true"
-          class="block h-full w-full overflow-auto p-3 text-sm leading-8 text-zinc-800 outline-none"
-          style="
-        line-height: 36px;
+      <!-- 左 -->
+      <div class="flex flex-1 flex-col justify-center gap-2 sm:gap-3">
+        <h3 class="text-base font-bold text-zinc-800 md:text-lg">About Me</h3>
+        <p class="text-[10px] leading-4 text-zinc-600 sm:text-xs md:text-sm">
+          大学で強化学習について研究しています。<br class="hidden sm:block" />
+          コーヒーが好きです。猫が好きです。息抜きの達人です。
+        </p>
+        <p class="mt-1 text-[10px] font-medium text-zinc-500 sm:text-xs">
+          Thanks for visiting my portfolio!
+        </p>
+      </div>
 
-        background-image:
-          repeating-linear-gradient(
-            to bottom,
-            transparent 0,
-            transparent calc(50% - 0.5px),
-            rgba(0,0,0,0.07) calc(50% - 0.5px),
-            rgba(0,0,0,0.07) calc(50% + 0.5px),
-            transparent calc(50% + 0.5px),
-            transparent 34px
-          );
-        background-size: 100% 34px;
-        background-repeat: repeat;
-        -webkit-background-clip: padding-box;
-      "
+      <!-- 右 -->
+      <div class="flex shrink-0 flex-col items-center gap-1 sm:gap-2">
+        <div
+          class="h-20 w-20 overflow-hidden rounded-md border bg-white p-1.5 sm:h-24 sm:w-24 md:h-28 md:w-28"
         >
-          文章を書けるようにしたかったが書く内容がない。臓器提供の意志でも明記しておこうか…？
-        </span>
+          <img
+            src="/images/brand/qrcode.png"
+            alt="QR Code"
+            class="h-full w-full object-contain"
+          />
+        </div>
       </div>
     </div>
   </div>
