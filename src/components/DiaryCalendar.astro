@@ -15,13 +15,13 @@ const { months } = Astro.props;
 function daysInMonth(y: number, m: number) {
   return new Date(y, m, 0).getDate();
 }
+
 function startWeekday(y: number, m: number) {
   return new Date(y, m - 1, 1).getDay();
 }
 
 const displayMonths = [...months].reverse();
 
-// サーバー側での「今日」の計算を削除
 const monthViews = displayMonths.map((m) => {
   const [yStr, moStr] = m.key.split("_");
   const year = Number(yStr);
@@ -30,10 +30,14 @@ const monthViews = displayMonths.map((m) => {
   const start = startWeekday(year, month);
 
   const cells = [];
-  for (let i = 0; i < start; i++) cells.push(null);
+
+  for (let i = 0; i < start; i++) {
+    cells.push(null);
+  }
 
   for (let d = 1; d <= days; d++) {
     const key = `${year}-${String(month).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+
     cells.push({
       day: d,
       key,
@@ -54,7 +58,7 @@ const initialIndex = Math.max(labels.length - 1, 0);
 ---
 
 <div
-  class="flex h-full w-full flex-col bg-white"
+  class="@container flex h-auto w-full flex-col bg-white lg:h-full lg:min-h-0"
   id="calendar-widget"
   data-initial-index={initialIndex}
 >
@@ -67,7 +71,10 @@ const initialIndex = Math.max(labels.length - 1, 0);
         aria-label="前の月"
       />
 
-      <div id="cal-month-label" class="text-sm font-medium text-zinc-700">
+      <div
+        id="cal-month-label"
+        class="text-[clamp(14px,0.76cqw,19px)] font-medium text-zinc-700"
+      >
         {labels[initialIndex] ?? "データなし"}
       </div>
 
@@ -79,21 +86,31 @@ const initialIndex = Math.max(labels.length - 1, 0);
       />
     </div>
 
-    <div class="grid grid-cols-7 py-1 text-center text-[11px] font-medium text-zinc-600">
-      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+    <div
+      class="grid grid-cols-7 py-1 text-center text-[clamp(11px,0.76cqw,14px)] font-medium text-zinc-600"
+    >
+      <div>Sun</div>
+      <div>Mon</div>
+      <div>Tue</div>
+      <div>Wed</div>
+      <div>Thu</div>
+      <div>Fri</div>
+      <div>Sat</div>
     </div>
   </div>
 
-  <div class="relative min-h-0 flex-1 overflow-hidden pt-2">
+  <div
+    class="relative overflow-x-hidden pt-2 lg:min-h-0 lg:flex-1 lg:overflow-hidden"
+  >
     <div
       id="cal-track"
-      class="flex h-full w-full transition-transform duration-300 ease-out"
+      class="flex w-full transition-transform duration-300 ease-out lg:h-full"
       style={`transform: translateX(-${initialIndex * 100}%);`}
     >
       {
         monthViews.map((mv) => (
           <div
-            class="calendar-slide no-scrollbar h-full w-full shrink-0 overflow-y-auto pb-10"
+            class="calendar-slide no-scrollbar w-full shrink-0 overflow-visible pb-10 lg:h-full lg:overflow-y-auto"
             data-label={mv.label}
           >
             <div class="grid grid-cols-7 gap-1">
@@ -106,19 +123,20 @@ const initialIndex = Math.max(labels.length - 1, 0);
                     data-date={cell.key}
                   >
                     <div class="flex shrink-0 justify-start">
-                      <!-- サーバーレンダリング時はすべてデフォルトの色（text-zinc-500）にしておく -->
-                      <div class="day-number flex h-6 w-6 items-center justify-center rounded-full text-[10px] text-zinc-500">
+                      <div class="day-number flex h-6 w-6 items-center justify-center rounded-full text-[clamp(11px,0.69cqw,15px)] text-zinc-500">
                         {cell.day}
                       </div>
                     </div>
 
-                    <div class="mt-1 flex min-h-0 flex-1 flex-col justify-start overflow-hidden bg-white lg:pt-4">
+                    <div class="flex min-h-0 flex-1 flex-col justify-start overflow-hidden bg-white pt-[clamp(1px,0.35cqw,5px)] lg:px-2">
                       {cell.entry ? (
-                        <div class="line-clamp-3 text-[11px] leading-tight wrap-break-word">
+                        <div class="line-clamp-3 text-[clamp(10px,0.90cqw,15px)] leading-tight wrap-break-word">
                           {cell.entry.emoji ?? ""} {cell.entry.text}
                         </div>
                       ) : (
-                        <div class="text-[10px] text-zinc-300">—</div>
+                        <div class="text-[clamp(9px,0.69cqw,13px)] text-zinc-300">
+                          —
+                        </div>
                       )}
                     </div>
                   </div>
@@ -135,7 +153,9 @@ const initialIndex = Math.max(labels.length - 1, 0);
 <script>
   const setupCalendar = () => {
     const widget = document.getElementById("calendar-widget");
+
     if (!widget || widget.dataset.initialized === "true") return;
+
     widget.dataset.initialized = "true";
 
     const track = widget.querySelector<HTMLElement>("#cal-track");
@@ -153,31 +173,53 @@ const initialIndex = Math.max(labels.length - 1, 0);
     const currentDay = now.getDate();
 
     const currentMonthLabel = `${currentYear}.${String(currentMonth).padStart(2, "0")}`;
+
     const todayStr = `${currentYear}-${String(currentMonth).padStart(2, "0")}-${String(currentDay).padStart(2, "0")}`;
 
     // 「今日」のセルをクライアント側でハイライト
-    const todayCell = widget.querySelector<HTMLElement>(`[data-date="${todayStr}"]`);
+    const todayCell = widget.querySelector<HTMLElement>(
+      `[data-date="${todayStr}"]`
+    );
+
     if (todayCell) {
       todayCell.dataset.today = "true";
+
       const numberEl = todayCell.querySelector<HTMLElement>(".day-number");
+
       if (numberEl) {
         numberEl.classList.remove("text-zinc-500");
         numberEl.classList.add("bg-cyan-700", "text-white");
       }
     }
-    // ------------------------------------------
 
     const initialIndexAttr = parseInt(widget.dataset.initialIndex || "0", 10);
-    let currentIndex = Math.max(0, Math.min(initialIndexAttr, slides.length - 1));
+
+    let currentIndex = Math.max(
+      0,
+      Math.min(initialIndexAttr, slides.length - 1)
+    );
+
     const savedIndex = sessionStorage.getItem("calendar-current-index");
 
     let navType = "navigate";
+
     try {
-      const entries = performance.getEntriesByType && performance.getEntriesByType("navigation");
-      if (entries && entries.length > 0 && (entries[0] as PerformanceNavigationTiming).type) {
+      const entries =
+        performance.getEntriesByType &&
+        performance.getEntriesByType("navigation");
+
+      if (
+        entries &&
+        entries.length > 0 &&
+        (entries[0] as PerformanceNavigationTiming).type
+      ) {
         navType = (entries[0] as PerformanceNavigationTiming).type;
-      } else if ((performance as any).navigation && typeof (performance as any).navigation.type === "number") {
+      } else if (
+        (performance as any).navigation &&
+        typeof (performance as any).navigation.type === "number"
+      ) {
         const t = (performance as any).navigation.type;
+
         navType = t === 1 ? "reload" : t === 2 ? "back_forward" : "navigate";
       }
     } catch (e) {
@@ -185,43 +227,68 @@ const initialIndex = Math.max(labels.length - 1, 0);
     }
 
     const slidesArr = Array.from(slides);
-    const currentMonthIndex = slidesArr.findIndex((s) => s.dataset.label === currentMonthLabel);
+
+    const currentMonthIndex = slidesArr.findIndex(
+      (s) => s.dataset.label === currentMonthLabel
+    );
 
     if (savedIndex !== null && navType === "back_forward") {
       const idx = parseInt(savedIndex, 10);
-      if (!Number.isNaN(idx)) currentIndex = Math.max(0, Math.min(idx, slides.length - 1));
+
+      if (!Number.isNaN(idx)) {
+        currentIndex = Math.max(0, Math.min(idx, slides.length - 1));
+      }
     } else {
       if (currentMonthIndex !== -1) {
         currentIndex = currentMonthIndex;
       } else {
-        currentIndex = Math.max(0, Math.min(initialIndexAttr, slides.length - 1));
+        currentIndex = Math.max(
+          0,
+          Math.min(initialIndexAttr, slides.length - 1)
+        );
       }
     }
 
     const updateView = (opts = { save: true, scrollToday: false }) => {
-      if (track) track.style.transform = `translateX(-${currentIndex * 100}%)`;
+      track.style.transform = `translateX(-${currentIndex * 100}%)`;
 
       const currentSlide = slides[currentIndex];
+
       if (currentSlide && currentSlide.dataset.label) {
         label.textContent = currentSlide.dataset.label;
       }
 
-      if (prev) prev.disabled = currentIndex === 0;
-      if (next) next.disabled = currentIndex === slides.length - 1;
+      if (prev) {
+        prev.disabled = currentIndex === 0;
+      }
+
+      if (next) {
+        next.disabled = currentIndex === slides.length - 1;
+      }
 
       if (opts.save) {
         sessionStorage.setItem("calendar-current-index", String(currentIndex));
       }
 
-      if (opts.scrollToday) {
+      if (
+        opts.scrollToday &&
+        window.matchMedia("(min-width: 1024px)").matches
+      ) {
         const currentSlideEl = slides[currentIndex];
+
         if (currentSlideEl) {
-          const todayEl = currentSlideEl.querySelector<HTMLElement>('[data-today="true"]');
+          const todayEl = currentSlideEl.querySelector<HTMLElement>(
+            '[data-today="true"]'
+          );
+
           if (todayEl) {
             requestAnimationFrame(() => {
               requestAnimationFrame(() => {
                 try {
-                  todayEl.scrollIntoView({ block: "center", behavior: "smooth" });
+                  todayEl.scrollIntoView({
+                    block: "center",
+                    behavior: "smooth",
+                  });
                 } catch (e) {
                   todayEl.scrollIntoView();
                 }
@@ -235,53 +302,91 @@ const initialIndex = Math.max(labels.length - 1, 0);
     if (prev) {
       prev.addEventListener("click", () => {
         currentIndex = Math.max(currentIndex - 1, 0);
-        updateView({ save: true, scrollToday: false });
+
+        updateView({
+          save: true,
+          scrollToday: false,
+        });
       });
     }
 
     if (next) {
       next.addEventListener("click", () => {
         currentIndex = Math.min(currentIndex + 1, slides.length - 1);
-        updateView({ save: true, scrollToday: false });
+
+        updateView({
+          save: true,
+          scrollToday: false,
+        });
       });
     }
 
     window.addEventListener("popstate", () => {
       const s = sessionStorage.getItem("calendar-current-index");
+
       if (s !== null) {
         const idx = parseInt(s, 10);
+
         if (!Number.isNaN(idx)) {
           currentIndex = Math.max(0, Math.min(idx, slides.length - 1));
         } else {
-          currentIndex = Math.max(0, Math.min(initialIndexAttr, slides.length - 1));
+          currentIndex = Math.max(
+            0,
+            Math.min(initialIndexAttr, slides.length - 1)
+          );
         }
       } else {
-        currentIndex = Math.max(0, Math.min(initialIndexAttr, slides.length - 1));
+        currentIndex = Math.max(
+          0,
+          Math.min(initialIndexAttr, slides.length - 1)
+        );
       }
-      updateView({ save: true, scrollToday: true });
+
+      updateView({
+        save: true,
+        scrollToday: true,
+      });
     });
 
     window.addEventListener("pageshow", (ev) => {
       if (ev && (ev as PageTransitionEvent).persisted) {
         const s = sessionStorage.getItem("calendar-current-index");
+
         if (s !== null) {
           const idx = parseInt(s, 10);
-          if (!Number.isNaN(idx)) currentIndex = Math.max(0, Math.min(idx, slides.length - 1));
+
+          if (!Number.isNaN(idx)) {
+            currentIndex = Math.max(0, Math.min(idx, slides.length - 1));
+          }
         }
-        updateView({ save: true, scrollToday: true });
+
+        updateView({
+          save: true,
+          scrollToday: true,
+        });
       } else {
         if (navType === "reload") {
           if (currentMonthIndex !== -1) {
             currentIndex = currentMonthIndex;
           } else {
-            currentIndex = Math.max(0, Math.min(initialIndexAttr, slides.length - 1));
+            currentIndex = Math.max(
+              0,
+              Math.min(initialIndexAttr, slides.length - 1)
+            );
           }
-          updateView({ save: true, scrollToday: true });
+
+          updateView({
+            save: true,
+            scrollToday: true,
+          });
         }
       }
     });
 
-    updateView({ save: true, scrollToday: true });
+    updateView({
+      save: true,
+      scrollToday: true,
+    });
   };
 
   setupCalendar();

@@ -51,11 +51,12 @@ const notificationItems = [
     <ClientRouter />
   </head>
 
-  <body class="flex h-screen flex-col overflow-hidden">
-    <main class="min-h-0 flex-1 overflow-hidden">
+  <body class="flex min-h-screen flex-col lg:h-screen lg:overflow-hidden">
+    <main class="flex-1 lg:min-h-0 lg:overflow-hidden">
       <div class="absolute w-full">
         <NotificationStrip items={notificationItems} />
       </div>
+
       <slot />
     </main>
 
