@@ -134,27 +134,22 @@ const {
 
     if (!card || !inner) return;
     if (card.dataset.initialized === "true") return;
-
     card.dataset.initialized = "true";
 
-    // 保存済みの表裏状態
+    // 表裏状態の復元
     const savedState = sessionStorage.getItem(PROFILE_CARD_STORAGE_KEY);
-
     let flipped = savedState === "true";
-
-    // 初期状態
     inner.style.transform = flipped
       ? "perspective(300cqw) rotateY(180deg)"
       : "perspective(300cqw) rotateY(0deg)";
-
     inner.dataset.flipped = String(flipped);
 
-    // reduced motion
+    // reduced motion の配慮
     const prefersReduced =
       window.matchMedia &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // マウス追従用の状態
+    // 状態（イージング用）
     let currentX = 0;
     let currentY = 0;
     let currentZ = 0;
@@ -166,24 +161,55 @@ const {
     let targetScale = 1;
 
     let rafId = 0;
-
-    const yawFactor = 3.5;
-    const pitchFactor = -3.5;
-    const twistFactor = 1.2;
+    let isAnimating = false;
     const easing = 0.12;
 
-    const updateTilt = () => {
+    // カード中心を基準に、マウス位置（比率）から角度を決定する関数
+    const updateTargetFromPosition = (clientX: number, clientY: number) => {
       if (prefersReduced) {
-        currentX += (0 - currentX) * easing;
-        currentY += (0 - currentY) * easing;
-        currentZ += (0 - currentZ) * easing;
-        currentScale += (1 - currentScale) * easing;
-      } else {
-        currentX += (targetX - currentX) * easing;
-        currentY += (targetY - currentY) * easing;
-        currentZ += (targetZ - currentZ) * easing;
-        currentScale += (targetScale - currentScale) * easing;
+        targetX = 0;
+        targetY = 0;
+        targetZ = 0;
+        targetScale = 1;
+        return;
       }
+
+      const rect = card.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+
+      // カード内の相対位置： -1 .. 1
+      const px = ((clientX - rect.left) / rect.width) * 2 - 1;
+      const py = ((clientY - rect.top) / rect.height) * 2 - 1;
+
+      // px, py が中央(0,0) のとき傾き無し。端に行くほど大きく傾く。
+      // 値を調整して自然な傾きにする
+      const maxRotateX = 6.5; // 上下（縦）方向の最大回転量（deg）
+      const maxRotateY = 6.5; // 左右（横）方向の最大回転量（deg）
+      const twistFactor = 1.2; // 斜めに捻る量
+
+      // 縦位置 -> rotateX（上下に傾く）: 上に行くほど正の回転（見下ろす）
+      targetX = -py * maxRotateX;
+      // 横位置 -> rotateY（左右に傾く）: 右に行くほど正の回転
+      targetY = px * maxRotateY;
+      // 斜めによるわずかなZ回転
+      targetZ = px * py * twistFactor;
+
+      // カード中心からの距離により微妙に拡大
+      const distance = Math.min(1, Math.sqrt(px * px + py * py));
+      targetScale = 1 + distance * 0.012;
+    };
+
+    const startAnimation = () => {
+      if (isAnimating) return;
+      isAnimating = true;
+      rafId = requestAnimationFrame(animate);
+    };
+
+    const animate = () => {
+      currentX += (targetX - currentX) * easing;
+      currentY += (targetY - currentY) * easing;
+      currentZ += (targetZ - currentZ) * easing;
+      currentScale += (targetScale - currentScale) * easing;
 
       card.style.transform = `
         perspective(250cqw)
@@ -193,54 +219,45 @@ const {
         scale(${currentScale})
       `;
 
-      rafId = requestAnimationFrame(updateTilt);
+      const settled =
+        Math.abs(targetX - currentX) < 0.02 &&
+        Math.abs(targetY - currentY) < 0.02 &&
+        Math.abs(targetZ - currentZ) < 0.02 &&
+        Math.abs(targetScale - currentScale) < 0.0005;
+
+      if (!settled) {
+        rafId = requestAnimationFrame(animate);
+      } else {
+        // 完全に目標に近づいたら rAF を止める
+        isAnimating = false;
+        rafId = 0;
+      }
     };
 
-    const handlePointerMove = (
-      event: Pick<PointerEvent, "clientX" | "clientY">
-    ) => {
-      const rect = card.getBoundingClientRect();
-
-      if (rect.width === 0 || rect.height === 0) return;
-
-      const x = (event.clientX - rect.left) / rect.width;
-      const y = (event.clientY - rect.top) / rect.height;
-
-      const normalizedX = Math.max(-1, Math.min(1, x * 2 - 1));
-
-      const normalizedY = Math.max(-1, Math.min(1, y * 2 - 1));
-
-      const visualX = normalizedX;
-
-      targetY = visualX * yawFactor;
-      targetX = normalizedY * pitchFactor;
-      targetZ = visualX * normalizedY * twistFactor;
-
-      const distance = Math.min(
-        1,
-        Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY)
-      );
-
-      targetScale = 1 + distance * 0.012;
+    // マウス位置に応じたターゲット更新（位置ベースのみ）
+    const handleMouseMove = (e: MouseEvent) => {
+      updateTargetFromPosition(e.clientX, e.clientY);
+      startAnimation();
     };
 
-    const handlePointerLeave = () => {
+    // カード外に出たら元に戻す
+    const handleMouseLeave = () => {
       targetX = 0;
       targetY = 0;
       targetZ = 0;
       targetScale = 1;
+      startAnimation();
     };
 
+    // クリック（pointerup）で表裏反転（既存のアニメーションを利用）
     const handlePointerUp = (event: PointerEvent) => {
-      // マウスの右クリックなどでは反転しない
+      // マウスの右クリックでは反転しない
       if (event.pointerType === "mouse" && event.button !== 0) {
         return;
       }
 
       flipped = !flipped;
-
       inner.dataset.flipped = String(flipped);
-
       sessionStorage.setItem(PROFILE_CARD_STORAGE_KEY, String(flipped));
 
       inner.getAnimations().forEach((animation) => {
@@ -301,30 +318,26 @@ const {
       );
     };
 
-    card.addEventListener("pointermove", handlePointerMove);
-
-    card.addEventListener("pointerleave", handlePointerLeave);
-
+    // デスクトップ（マウス）向けに mousemove / mouseleave を使う
+    card.addEventListener("mousemove", handleMouseMove);
+    card.addEventListener("mouseleave", handleMouseLeave);
     card.addEventListener("pointerup", handlePointerUp);
 
-    rafId = requestAnimationFrame(updateTilt);
-
     const cleanup = () => {
-      card.removeEventListener("pointermove", handlePointerMove);
-
-      card.removeEventListener("pointerleave", handlePointerLeave);
-
+      card.removeEventListener("mousemove", handleMouseMove);
+      card.removeEventListener("mouseleave", handleMouseLeave);
       card.removeEventListener("pointerup", handlePointerUp);
-
-      cancelAnimationFrame(rafId);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+      isAnimating = false;
     };
 
     window.addEventListener("beforeunload", cleanup);
-
     document.addEventListener("astro:page-unload", cleanup);
   };
 
   setupProfileCard();
-
   document.addEventListener("astro:page-load", setupProfileCard);
 </script>
