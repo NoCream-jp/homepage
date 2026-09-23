@@ -85,9 +85,9 @@ const isActive = (href: string) => {
   (function () {
     if (typeof document === "undefined") return;
 
-    const RATIO = 0.02; // 親高さに対する割合（調整可）
+    const RATIO = 0.04; // 親高さに対する割合（調整可）
     const MIN = 2; // 最小 gap(px)
-    const MAX = 28; // 最大 gap(px)
+    const MAX = 50; // 最大 gap(px)
     const BOTTOM_BUFFER = 8; // フッターとの余裕(px)
     const STORAGE_KEY = "leftnav-gap";
 
