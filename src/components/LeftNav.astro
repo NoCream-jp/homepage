@@ -1,5 +1,4 @@
 ---
-// src/components/LeftNav.astro
 import BuisinessCard from "./BuisinessCard.astro";
 import LinkCard from "./LinkCard.astro";
 
@@ -93,7 +92,7 @@ const isActive = (href: string) => {
     const STORAGE_KEY = "leftnav-gap";
 
     // ==========================================
-    // 1. スタイル即時適用（チラつき防止）
+    // 1. スタイル即時適用
     // ==========================================
     function applySavedGap() {
       const el = document.getElementById("leftnav");
@@ -133,8 +132,6 @@ const isActive = (href: string) => {
     }
 
     function computeAndApply() {
-      // 🚨 修正: キャッシュした要素を使わず、必ず現在のDOMから取得し直す
-      // （ページ遷移後は以前の要素が破棄されているため）
       const el = document.getElementById("leftnav");
       if (!el) return;
 
@@ -189,7 +186,6 @@ const isActive = (href: string) => {
     // ==========================================
     // 3. イベントリスナー管理
     // ==========================================
-    // window/document へのイベント登録はモジュール初回ロードの1回だけでOK
     window.addEventListener("resize", schedule, { passive: true });
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") schedule();
@@ -197,7 +193,6 @@ const isActive = (href: string) => {
 
     let ro: ResizeObserver | null = null;
 
-    // 🚨 修正: ResizeObserverの設定などはページ遷移のたびにやり直す
     document.addEventListener("astro:page-load", () => {
       const el = document.getElementById("leftnav");
       if (!el) return;
