@@ -85,41 +85,135 @@ const isActive = (href: string) => {
 <script>
   (function () {
     if (typeof document === "undefined") return;
-    const el = document.getElementById("leftnav");
-    if (!el) return;
 
-    const R = 0.04,
-      MIN = 8,
-      MAX = 36; // 小さめの上限でコンパクトに
-    const getH = () =>
-      (el.parentElement && el.parentElement.clientHeight) || innerHeight;
-    const apply = () => {
-      const g = Math.round(Math.max(MIN, Math.min(MAX, getH() * R)));
-      if (el.style.gap !== g + "px") el.style.gap = g + "px";
-    };
+    const RATIO = 0.02; // 親高さに対する割合（調整可）
+    const MIN = 2; // 最小 gap(px)
+    const MAX = 28; // 最大 gap(px)
+    const BOTTOM_BUFFER = 8; // フッターとの余裕(px)
+    const STORAGE_KEY = "leftnav-gap";
 
-    let raf: number | null = null;
-    const upd = () => {
-      if (raf) cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        apply();
-        raf = null;
-      });
-    };
-
-    apply();
-    addEventListener("resize", upd, { passive: true });
-    if (typeof ResizeObserver !== "undefined") {
+    // ==========================================
+    // 1. スタイル即時適用（チラつき防止）
+    // ==========================================
+    function applySavedGap() {
+      const el = document.getElementById("leftnav");
+      if (!el) return;
       try {
-        new ResizeObserver(upd).observe(el.parentElement || el);
+        const saved = sessionStorage.getItem(STORAGE_KEY);
+        if (saved !== null) {
+          el.style.gap = saved + "px";
+          el.style.transition = "none";
+        }
       } catch (e) {}
     }
+
+    // 初回マウント時
+    applySavedGap();
+
+    // 🚨 追加: ページ遷移時
+    // 新しいDOMに入れ替わった直後、画面に描画される"前"に適用し、チラつきを完全に防ぎます
+    document.addEventListener("astro:after-swap", applySavedGap);
+
+    // ==========================================
+    // 2. ギャップ計算ロジック
+    // ==========================================
+    function footerHeight() {
+      const f = document.querySelector("footer");
+      return f instanceof HTMLElement ? f.offsetHeight : 0;
+    }
+
+    function visibleChildren(root: HTMLElement) {
+      return Array.from(root.children).filter(
+        (c) => c instanceof HTMLElement && c.offsetParent !== null
+      );
+    }
+
+    function calcClampByParent(parentH: number) {
+      return Math.round(Math.max(MIN, Math.min(MAX, parentH * RATIO)));
+    }
+
+    function computeAndApply() {
+      // 🚨 修正: キャッシュした要素を使わず、必ず現在のDOMから取得し直す
+      // （ページ遷移後は以前の要素が破棄されているため）
+      const el = document.getElementById("leftnav");
+      if (!el) return;
+
+      const parent = el.parentElement;
+      const parentH = (parent && parent.clientHeight) || window.innerHeight;
+      const baseGap = calcClampByParent(parentH);
+
+      const childs = visibleChildren(el);
+      const n = childs.length;
+      const totalChildH = childs.reduce(
+        (s, c) => s + (c instanceof HTMLElement ? c.offsetHeight : 0),
+        0
+      );
+      const avail = Math.max(
+        0,
+        window.innerHeight -
+          footerHeight() -
+          el.getBoundingClientRect().top -
+          BOTTOM_BUFFER
+      );
+
+      let gap = baseGap;
+      if (totalChildH + (n - 1) * baseGap > avail) {
+        const computed = Math.floor((avail - totalChildH) / Math.max(1, n - 1));
+        gap = Math.max(MIN, Math.min(baseGap, computed));
+      }
+
+      const gapStr = gap + "px";
+      if (el.style.gap !== gapStr) el.style.gap = gapStr;
+      try {
+        sessionStorage.setItem(STORAGE_KEY, String(gap));
+      } catch (e) {}
+
+      if (el.style.transition === "none") {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            el.style.transition = "";
+          });
+        });
+      }
+    }
+
+    let raf: number | null = null;
+    function schedule() {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        computeAndApply();
+        raf = null;
+      });
+    }
+
+    // ==========================================
+    // 3. イベントリスナー管理
+    // ==========================================
+    // window/document へのイベント登録はモジュール初回ロードの1回だけでOK
+    window.addEventListener("resize", schedule, { passive: true });
     document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible") upd();
+      if (document.visibilityState === "visible") schedule();
     });
-    addEventListener("unload", () => {
-      removeEventListener("resize", upd);
-      document.removeEventListener("visibilitychange", upd);
+
+    let ro: ResizeObserver | null = null;
+
+    // 🚨 修正: ResizeObserverの設定などはページ遷移のたびにやり直す
+    document.addEventListener("astro:page-load", () => {
+      const el = document.getElementById("leftnav");
+      if (!el) return;
+
+      // 前回の Observer が残っていれば解除
+      if (ro) ro.disconnect();
+
+      if (typeof ResizeObserver !== "undefined") {
+        try {
+          ro = new ResizeObserver(schedule);
+          ro.observe(el);
+          if (el.parentElement) ro.observe(el.parentElement);
+        } catch (e) {}
+      }
+
+      schedule();
     });
   })();
 </script>
