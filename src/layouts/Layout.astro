@@ -52,11 +52,10 @@ const notificationItems = [
   </head>
 
   <body class="flex min-h-screen flex-col lg:h-screen lg:overflow-hidden">
+    <div class="w-full">
+      <NotificationStrip items={notificationItems} />
+    </div>
     <main class="flex-1 lg:min-h-0 lg:overflow-hidden">
-      <div class="absolute w-full">
-        <NotificationStrip items={notificationItems} />
-      </div>
-
       <slot />
     </main>
 

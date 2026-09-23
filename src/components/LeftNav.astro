@@ -1,4 +1,5 @@
 ---
+// src/components/LeftNav.astro
 import BuisinessCard from "./BuisinessCard.astro";
 import LinkCard from "./LinkCard.astro";
 
@@ -17,8 +18,7 @@ const isActive = (href: string) => {
 };
 ---
 
-<div class="flex flex-col gap-7">
-  <!-- ページナビゲーション -->
+<div id="leftnav" class="flex flex-col" style="gap:1.75rem">
   <nav
     class="flex w-full max-w-100 items-center gap-1"
     aria-label="page navigation"
@@ -37,7 +37,6 @@ const isActive = (href: string) => {
             ]}
           >
             {item.label}
-
             {active && (
               <span
                 aria-hidden="true"
@@ -51,7 +50,6 @@ const isActive = (href: string) => {
     }
   </nav>
 
-  <!-- Business Card -->
   <div class="hidden lg:block">
     <BuisinessCard
       name="Minato Hayashi"
@@ -62,30 +60,66 @@ const isActive = (href: string) => {
     />
   </div>
 
-  <!-- External Links -->
   <div class="hidden w-full max-w-100 grid-cols-2 gap-1 lg:grid">
     <LinkCard
       title="GitHub"
       username="NoCream-jp"
       href="https://github.com/NoCream-jp"
     />
-
     <LinkCard title="X" username="Cafe" href="https://x.com/sXMN1au45a68174" />
-
     <LinkCard
       title="LinkedIn"
       username="Minato Hayashi"
       href="https://www.linkedin.com/in/m-hayashi/"
     />
-
     <LinkCard title="Instagram" href="https://www.instagram.com/koshi2055" />
-
     <LinkCard
       title="AtCoder"
       username="Caffeineholic"
       href="https://atcoder.jp/users/Caffeineholic"
     />
-
     <LinkCard title="can i put address here" disabled />
   </div>
 </div>
+
+<script>
+  (function () {
+    if (typeof document === "undefined") return;
+    const el = document.getElementById("leftnav");
+    if (!el) return;
+
+    const R = 0.04,
+      MIN = 8,
+      MAX = 36; // 小さめの上限でコンパクトに
+    const getH = () =>
+      (el.parentElement && el.parentElement.clientHeight) || innerHeight;
+    const apply = () => {
+      const g = Math.round(Math.max(MIN, Math.min(MAX, getH() * R)));
+      if (el.style.gap !== g + "px") el.style.gap = g + "px";
+    };
+
+    let raf: number | null = null;
+    const upd = () => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        apply();
+        raf = null;
+      });
+    };
+
+    apply();
+    addEventListener("resize", upd, { passive: true });
+    if (typeof ResizeObserver !== "undefined") {
+      try {
+        new ResizeObserver(upd).observe(el.parentElement || el);
+      } catch (e) {}
+    }
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") upd();
+    });
+    addEventListener("unload", () => {
+      removeEventListener("resize", upd);
+      document.removeEventListener("visibilitychange", upd);
+    });
+  })();
+</script>
