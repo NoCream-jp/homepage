@@ -1,11 +1,11 @@
 ---
-// src/pages/blog/[id].astro
 import { getCollection, render, type CollectionEntry } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import BackButton from "../../components/BackButton.astro";
 import Highlight from "../../components/Highlight.astro";
 import LikeButton from "../../components/LikeButton.astro";
 import LeftNav from "../../components/LeftNav.astro";
+import ExternalLink from "../../components/ExternalLink.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog", ({ data }) => data.draft !== true);
@@ -60,7 +60,7 @@ const formattedDate = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2,
               <article
                 class="blog-content text-[15px] leading-normal tracking-wide text-zinc-800 md:text-base"
               >
-                <Content components={{ Highlight }} />
+                <Content components={{ Highlight, ExternalLink }} />
               </article>
             </section>
           </div>
@@ -80,7 +80,7 @@ const formattedDate = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2,
   :global(.blog-content p) {
     margin-bottom: 0.5rem;
   }
-
+  /*
   :global(.blog-content a) {
     color: #52525b;
     text-decoration: underline;
@@ -91,7 +91,7 @@ const formattedDate = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2,
   :global(.blog-content a:hover) {
     color: #a0a0a0;
     text-decoration-color: #d4d4d8;
-  }
+  } */
   :global(.blog-content h2) {
     font-size: 1.2rem;
     font-weight: 600;
