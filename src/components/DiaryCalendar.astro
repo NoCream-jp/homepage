@@ -94,13 +94,13 @@ const initialIndex = Math.max(labels.length - 1, 0);
     <div
       class="grid grid-cols-7 py-1 text-center text-[clamp(11px,0.76cqw,14px)] font-medium text-zinc-600"
     >
-      <div aria-hidden="true">S</div>
-      <div aria-hidden="true">M</div>
-      <div aria-hidden="true">T</div>
-      <div aria-hidden="true">W</div>
-      <div aria-hidden="true">T</div>
-      <div aria-hidden="true">F</div>
-      <div aria-hidden="true">S</div>
+      <div aria-hidden="true">Sun</div>
+      <div aria-hidden="true">Mon</div>
+      <div aria-hidden="true">Tue</div>
+      <div aria-hidden="true">Wed</div>
+      <div aria-hidden="true">Tue</div>
+      <div aria-hidden="true">Fun</div>
+      <div aria-hidden="true">Sun</div>
     </div>
   </div>
 
@@ -124,7 +124,7 @@ const initialIndex = Math.max(labels.length - 1, 0);
                   <div class="aspect-3/4 rounded bg-zinc-50 md:aspect-square" />
                 ) : (
                   <div
-                    class="relative flex aspect-3/4 flex-col overflow-hidden rounded border p-1 md:aspect-square"
+                    class="relative flex aspect-3/4 flex-col overflow-hidden rounded border border-zinc-200 p-1 md:aspect-square"
                     data-date={cell.key}
                   >
                     <div class="flex shrink-0 justify-start">
@@ -228,13 +228,8 @@ const initialIndex = Math.max(labels.length - 1, 0);
       const todayCell = todayCellGeneric as HTMLElement;
       todayCell.dataset.today = "true";
 
-      const numberElGeneric = todayCell.querySelector(".day-number");
-
-      if (numberElGeneric && numberElGeneric instanceof HTMLElement) {
-        const numberEl = numberElGeneric as HTMLElement;
-        numberEl.classList.remove("text-zinc-500");
-        numberEl.classList.add("bg-cyan-700", "text-white");
-      }
+      todayCell.classList.remove("border", "border-zinc-200");
+      todayCell.classList.add("border-2", "border-cyan-700");
     }
 
     const initialIndexAttr = parseInt(widget.dataset.initialIndex || "0", 10);
