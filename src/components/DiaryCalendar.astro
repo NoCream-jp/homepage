@@ -1,11 +1,4 @@
 ---
-// src/components/DiaryCalendar.astro
-// DiaryCalendar — emoji-centered デザイン（構造は変更なし）
-// 条件:
-// - 日付の数字は消さない
-// - 今日の日付はスクリプトでハイライト（既存処理維持）
-// - セル中央に emoji のみ大きく表示（視覚的テキストは表示しないが aria-label は残す）
-
 import ChevronButton from "./ChevronButton.astro";
 
 interface MonthData {
@@ -98,7 +91,6 @@ const initialIndex = Math.max(labels.length - 1, 0);
       />
     </div>
 
-    <!-- 曜日ヘッダは簡素に保持（表示文字最小化） -->
     <div
       class="grid grid-cols-7 py-1 text-center text-[clamp(11px,0.76cqw,14px)] font-medium text-zinc-600"
     >
@@ -132,24 +124,22 @@ const initialIndex = Math.max(labels.length - 1, 0);
                   <div class="aspect-3/4 rounded bg-zinc-50 md:aspect-square" />
                 ) : (
                   <div
-                    class="flex aspect-3/4 flex-col overflow-hidden rounded border p-1 md:aspect-square"
+                    class="relative flex aspect-3/4 flex-col overflow-hidden rounded border p-1 md:aspect-square"
                     data-date={cell.key}
                   >
                     <div class="flex shrink-0 justify-start">
-                      {/* day-number: 常に表示（モバイル含む）。スクリプトで today にハイライトを付与 */}
-                      <div class="day-number flex h-6 w-6 items-center justify-center rounded-full text-[clamp(11px,0.69cqw,12px)] text-zinc-500">
+                      <div class="day-number relative z-10 flex h-6 w-6 items-center justify-center rounded-full text-[clamp(11px,0.69cqw,12px)] text-zinc-500">
                         {cell.day}
                       </div>
 
                       <span class="sr-only">日付 {cell.key}</span>
                     </div>
 
-                    <div class="flex min-h-0 flex-1 flex-col justify-center overflow-hidden bg-white pt-[clamp(1px,0.15cqw,5px)] md:mt-2 lg:px-2">
+                    <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
                       {cell.entry ? (
-                        /* emoji only を中央に大きく表示するレイアウト */
                         <div
                           role="button"
-                          class="relative flex h-full w-full items-center justify-center"
+                          class="absolute inset-0"
                           aria-label={
                             cell.entry.text
                               ? `${cell.entry.emoji ?? ""} ${cell.entry.text}`
@@ -157,11 +147,12 @@ const initialIndex = Math.max(labels.length - 1, 0);
                           }
                         >
                           <div
-                            class="emoji-center leading-none select-none"
+                            class="pointer-events-none absolute inset-0 flex items-center justify-center"
                             aria-hidden="true"
-                            style="font-size: clamp(20px, 9vw, 44px);"
                           >
-                            {cell.entry.emoji ?? ""}
+                            <span class="emoji-center block max-h-[90%] max-w-[90%] overflow-hidden pt-3 text-center text-[clamp(20px,4.5cqw,28px)] leading-none whitespace-nowrap antialiased">
+                              {cell.entry.emoji ?? ""}
+                            </span>
                           </div>
                         </div>
                       ) : (
@@ -187,21 +178,14 @@ const initialIndex = Math.max(labels.length - 1, 0);
 </div>
 
 <script>
-  /* 型エラーの原因である 'Element' に対する dataset 参照を避けるため
-     instanceof HTMLElement チェックを多用し、TypeScript 型警告が出ないようにしています。
-     today のハイライト処理は day-number 要素に作用します（常に日付を表示するため動作します）。
-     既存の月移動 / session 保存などのロジックは維持しています。 */
-
   const setupCalendar = () => {
     const widgetEl = document.getElementById("calendar-widget");
     if (!widgetEl || !(widgetEl instanceof HTMLElement)) return;
     const widget = widgetEl as HTMLElement;
 
-    // 初期化済みチェック（datasetへのアクセスは HTMLElement で安全）
     if (widget.dataset.initialized === "true") return;
     widget.dataset.initialized = "true";
 
-    // cal-track / label / prev / next / slides を安全に取得
     const trackEl = widget.querySelector("#cal-track");
     if (!trackEl || !(trackEl instanceof HTMLElement)) return;
     const track = trackEl as HTMLElement;
@@ -229,7 +213,6 @@ const initialIndex = Math.max(labels.length - 1, 0);
 
     if (!track || !label || slides.length === 0) return;
 
-    // --- ブラウザの現在時刻から「今日」を判定 ---
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth() + 1;
@@ -239,13 +222,14 @@ const initialIndex = Math.max(labels.length - 1, 0);
 
     const todayStr = `${currentYear}-${String(currentMonth).padStart(2, "0")}-${String(currentDay).padStart(2, "0")}`;
 
-    // 「今日」のセルをクライアント側でハイライト
     const todayCellGeneric = widget.querySelector(`[data-date="${todayStr}"]`);
+
     if (todayCellGeneric && todayCellGeneric instanceof HTMLElement) {
       const todayCell = todayCellGeneric as HTMLElement;
       todayCell.dataset.today = "true";
 
       const numberElGeneric = todayCell.querySelector(".day-number");
+
       if (numberElGeneric && numberElGeneric instanceof HTMLElement) {
         const numberEl = numberElGeneric as HTMLElement;
         numberEl.classList.remove("text-zinc-500");
@@ -338,8 +322,10 @@ const initialIndex = Math.max(labels.length - 1, 0);
           const todayElGeneric = currentSlideEl.querySelector(
             '[data-today="true"]'
           );
+
           if (todayElGeneric && todayElGeneric instanceof HTMLElement) {
             const todayEl = todayElGeneric as HTMLElement;
+
             requestAnimationFrame(() => {
               requestAnimationFrame(() => {
                 try {
@@ -408,6 +394,7 @@ const initialIndex = Math.max(labels.length - 1, 0);
 
     window.addEventListener("pageshow", (ev) => {
       const evAny = ev as any;
+
       if (evAny && evAny.persisted) {
         const s = sessionStorage.getItem("calendar-current-index");
 
@@ -448,7 +435,6 @@ const initialIndex = Math.max(labels.length - 1, 0);
     });
   };
 
-  // 初期化呼び出しと Astro ナビゲーションフック
   setupCalendar();
   document.addEventListener("astro:page-load", setupCalendar);
 </script>
