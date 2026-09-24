@@ -1,9 +1,16 @@
 ---
+// src/components/DiaryCalendar.astro
+// DiaryCalendar — emoji-centered デザイン（構造は変更なし）
+// 条件:
+// - 日付の数字は消さない
+// - 今日の日付はスクリプトでハイライト（既存処理維持）
+// - セル中央に emoji のみ大きく表示（視覚的テキストは表示しないが aria-label は残す）
+
 import ChevronButton from "./ChevronButton.astro";
 
 interface MonthData {
   key: string;
-  data: Record<string, { text?: string; emoji?: string }>;
+  data: Record<string, { text?: string; emoji?: string; photos?: string[] }>;
 }
 
 interface Props {
@@ -29,7 +36,11 @@ const monthViews = displayMonths.map((m) => {
   const days = daysInMonth(year, month);
   const start = startWeekday(year, month);
 
-  const cells = [];
+  const cells: Array<null | {
+    day: number;
+    key: string;
+    entry?: { text?: string; emoji?: string; photos?: string[] };
+  }> = [];
 
   for (let i = 0; i < start; i++) {
     cells.push(null);
@@ -74,6 +85,7 @@ const initialIndex = Math.max(labels.length - 1, 0);
       <div
         id="cal-month-label"
         class="text-[clamp(14px,0.76cqw,19px)] font-medium text-zinc-700"
+        aria-hidden="true"
       >
         {labels[initialIndex] ?? "データなし"}
       </div>
@@ -86,16 +98,17 @@ const initialIndex = Math.max(labels.length - 1, 0);
       />
     </div>
 
+    <!-- 曜日ヘッダは簡素に保持（表示文字最小化） -->
     <div
       class="grid grid-cols-7 py-1 text-center text-[clamp(11px,0.76cqw,14px)] font-medium text-zinc-600"
     >
-      <div>Sun</div>
-      <div>Mon</div>
-      <div>Tue</div>
-      <div>Wed</div>
-      <div>Thu</div>
-      <div>Fri</div>
-      <div>Sat</div>
+      <div aria-hidden="true">S</div>
+      <div aria-hidden="true">M</div>
+      <div aria-hidden="true">T</div>
+      <div aria-hidden="true">W</div>
+      <div aria-hidden="true">T</div>
+      <div aria-hidden="true">F</div>
+      <div aria-hidden="true">S</div>
     </div>
   </div>
 
@@ -116,26 +129,49 @@ const initialIndex = Math.max(labels.length - 1, 0);
             <div class="grid grid-cols-7 gap-1">
               {mv.cells.map((cell) =>
                 cell === null ? (
-                  <div class="aspect-square rounded bg-zinc-50" />
+                  <div class="aspect-3/4 rounded bg-zinc-50 md:aspect-square" />
                 ) : (
                   <div
-                    class="flex aspect-square flex-col overflow-hidden rounded border p-1"
+                    class="flex aspect-3/4 flex-col overflow-hidden rounded border p-1 md:aspect-square"
                     data-date={cell.key}
                   >
                     <div class="flex shrink-0 justify-start">
-                      <div class="day-number flex h-6 w-6 items-center justify-center rounded-full text-[clamp(11px,0.69cqw,15px)] text-zinc-500">
+                      {/* day-number: 常に表示（モバイル含む）。スクリプトで today にハイライトを付与 */}
+                      <div class="day-number flex h-6 w-6 items-center justify-center rounded-full text-[clamp(11px,0.69cqw,12px)] text-zinc-500">
                         {cell.day}
                       </div>
+
+                      <span class="sr-only">日付 {cell.key}</span>
                     </div>
 
-                    <div class="flex min-h-0 flex-1 flex-col justify-start overflow-hidden bg-white pt-[clamp(1px,0.15cqw,5px)] md:mt-2 lg:px-2">
+                    <div class="flex min-h-0 flex-1 flex-col justify-center overflow-hidden bg-white pt-[clamp(1px,0.15cqw,5px)] md:mt-2 lg:px-2">
                       {cell.entry ? (
-                        <div class="line-clamp-3 text-[clamp(10px,1.7cqw,15px)] leading-tight wrap-break-word">
-                          {cell.entry.emoji ?? ""} {cell.entry.text}
+                        /* emoji only を中央に大きく表示するレイアウト */
+                        <div
+                          role="button"
+                          class="relative flex h-full w-full items-center justify-center"
+                          aria-label={
+                            cell.entry.text
+                              ? `${cell.entry.emoji ?? ""} ${cell.entry.text}`
+                              : `${cell.entry.emoji ?? ""}`
+                          }
+                        >
+                          <div
+                            class="emoji-center leading-none select-none"
+                            aria-hidden="true"
+                            style="font-size: clamp(20px, 9vw, 44px);"
+                          >
+                            {cell.entry.emoji ?? ""}
+                          </div>
                         </div>
                       ) : (
-                        <div class="text-[clamp(9px,0.69cqw,13px)] text-zinc-300">
-                          —
+                        <div class="flex h-full items-center justify-center">
+                          <div
+                            class="text-[clamp(9px,0.69cqw,13px)] text-zinc-200"
+                            aria-hidden="true"
+                          >
+                            —
+                          </div>
                         </div>
                       )}
                     </div>
@@ -151,18 +187,45 @@ const initialIndex = Math.max(labels.length - 1, 0);
 </div>
 
 <script>
+  /* 型エラーの原因である 'Element' に対する dataset 参照を避けるため
+     instanceof HTMLElement チェックを多用し、TypeScript 型警告が出ないようにしています。
+     today のハイライト処理は day-number 要素に作用します（常に日付を表示するため動作します）。
+     既存の月移動 / session 保存などのロジックは維持しています。 */
+
   const setupCalendar = () => {
-    const widget = document.getElementById("calendar-widget");
+    const widgetEl = document.getElementById("calendar-widget");
+    if (!widgetEl || !(widgetEl instanceof HTMLElement)) return;
+    const widget = widgetEl as HTMLElement;
 
-    if (!widget || widget.dataset.initialized === "true") return;
-
+    // 初期化済みチェック（datasetへのアクセスは HTMLElement で安全）
+    if (widget.dataset.initialized === "true") return;
     widget.dataset.initialized = "true";
 
-    const track = widget.querySelector<HTMLElement>("#cal-track");
-    const label = widget.querySelector<HTMLElement>("#cal-month-label");
-    const prev = widget.querySelector<HTMLButtonElement>("#cal-prev");
-    const next = widget.querySelector<HTMLButtonElement>("#cal-next");
-    const slides = widget.querySelectorAll<HTMLElement>(".calendar-slide");
+    // cal-track / label / prev / next / slides を安全に取得
+    const trackEl = widget.querySelector("#cal-track");
+    if (!trackEl || !(trackEl instanceof HTMLElement)) return;
+    const track = trackEl as HTMLElement;
+
+    const labelEl = widget.querySelector("#cal-month-label");
+    if (!labelEl || !(labelEl instanceof HTMLElement)) return;
+    const label = labelEl as HTMLElement;
+
+    const prevEl = widget.querySelector("#cal-prev");
+    const nextEl = widget.querySelector("#cal-next");
+
+    const prev =
+      prevEl && prevEl instanceof HTMLElement
+        ? (prevEl as HTMLButtonElement)
+        : null;
+    const next =
+      nextEl && nextEl instanceof HTMLElement
+        ? (nextEl as HTMLButtonElement)
+        : null;
+
+    const slideNodes = Array.from(widget.querySelectorAll(".calendar-slide"));
+    const slides = slideNodes.filter(
+      (s) => s instanceof HTMLElement
+    ) as HTMLElement[];
 
     if (!track || !label || slides.length === 0) return;
 
@@ -177,16 +240,14 @@ const initialIndex = Math.max(labels.length - 1, 0);
     const todayStr = `${currentYear}-${String(currentMonth).padStart(2, "0")}-${String(currentDay).padStart(2, "0")}`;
 
     // 「今日」のセルをクライアント側でハイライト
-    const todayCell = widget.querySelector<HTMLElement>(
-      `[data-date="${todayStr}"]`
-    );
-
-    if (todayCell) {
+    const todayCellGeneric = widget.querySelector(`[data-date="${todayStr}"]`);
+    if (todayCellGeneric && todayCellGeneric instanceof HTMLElement) {
+      const todayCell = todayCellGeneric as HTMLElement;
       todayCell.dataset.today = "true";
 
-      const numberEl = todayCell.querySelector<HTMLElement>(".day-number");
-
-      if (numberEl) {
+      const numberElGeneric = todayCell.querySelector(".day-number");
+      if (numberElGeneric && numberElGeneric instanceof HTMLElement) {
+        const numberEl = numberElGeneric as HTMLElement;
         numberEl.classList.remove("text-zinc-500");
         numberEl.classList.add("bg-cyan-700", "text-white");
       }
@@ -219,16 +280,13 @@ const initialIndex = Math.max(labels.length - 1, 0);
         typeof (performance as any).navigation.type === "number"
       ) {
         const t = (performance as any).navigation.type;
-
         navType = t === 1 ? "reload" : t === 2 ? "back_forward" : "navigate";
       }
     } catch (e) {
       // ignore
     }
 
-    const slidesArr = Array.from(slides);
-
-    const currentMonthIndex = slidesArr.findIndex(
+    const currentMonthIndex = slides.findIndex(
       (s) => s.dataset.label === currentMonthLabel
     );
 
@@ -277,11 +335,11 @@ const initialIndex = Math.max(labels.length - 1, 0);
         const currentSlideEl = slides[currentIndex];
 
         if (currentSlideEl) {
-          const todayEl = currentSlideEl.querySelector<HTMLElement>(
+          const todayElGeneric = currentSlideEl.querySelector(
             '[data-today="true"]'
           );
-
-          if (todayEl) {
+          if (todayElGeneric && todayElGeneric instanceof HTMLElement) {
+            const todayEl = todayElGeneric as HTMLElement;
             requestAnimationFrame(() => {
               requestAnimationFrame(() => {
                 try {
@@ -349,7 +407,8 @@ const initialIndex = Math.max(labels.length - 1, 0);
     });
 
     window.addEventListener("pageshow", (ev) => {
-      if (ev && (ev as PageTransitionEvent).persisted) {
+      const evAny = ev as any;
+      if (evAny && evAny.persisted) {
         const s = sessionStorage.getItem("calendar-current-index");
 
         if (s !== null) {
@@ -389,6 +448,7 @@ const initialIndex = Math.max(labels.length - 1, 0);
     });
   };
 
+  // 初期化呼び出しと Astro ナビゲーションフック
   setupCalendar();
   document.addEventListener("astro:page-load", setupCalendar);
 </script>
