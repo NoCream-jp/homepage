@@ -1,44 +1,15 @@
 ---
-// src/components/LearningCard.astro
 import type { CollectionEntry } from "astro:content";
 
 interface Props {
   item: CollectionEntry<"learning">;
 }
-const { item } = Astro.props as Props;
+const { item } = Astro.props;
 
 // 表示文字列
-const title = (item.data as any)?.title ?? item.id;
+const title = item.data.title ?? item.id;
 
-// raw logo（frontmatter の値そのまま）
-const rawLogo = (item.data as any)?.logo ?? null;
-
-/** logo 値から実際に img src に使える文字列を取り出す */
-function resolveLogo(val: any): string | null {
-  if (!val) return null;
-  if (typeof val === "string") return val;
-  if (Array.isArray(val) && val.length > 0) return resolveLogo(val[0]);
-  if (typeof val === "object") {
-    // common fields observed in various bundler/astro outputs
-    if (typeof val.src === "string") return val.src;
-    if (typeof val.url === "string") return val.url;
-    // sometimes `default` is a string or object with src
-    if (val.default) {
-      if (typeof val.default === "string") return val.default;
-      if (
-        typeof val.default === "object" &&
-        typeof val.default.src === "string"
-      )
-        return val.default.src;
-    }
-    // webpack-like: value may itself be a module with a `pathname`/`href`
-    if (typeof val.pathname === "string") return val.pathname;
-    if (typeof val.href === "string") return val.href;
-  }
-  return null;
-}
-
-const logoSrc = resolveLogo(rawLogo);
+const logoSrc = item.data.logo;
 
 // ロゴが無いときのイニシャル
 function initialsOf(s: string) {
@@ -54,7 +25,7 @@ const initials = initialsOf(String(title));
   class="cert-card group relative flex w-full items-center gap-4 overflow-hidden rounded-md border bg-white px-4 py-3 transition-colors duration-150 ease-out focus-within:outline-none"
   role="article"
   aria-labelledby={`learning-title-${item.id}`}
-  data-tags={(item.data as any).tags?.join(",") ?? ""}
+  data-tags={item.data.tags?.join(",") ?? ""}
 >
   <div class="shrink-0">
     {
