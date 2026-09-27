@@ -1,4 +1,4 @@
 ---
 title: "English"
-logo: "images/learning/english.svg"
+logo: "/images/learning/english.svg"
 ---
