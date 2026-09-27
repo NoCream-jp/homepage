@@ -1,10 +1,9 @@
 ---
-// src/pages/bio.astro
 import Layout from "../layouts/Layout.astro";
 import LeftNav from "../components/LeftNav.astro";
 import ImageStack from "../components/ImageStack.astro";
 import LearningCard from "../components/LearningCard.astro";
-import { getCollection, type CollectionEntry } from "astro:content";
+import { getCollection } from "astro:content";
 
 const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
@@ -16,54 +15,7 @@ const sampleImages = [
   "/images/spotify.webp",
 ];
 
-const notificationItems = [
-  {
-    section: "blog",
-    date: "2026/09/15",
-    title: "最近考えていること",
-    href: "/blog/20260915_diary",
-    banner: false,
-  },
-  {
-    section: "blog",
-    date: "2026/09/15",
-    title: "ホームページをリニューアルしました",
-    href: "/blog/20260915_renew-site",
-    banner: false,
-  },
-];
-
-// learning コレクションを取得（存在しない場合は空配列にフォールバック）
-let learning: CollectionEntry<"learning">[] = [];
-try {
-  learning = await getCollection("learning");
-} catch (e) {
-  // collection が無ければ空のままにしておく（ビルドが止まらないよう）
-  console.warn("collection 'learning' not found:", e);
-}
-
-// 既存の learning を取得済みとして
-function entryTime(e: any): number {
-  // e.data の型が厳密でないので any を使って安全に参照
-  const data = e.data || {};
-  const maybe = data.date ?? data.published;
-  if (maybe) {
-    const t = new Date(maybe).getTime();
-    return Number.isFinite(t) ? t : 0;
-  }
-  // 日付がなければ 0（古い扱い）。必要なら order と併用して優先度付けも可能
-  return 0;
-}
-
-// 安定ソート：まず日付降順、同値なら order（小さい順）で
-learning.sort((a, b) => {
-  const ta = entryTime(a);
-  const tb = entryTime(b);
-  if (ta !== tb) return tb - ta;
-  const oa = (a.data as any).order ?? 0;
-  const ob = (b.data as any).order ?? 0;
-  return oa - ob;
-});
+const learning = await getCollection("learning");
 ---
 
 <Layout title={title} description={description}>
@@ -85,7 +37,8 @@ learning.sort((a, b) => {
         <div class="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto">
           <div class="w-full">
             <section class="mt-5 flex w-full flex-col gap-4">
-              <h2 class="">Who I am</h2>
+              <h2>Who I am</h2>
+
               <div class="rounded-md border p-5">
                 <div>
                   こんにちは。みなとといいます。大学4回生で、AIや機械学習、ブロックチェーン、ネットワークについて学んでいます。
@@ -94,10 +47,12 @@ learning.sort((a, b) => {
                 </div>
               </div>
 
-              <h2 class="">What I saw</h2>
+              <h2>What I saw</h2>
+
               <div class="rounded-md border p-5">
                 <div class="flex items-center gap-10">
                   <ImageStack images={sampleImages} />
+
                   <div>
                     各種SNSには、猫の画像や外出時に撮影した写真、その他趣味関連のお気に入りの画像を投稿しています。
                     外食時には、後から見返せるように食べた料理を記録しています。
@@ -105,18 +60,13 @@ learning.sort((a, b) => {
                 </div>
               </div>
 
-              <h2 class="">What I'm learning</h2>
+              <h2>What I'm learning</h2>
+
               <div class="rounded-md border p-5">
                 <div
                   class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
                 >
-                  {
-                    learning.length === 0 ? (
-                      <div class="col-span-full text-sm text-zinc-500" />
-                    ) : (
-                      learning.map((entry) => <LearningCard item={entry} />)
-                    )
-                  }
+                  {learning.map((entry) => <LearningCard item={entry} />)}
                 </div>
               </div>
             </section>

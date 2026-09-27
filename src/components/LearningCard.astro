@@ -4,19 +4,43 @@ import type { CollectionEntry } from "astro:content";
 interface Props {
   item: CollectionEntry<"learning">;
 }
-const { item } = Astro.props;
+const { item } = Astro.props as Props;
 
-// 表示文字列
-const title = item.data.title ?? item.id;
+// frontmatter 優先でタイトル
+const title = (item.data as any)?.title ?? item.id;
+// frontmatter をそのまま使う（正規化しないという要求に沿う）
+const rawLogo = (item.data as any)?.logo;
 
-const logoSrc = item.data.logo;
+// 文字列化またはモジュールラップ解除（完全な正規化はしない）
+function logoToString(raw: unknown): string | undefined {
+  if (raw === undefined || raw === null) return undefined;
+  if (typeof raw === "string") {
+    const s = raw.trim();
+    return s.length ? s : undefined;
+  }
+  if (typeof raw === "object") {
+    const anyRaw = raw as any;
+    if (typeof anyRaw.src === "string" && anyRaw.src) return anyRaw.src;
+    if (typeof anyRaw.default === "string" && anyRaw.default)
+      return anyRaw.default;
+    if (anyRaw.href) return String(anyRaw.href);
+    // fallback: JSON 化（デバッグ用）
+    try {
+      return JSON.stringify(anyRaw);
+    } catch {
+      return undefined;
+    }
+  }
+  return undefined;
+}
 
-// ロゴが無いときのイニシャル
+const logoSrc = logoToString(rawLogo);
+
 function initialsOf(s: string) {
   if (!s) return "";
   const parts = s.trim().split(/\s+/);
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[1][0]).slice(0, 2).toUpperCase();
+  return (parts[0][0] + (parts[1]?.[0] ?? "")).slice(0, 2).toUpperCase();
 }
 const initials = initialsOf(String(title));
 ---
@@ -25,7 +49,8 @@ const initials = initialsOf(String(title));
   class="cert-card group relative flex w-full items-center gap-4 overflow-hidden rounded-md border bg-white px-4 py-3 transition-colors duration-150 ease-out focus-within:outline-none"
   role="article"
   aria-labelledby={`learning-title-${item.id}`}
-  data-tags={item.data.tags?.join(",") ?? ""}
+  data-logo={String(logoSrc ?? rawLogo ?? "")}
+  data-id={item.id}
 >
   <div class="shrink-0">
     {
@@ -36,7 +61,7 @@ const initials = initialsOf(String(title));
             alt={`${title} logo`}
             class="h-10 w-10 rounded-md object-contain"
             loading="lazy"
-            onerror="this.style.display='none'; const fb = this.nextElementSibling; if(fb) fb.style.display='flex';"
+            onerror="this.style.display='none'; const fb=this.nextElementSibling; if(fb) fb.style.display='flex';"
           />
           <div
             style="display:none"
@@ -57,7 +82,6 @@ const initials = initialsOf(String(title));
     }
   </div>
 
-  <!-- タイトル -->
   <div class="min-w-0">
     <h3
       id={`learning-title-${item.id}`}
@@ -67,12 +91,4 @@ const initials = initialsOf(String(title));
       {title}
     </h3>
   </div>
-
-  <style>
-    :global(.cert-card:focus-within),
-    :global(.cert-card:focus-visible) {
-      box-shadow: 0 0 0 3px rgb(0 0 0 / 6%);
-      border-color: rgb(0 0 0 / 40%);
-    }
-  </style>
 </article>
