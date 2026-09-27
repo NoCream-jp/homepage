@@ -1,5 +1,4 @@
 ---
-// src/components/ImageStack.astro
 interface Props {
   images: string[];
   // optional: how many visible depth levels before hiding (default 3)
@@ -118,7 +117,6 @@ const safeImages = (images || []).filter(Boolean);
         // idempotent init: 既に true なら何もしない
         if (container.dataset.stackInit === "true") return;
 
-        // NOTE: ここではまだ data-stack-init を true にしない（入場アニメを制御するため）
         // container.dataset.stackInit = "true";
 
         const maxDepth = parseInt(container.dataset.maxDepth || "3", 10);
