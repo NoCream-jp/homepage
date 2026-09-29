@@ -1,0 +1,68 @@
+---
+title: "ABC477(AtCoder)参加記"
+date: 2026-09-29
+tags: ["AtCoder"]
+draft: true
+images:
+  - "/images/blog/20260929_atcoder/rating.png"
+  - "/images/blog/20260929_atcoder/wcpc_logo.svg"
+---
+
+import Highlight from "/src/components/Highlight.astro";
+import ExternalLink from "/src/components/ExternalLink.astro";
+
+## 今週の参加記
+
+今週も、AtCoderの[ABC](https://atcoder.jp/contests/abc477)に参加し、4完できました。
+研究室の課題、このサイトの整備、バイトとやることが尽きない夏休みでしたが、2か月もあったはずなのにもうすぐ終わることに驚愕しています。
+
+## 結果
+
+| 得点                                                                         | A                                       | B                                       | C                                       | D                                                                            | E   | F   | G   |
+| ---------------------------------------------------------------------------- | --------------------------------------- | --------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------- | --- | --- | --- |
+| <span class="text-blue-700">1000</span><span class="text-red-600">(5)</span> | <span class="text-green-700">100</span> | <span class="text-green-700">200</span> | <span class="text-green-700">300</span> | <span class="text-green-700">400</span><span class="text-red-600">(5)</span> | -   | -   | -   |
+| <span class="text-zinc-700">120:22</span>                                    | 1:45                                    | 12:21                                   | 95:22                                   | 67:17                                                                        | -   | -   | -   |
+
+| パフォーマンス                                       | レート推移 | 新レート                                 |
+| ---------------------------------------------------- | ---------- | ---------------------------------------- |
+| <span class="text-green-700">981</span> \( 3861位 \) | -8         | <span class="text-green-700">1059</span> |
+
+## 考察・所感
+
+### A問題、B問題
+
+if文とfor文が書ければ通る問題のはずなのに、B問題の制約をC問題以降で出てくる大きい数字と勘違いし、ずっと $N^2$ 解法では通らないと思い込んでいました。
+12分もB問題に書けてしまったのは久しぶりです。
+
+### C問題
+
+文字列Sに文字列Tが出現したとき、その頭文字のインデックスiを保存していきます。そのあとクエリのLRが完全にそのインデックス $i~i+len(T)$ を包含した時に`Yes`を出力させました。
+
+### D問題
+
+### E問題
+
+ある区間の最大値や最小値を高速に求める必要がある、要素を更新する必要がある、ということからセグメント木を使えば「更新されるべき要素の値」が分かります。
+それが分かれば、各要素の値とインデックスを紐づけておいてそれも同時に更新していけば解けるということに気づきました。
+添え字ミスが重なってかなり時間をかけたのと、一度デバッグ出力をコメントアウトせずに提出してしまったところが反省ポイントでしょうか。
+とはいえある程度的確な考察はできていたので、嬉しいです。
+
+## 最後に
+
+5完できる回なんてそうそうないので、とても嬉しいです。
+ゆくゆくは安定して5完できる力をつけたいなと思っていますが、空き時間にADTに参加する程度の精進具合なのでどうなることやらわかりません。
+まあまったりいきましょう。お疲れさまでした。
+
+### 関連リンク
+
+<ExternalLink
+  href="https://atcoder.jp/users/Caffeineholic/history/share/abc477"
+  text="コンテスト成績証"
+  description="https://atcoder.jp/users/Caffeineholic/history/share/abc477"
+/>
+
+<ExternalLink
+  href="https://wcpc.pages.dev"
+  text="和歌山大学競技プログラミングサークル公式HP"
+  description="https://wcpc.pages.dev"
+/>
