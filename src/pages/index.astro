@@ -11,7 +11,7 @@ posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
 
-// --- calendar用 連続月生成 ---
+// --- calendar用 月生成 ---
 const files = import.meta.glob("../content/calendar/*.json", { eager: true });
 const dataMap = new Map<string, any>();
 

@@ -53,9 +53,9 @@ const initials = initialsOf(String(title));
   data-id={item.id}
 >
   <div class="shrink-0">
+    
     {
       logoSrc ? (
-        <>
           <img
             src={logoSrc}
             alt={`${title} logo`}
@@ -70,7 +70,6 @@ const initials = initialsOf(String(title));
           >
             {initials}
           </div>
-        </>
       ) : (
         <div
           class="flex h-10 w-10 items-center justify-center rounded-md border border-black/5 bg-black/5 text-sm font-medium text-zinc-900"
@@ -80,6 +79,7 @@ const initials = initialsOf(String(title));
         </div>
       )
     }
+
   </div>
 
   <div class="min-w-0">
