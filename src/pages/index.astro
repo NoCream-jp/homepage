@@ -32,7 +32,7 @@ for (let i = 0; i < 12; i++) {
   const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
 
   const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const m = String(d.getMonth() + 2).padStart(2, "0");
   const key = `${y}_${m}`;
 
   months.push({
