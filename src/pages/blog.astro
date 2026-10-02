@@ -78,16 +78,14 @@ const notificationItems = [
             id="article-scroll-up"
             direction="up"
             aria-label="上へスクロール"
-            class="absolute top-2 left-1/2 z-10 -translate-x-1/2 cursor-pointer hover:border-zinc-600 hover:text-zinc-600"
-            hidden
+            class="pointer-events-none absolute top-2 left-1/2 z-10 -translate-x-1/2 translate-y-1 cursor-pointer opacity-0 transition-all duration-500 ease-out hover:border-zinc-600 hover:text-zinc-600"
           />
           <!-- 下へ -->
           <ChevronButton
             id="article-scroll-down"
             direction="down"
             aria-label="下へスクロール"
-            class="absolute bottom-2 left-1/2 z-10 -translate-x-1/2 cursor-pointer hover:border-zinc-600 hover:text-zinc-600"
-            hidden
+            class="pointer-events-none absolute bottom-2 left-1/2 z-10 -translate-x-1/2 -translate-y-1 cursor-pointer opacity-0 transition-all duration-500 ease-out hover:border-zinc-600 hover:text-zinc-600"
           />
         </div>
       </main>
@@ -110,6 +108,28 @@ const notificationItems = [
 
     if (!scrollContainer || !upButton || !downButton) return;
 
+    // ボタンの表示状態を切り替える共通関数
+    const toggleButtonVisibility = (btn: HTMLButtonElement, show: boolean) => {
+      if (show) {
+        btn.classList.remove(
+          "opacity-0",
+          "pointer-events-none",
+          "translate-y-1",
+          "-translate-y-1"
+        );
+        btn.classList.add("opacity-100");
+      } else {
+        btn.classList.remove("opacity-100");
+        btn.classList.add("opacity-0", "pointer-events-none");
+
+        if (btn.id === "article-scroll-up") {
+          btn.classList.add("translate-y-1");
+        } else {
+          btn.classList.add("-translate-y-1");
+        }
+      }
+    };
+
     const updateButtons = () => {
       const atTop = scrollContainer.scrollTop <= 1;
 
@@ -117,8 +137,8 @@ const notificationItems = [
         scrollContainer.scrollTop + scrollContainer.clientHeight >=
         scrollContainer.scrollHeight - 1;
 
-      upButton.hidden = atTop;
-      downButton.hidden = atBottom;
+      toggleButtonVisibility(upButton, !atTop);
+      toggleButtonVisibility(downButton, !atBottom);
     };
 
     upButton.addEventListener("click", () => {
