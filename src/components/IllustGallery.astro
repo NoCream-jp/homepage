@@ -1,4 +1,6 @@
 ---
+// src/components/IllustrationViewer.astro
+
 interface Props {
   images?: any[];
   maxHeight?: string;
@@ -13,19 +15,52 @@ const safeImages = images
 ---
 
 <div
-  class="illustration-viewer relative my-8 flex aspect-4/3 w-full flex-col overflow-hidden rounded-2xl bg-black shadow-2xl md:aspect-video"
+  class="illustration-viewer relative my-3 flex aspect-4/3 w-full flex-col overflow-hidden rounded-xl border bg-black md:aspect-video"
   style={maxHeight ? `max-height: ${maxHeight};` : undefined}
   data-total={safeImages.length}
 >
   {
     safeImages.length === 0 ? (
-      <div class="flex h-full w-full flex-col items-center justify-center rounded-2xl border border-zinc-800 bg-black text-zinc-500">
+      <div class="flex h-full w-full flex-col items-center justify-center rounded-xl border bg-black text-zinc-500">
         <span class="text-xs font-medium tracking-wider uppercase">
           No Illustration
         </span>
       </div>
     ) : (
       <>
+        {/* トップUI */}
+        <div class="pointer-events-none absolute top-4 right-0 left-0 z-30 flex items-start justify-between px-4">
+          {/* 左上のカウンター */}
+          {1 < safeImages.length ? (
+            <div class="pointer-events-auto rounded-full px-3 py-1 text-xs font-bold text-white">
+              <span class="current-index">1</span> / {safeImages.length}
+            </div>
+          ) : (
+            <div />
+          )}
+
+          {/* 右上の拡大ボタン (常に表示) */}
+          <button
+            class="expand-btn pointer-events-auto flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-white transition-all hover:text-zinc-100"
+            aria-label="画像を拡大する"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="h-4 w-4"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
+              />
+            </svg>
+          </button>
+        </div>
+
         {/* 画像コンテナ */}
         <div class="relative h-full w-full">
           {safeImages.map((src, index) => (
@@ -62,37 +97,57 @@ const safeImages = images
           ))}
         </div>
 
-        {/* 複数枚ある場合のみ、ボタンとカウンターを表示 */}
+        {/* 複数枚ある場合のみ、Nextボタンを下部に表示 */}
         {1 < safeImages.length && (
-          <>
-            {/* カウンター*/}
-            <div class="absolute bottom-4 left-4 z-20 rounded-full bg-white px-3 py-1 text-xs font-medium text-black">
-              <span class="current-index">1</span> / {safeImages.length}
-            </div>
-
-            {/* 次の画像を見るボタン */}
-            <button
-              class="next-btn absolute right-4 bottom-4 z-20 flex h-10 cursor-pointer items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-medium text-black transition-all hover:text-zinc-600"
-              aria-label="次の画像を見る"
+          <button
+            class="next-btn absolute right-4 bottom-4 z-20 flex h-10 cursor-pointer items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-medium text-black transition-all hover:text-zinc-600"
+            aria-label="次の画像を見る"
+          >
+            Next
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="h-4 w-4"
             >
-              Next
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="2"
-                stroke="currentColor"
-                class="h-4 w-4"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                />
-              </svg>
-            </button>
-          </>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m8.25 4.5 7.5 7.5-7.5 7.5"
+              />
+            </svg>
+          </button>
         )}
+
+        {/* ライトボックス */}
+        <div class="lightbox-modal pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-black/80 opacity-0 backdrop-blur-xl transition-opacity duration-300">
+          <button
+            class="close-lightbox absolute top-6 right-6 z-50 cursor-pointer rounded-full p-2 text-white transition-colors hover:text-zinc-100"
+            aria-label="閉じる"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="h-6 w-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18 18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+          <img
+            src=""
+            alt="Expanded view"
+            class="lightbox-img max-h-[90vh] max-w-[90vw] object-contain drop-shadow-2xl"
+          />
+        </div>
       </>
     )
   }
@@ -112,36 +167,71 @@ const safeImages = images
 
       const totalAttr = viewer.getAttribute("data-total");
       const total = parseInt(totalAttr || "0", 10);
-      if (total <= 1) return;
+      if (total === 0) return;
 
       let currentIndex = 0;
       const slides = viewer.querySelectorAll(".slide");
+
+      // スライダー操作要素
       const nextBtn = viewer.querySelector(".next-btn");
       const counter = viewer.querySelector(".current-index");
 
-      if (!nextBtn) return;
+      // ライトボックス操作要素
+      const expandBtn = viewer.querySelector(".expand-btn");
+      const lightbox = viewer.querySelector(".lightbox-modal");
+      const lightboxImg = viewer.querySelector(
+        ".lightbox-img"
+      ) as HTMLImageElement;
+      const closeLightboxBtn = viewer.querySelector(".close-lightbox");
 
-      nextBtn.addEventListener("click", () => {
-        slides[currentIndex].classList.remove("z-10", "opacity-100");
-        slides[currentIndex].classList.add(
-          "pointer-events-none",
-          "z-0",
-          "opacity-0"
-        );
+      // Nextボタンの処理 (複数枚ある時のみ)
+      if (nextBtn && total > 1) {
+        nextBtn.addEventListener("click", () => {
+          slides[currentIndex].classList.remove("z-10", "opacity-100");
+          slides[currentIndex].classList.add(
+            "pointer-events-none",
+            "z-0",
+            "opacity-0"
+          );
 
-        currentIndex = (currentIndex + 1) % total;
+          currentIndex = (currentIndex + 1) % total;
 
-        slides[currentIndex].classList.remove(
-          "pointer-events-none",
-          "z-0",
-          "opacity-0"
-        );
-        slides[currentIndex].classList.add("z-10", "opacity-100");
+          slides[currentIndex].classList.remove(
+            "pointer-events-none",
+            "z-0",
+            "opacity-0"
+          );
+          slides[currentIndex].classList.add("z-10", "opacity-100");
 
-        if (counter) {
-          counter.textContent = String(currentIndex + 1);
-        }
-      });
+          if (counter) {
+            counter.textContent = String(currentIndex + 1);
+          }
+        });
+      }
+
+      // 拡大ボタン（ライトボックス）の処理
+      if (expandBtn && lightbox && lightboxImg) {
+        expandBtn.addEventListener("click", () => {
+          // 現在表示されている画像のソースを取得してライトボックスに渡す
+          const currentImg = slides[currentIndex]?.querySelector(
+            "img.relative"
+          ) as HTMLImageElement;
+          if (currentImg) {
+            lightboxImg.src = currentImg.src;
+          }
+          lightbox.classList.remove("opacity-0", "pointer-events-none");
+        });
+
+        const closeLightbox = () => {
+          lightbox.classList.add("opacity-0", "pointer-events-none");
+        };
+
+        // 閉じるボタンか、画像の背景部分をクリックしたら閉じる
+        closeLightboxBtn?.addEventListener("click", closeLightbox);
+        lightbox.addEventListener("click", (e) => {
+          if (e.target === lightbox) closeLightbox();
+        });
+      }
     });
   };
 
