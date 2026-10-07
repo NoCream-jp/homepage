@@ -17,4 +17,8 @@ export default defineConfig({
     remarkPlugins: [remarkGfm, remarkMath],
     rehypePlugins: [rehypeKatex],
   },
+  prefetch: { // リンク先プリロードして高速化
+    prefetchAll: true,
+    defaultStrategy: "hover",
+  },
 });
