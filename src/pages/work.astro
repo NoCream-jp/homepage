@@ -9,28 +9,11 @@ import NotificationStrip from "../components/NotificationStrip.astro";
 const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
 
-const sampleImages = [
-  "/images/cat.webp",
-  "/images/atcoder.png",
-  "/images/ra-men.webp",
-  "/images/spotify.webp",
-];
-
-const notificationItems = [
-  {
-    section: "blog",
-    date: "2026/09/15",
-    title: "最近考えていること",
-    href: "/blog/20260915_diary",
-    banner: false,
-  },
-  {
-    section: "blog",
-    date: "2026/09/15",
-    title: "ホームページをリニューアルしました",
-    href: "/blog/20260915_renew-site",
-    banner: false,
-  },
+const items = [
+  "public/images/gallery/orange.png",
+  "public/images/gallery/purple.png",
+  "public/images/gallery/pink.png",
+  "public/images/gallery/white.png",
 ];
 ---
 
@@ -49,10 +32,12 @@ const notificationItems = [
         class="flex w-full min-w-0 flex-col px-4 py-3 lg:min-h-0 lg:flex-1 lg:px-7 lg:py-10"
       >
         <h1 class="mb-6 text-2xl font-semibold text-zinc-800">work</h1>
+
+        <h2>gallery (AI illusts)</h2>
         <div class="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto">
           <div class="w-full">
-            <section class="mt-10 flex w-full flex-col gap-4">
-              work in progress ...
+            <section class="mt-10 flex h-full w-full flex-col gap-4">
+              <ImageStack images={items} maxWidth="400px" />
             </section>
           </div>
         </div>

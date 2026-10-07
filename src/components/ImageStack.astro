@@ -7,9 +7,24 @@ interface Props {
   debug?: boolean;
 }
 
-const { images = [], maxDepth = 3, debug = false } = Astro.props;
-
 // filter out falsy / empty paths
+
+interface Props {
+  images: string[];
+  maxDepth?: number;
+  debug?: boolean;
+  minWidth?: string;
+  maxWidth?: string;
+}
+
+const {
+  images = [],
+  maxDepth = 3,
+  debug = false,
+  minWidth = "0",
+  maxWidth = "7.5rem",
+} = Astro.props;
+
 const safeImages = (images || []).filter(Boolean);
 ---
 
@@ -75,7 +90,8 @@ const safeImages = (images || []).filter(Boolean);
 </style>
 
 <div
-  class="image-stack-container relative mx-auto aspect-3/2 w-full max-w-30 -translate-y-1.5 cursor-pointer outline-none select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:ring-offset-2"
+  class="image-stack-container relative mx-auto aspect-3/2 w-full -translate-y-1.5 cursor-pointer outline-none select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:ring-offset-2"
+  style={`min-width: ${minWidth}; max-width: ${maxWidth};`}
   role="button"
   tabindex="0"
   aria-label="image stack"
