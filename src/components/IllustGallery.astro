@@ -1,0 +1,150 @@
+---
+interface Props {
+  images?: any[];
+  maxHeight?: string;
+}
+
+const { images = [], maxHeight } = Astro.props;
+
+// 空データを除外し、パス文字列を抽出した配列を作成
+const safeImages = images
+  .filter(Boolean)
+  .map((img) => (typeof img === "object" && img.src ? img.src : img));
+---
+
+<div
+  class="illustration-viewer relative my-8 flex aspect-4/3 w-full flex-col overflow-hidden rounded-2xl bg-black shadow-2xl md:aspect-video"
+  style={maxHeight ? `max-height: ${maxHeight};` : undefined}
+  data-total={safeImages.length}
+>
+  {
+    safeImages.length === 0 ? (
+      <div class="flex h-full w-full flex-col items-center justify-center rounded-2xl border border-zinc-800 bg-black text-zinc-500">
+        <span class="text-xs font-medium tracking-wider uppercase">
+          No Illustration
+        </span>
+      </div>
+    ) : (
+      <>
+        {/* 画像コンテナ */}
+        <div class="relative h-full w-full">
+          {safeImages.map((src, index) => (
+            <div
+              class={`slide absolute inset-0 h-full w-full transition-opacity duration-700 ease-in-out ${
+                index === 0
+                  ? "z-10 opacity-100"
+                  : "pointer-events-none z-0 opacity-0"
+              }`}
+            >
+              {/* アンビエント背景層 */}
+              <img
+                src={src}
+                alt=""
+                class="pointer-events-none absolute inset-0 h-full w-full scale-[1.6] object-cover opacity-80 mix-blend-screen blur-xs saturate-200 transition-transform duration-3000 ease-out"
+                aria-hidden="true"
+                loading={index === 0 ? "eager" : "lazy"}
+              />
+
+              {/* 背景黒のオーバーレイ */}
+              <div
+                class="pointer-events-none absolute inset-0 bg-black/20"
+                aria-hidden="true"
+              />
+
+              {/* 中央のメインイラスト */}
+              <img
+                src={src}
+                alt={`Illustration ${index + 1}`}
+                class="relative z-10 h-full w-full object-contain p-4 drop-shadow-2xl transition-transform duration-700 ease-out md:p-8"
+                loading={index === 0 ? "eager" : "lazy"}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* 複数枚ある場合のみ、ボタンとカウンターを表示 */}
+        {1 < safeImages.length && (
+          <>
+            {/* カウンター*/}
+            <div class="absolute bottom-4 left-4 z-20 rounded-full bg-white px-3 py-1 text-xs font-medium text-black">
+              <span class="current-index">1</span> / {safeImages.length}
+            </div>
+
+            {/* 次の画像を見るボタン */}
+            <button
+              class="next-btn absolute right-4 bottom-4 z-20 flex h-10 cursor-pointer items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-medium text-black transition-all hover:text-zinc-600"
+              aria-label="次の画像を見る"
+            >
+              Next
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                class="h-4 w-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+              </svg>
+            </button>
+          </>
+        )}
+      </>
+    )
+  }
+</div>
+
+<script>
+  const setupIllustrationViewer = () => {
+    const viewers = document.querySelectorAll(".illustration-viewer");
+
+    viewers.forEach((viewer) => {
+      if (
+        viewer instanceof HTMLElement &&
+        viewer.dataset.initialized === "true"
+      )
+        return;
+      if (viewer instanceof HTMLElement) viewer.dataset.initialized = "true";
+
+      const totalAttr = viewer.getAttribute("data-total");
+      const total = parseInt(totalAttr || "0", 10);
+      if (total <= 1) return;
+
+      let currentIndex = 0;
+      const slides = viewer.querySelectorAll(".slide");
+      const nextBtn = viewer.querySelector(".next-btn");
+      const counter = viewer.querySelector(".current-index");
+
+      if (!nextBtn) return;
+
+      nextBtn.addEventListener("click", () => {
+        slides[currentIndex].classList.remove("z-10", "opacity-100");
+        slides[currentIndex].classList.add(
+          "pointer-events-none",
+          "z-0",
+          "opacity-0"
+        );
+
+        currentIndex = (currentIndex + 1) % total;
+
+        slides[currentIndex].classList.remove(
+          "pointer-events-none",
+          "z-0",
+          "opacity-0"
+        );
+        slides[currentIndex].classList.add("z-10", "opacity-100");
+
+        if (counter) {
+          counter.textContent = String(currentIndex + 1);
+        }
+      });
+    });
+  };
+
+  setupIllustrationViewer();
+  document.addEventListener("astro:page-load", setupIllustrationViewer);
+</script>

@@ -5,6 +5,7 @@ import ActionLog from "../components/ActionLog.astro";
 import ImageStack from "../components/ImageStack.astro";
 import LeftNav from "../components/LeftNav.astro";
 import NotificationStrip from "../components/NotificationStrip.astro";
+import IllustGallery from "../components/IllustGallery.astro";
 
 const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
@@ -33,11 +34,12 @@ const items = [
       >
         <h1 class="mb-6 text-2xl font-semibold text-zinc-800">work</h1>
 
-        <h2>gallery (AI illusts)</h2>
         <div class="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto">
           <div class="w-full">
             <section class="mt-10 flex h-full w-full flex-col gap-4">
-              <ImageStack images={items} maxWidth="400px" />
+              <h2>gallery (AI illusts)</h2>
+              <!-- <ImageStack images={items} maxWidth="400px" /> -->
+              <IllustGallery images={items} maxHeight="350px" />
             </section>
           </div>
         </div>
