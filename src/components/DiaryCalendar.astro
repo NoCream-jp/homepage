@@ -1,5 +1,6 @@
 ---
 import ChevronButton from "./ChevronButton.astro";
+import holiday_jp from "@holiday-jp/holiday_jp";
 
 interface MonthData {
   key: string;
@@ -33,6 +34,9 @@ const monthViews = displayMonths.map((m) => {
     day: number;
     key: string;
     entry?: { text?: string; emoji?: string; photos?: string[] };
+    isHoliday: boolean;
+    isSunday: boolean;
+    isSaturday: boolean;
   }> = [];
 
   for (let i = 0; i < start; i++) {
@@ -41,11 +45,15 @@ const monthViews = displayMonths.map((m) => {
 
   for (let d = 1; d <= days; d++) {
     const key = `${year}-${String(month).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    const date = new Date(year, month - 1, d);
 
     cells.push({
       day: d,
       key,
       entry: m.data[key],
+      isHoliday: holiday_jp.isHoliday(date),
+      isSunday: date.getDay() === 0,
+      isSaturday: date.getDay() === 6,
     });
   }
 
@@ -128,10 +136,19 @@ const initialIndex = Math.max(labels.length - 1, 0);
                     data-date={cell.key}
                   >
                     <div class="flex shrink-0 justify-start">
-                      <div class="day-number relative z-10 flex h-6 w-6 items-center justify-center rounded-full text-[clamp(11px,0.69cqw,12px)] text-zinc-500">
+                      +
+                      <div
+                        class:list={[
+                          "day-number relative z-10 flex h-6 w-6 items-center justify-center rounded-full text-[clamp(11px,0.69cqw,12px)]",
+                          cell.isHoliday || cell.isSunday
+                            ? "text-red-500"
+                            : cell.isSaturday
+                              ? "text-blue-500"
+                              : "text-zinc-500",
+                        ]}
+                      >
                         {cell.day}
                       </div>
-
                       <span class="sr-only">日付 {cell.key}</span>
                     </div>
 
