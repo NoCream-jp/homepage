@@ -136,14 +136,13 @@ const initialIndex = Math.max(labels.length - 1, 0);
                     data-date={cell.key}
                   >
                     <div class="flex shrink-0 justify-start">
-                      +
                       <div
                         class:list={[
                           "day-number relative z-10 flex h-6 w-6 items-center justify-center rounded-full text-[clamp(11px,0.69cqw,12px)]",
                           cell.isHoliday || cell.isSunday
                             ? "text-red-500"
                             : cell.isSaturday
-                              ? "text-blue-500"
+                              ? "text-blue-700"
                               : "text-zinc-500",
                         ]}
                       >
