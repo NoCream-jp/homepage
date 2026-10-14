@@ -4,6 +4,28 @@
   --font-sans: "Schibsted Grotesk", ui-sans-serif, system-ui, sans-serif;
 }
 
+@keyframes terminal-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes terminal-line-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 /* 記事内のテーブルを復活させるCSS */
 table {
   border-collapse: collapse;
