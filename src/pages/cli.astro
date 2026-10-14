@@ -65,7 +65,7 @@ import "../styles/global.css";
             autocomplete="off"
             autocapitalize="off"
             spellcheck="false"
-            class="min-w-0 flex-1 rounded-none border-0 bg-transparent p-0 text-inherit caret-zinc-100 outline-none [font:inherit]"
+            class="min-w-0 flex-1 rounded-none border-0 bg-transparent p-0 text-orange-200 caret-zinc-100 outline-none [font:inherit]"
           />
         </form>
 
@@ -119,10 +119,42 @@ import "../styles/global.css";
 `.trim(),
     };
 
-    // 文字列を末尾に追加する
-    const print = (text: string = "") => {
+    const appendLine = (text: string = "") => {
       const line = document.createElement("div");
       line.textContent = text;
+      output.appendChild(line);
+
+      requestAnimationFrame(() => {
+        scroll.scrollTo({ top: scroll.scrollHeight, behavior: "smooth" });
+      });
+    };
+
+    const OUTPUT_WIDTH = 48;
+
+    const beginOutput = (title: string = "") => {
+      appendLine(
+        `${title}${"-".repeat(Math.max(6, OUTPUT_WIDTH - title.length))}`
+      );
+    };
+
+    const endOutput = () => {
+      appendLine(`${"-".repeat(OUTPUT_WIDTH - 2)}//`);
+    };
+
+    const print = (text: string = "") => {
+      appendLine(text);
+    };
+
+    const printCommand = (raw: string) => {
+      const line = document.createElement("div");
+      const prompt = document.createElement("span");
+      const command = document.createElement("span");
+
+      prompt.textContent = `${PROMPT} `;
+      command.textContent = raw;
+      command.className = "text-orange-200";
+
+      line.append(prompt, command);
       output.appendChild(line);
 
       requestAnimationFrame(() => {
@@ -166,18 +198,19 @@ import "../styles/global.css";
         if (count >= 50) {
           stopStream();
           print("Process completed.");
+          endOutput();
           input.focus();
         }
       }, 100);
+
+      return true;
     };
 
     // コマンド定義
-    const commands: Record<string, (args: string[]) => void> = {
+    const commands: Record<string, (args: string[]) => boolean | void> = {
       help: () => {
         print(
           [
-            "Available commands:",
-            "",
             "  help          Show available commands",
             "  ls            List files",
             "  cat <file>    Display file contents",
@@ -232,8 +265,6 @@ import "../styles/global.css";
       whoareyou: () => {
         print(
           [
-            "Profile",
-            "-------",
             "name     : Minato Hayashi",
             "age      : 23+",
             "location : Osaka, Japan",
@@ -262,7 +293,7 @@ import "../styles/global.css";
       },
 
       demo: () => {
-        demo();
+        return demo();
       },
 
       history: () => {
@@ -284,9 +315,16 @@ import "../styles/global.css";
       },
     };
 
+    const commandTitles: Record<string, string> = {
+      help: "Available commands:",
+      whoareyou: "Profile",
+    };
+
+    const silentCommands = new Set(["clear", "home", "exit"]);
+
     // 入力されたコマンドを実行する
     const execute = (raw: string) => {
-      print(`${PROMPT} ${raw}`);
+      printCommand(raw);
 
       const trimmed = raw.trim();
       if (!trimmed) return;
@@ -297,10 +335,16 @@ import "../styles/global.css";
       const [command, ...args] = trimmed.split(/\s+/);
 
       if (Object.prototype.hasOwnProperty.call(commands, command)) {
-        commands[command](args);
+        const shouldFrame = !silentCommands.has(command);
+        if (shouldFrame) beginOutput(commandTitles[command]);
+
+        const isStreaming = commands[command](args) === true;
+        if (shouldFrame && !isStreaming) endOutput();
       } else {
+        beginOutput();
         print(`${command}: command not found`);
         print("Type 'help' for available commands.");
+        endOutput();
       }
     };
 
@@ -322,7 +366,8 @@ import "../styles/global.css";
         event.preventDefault();
 
         const interrupted = stopStream();
-        print(`${PROMPT} ${input.value}^C`);
+        if (interrupted) endOutput();
+        printCommand(`${input.value}^C`);
 
         input.value = "";
         historyIndex = history.length;
