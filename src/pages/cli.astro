@@ -17,7 +17,7 @@ import "../styles/global.css";
     >
       <div
         id="terminal-scroll"
-        class="no-scrollbar h-full [scroll-padding-bottom:24px] overflow-x-hidden overflow-y-auto scroll-smooth motion-reduce:scroll-auto"
+        class="no-scrollbar h-full scroll-pb-6 overflow-x-hidden overflow-y-auto scroll-smooth motion-reduce:scroll-auto"
       >
         <header
           class="mb-[clamp(18px,3vh,32px)] animate-[terminal-enter_420ms_ease-out_both] text-zinc-100 motion-reduce:animate-none"
@@ -42,7 +42,7 @@ import "../styles/global.css";
 
         <div
           id="terminal-output"
-          class="[overflow-wrap:anywhere] whitespace-pre-wrap [&:not(:empty)]:mb-[0.5em]"
+          class="wrap-anywhere whitespace-pre-wrap not-empty:mb-[0.5em]"
           aria-live="polite"
         >
         </div>
