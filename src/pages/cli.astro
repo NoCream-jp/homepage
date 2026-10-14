@@ -43,7 +43,8 @@
         </form>
 
         <div class="terminal-hint">
-          type "help" for commands · Ctrl+D to exit
+          type "<span class="terminal-hint-command">help</span>" for commands ·
+          Ctrl+D to exit
         </div>
       </div>
     </main>
@@ -141,6 +142,11 @@
     color: #71717a;
     font-size: 11px;
     animation: terminal-enter 420ms 160ms ease-out both;
+  }
+
+  .terminal-hint-command {
+    color: #67e8f9;
+    font-weight: 700;
   }
 
   @keyframes terminal-enter {
@@ -281,6 +287,7 @@
             "  cat <file>    Display file contents",
             "  pwd           Print working directory",
             "  whoami        Print current user",
+            "  whoareyou     Show profile",
             "  date          Show current date and time",
             "  echo <text>   Print text",
             "  art           Display ASCII art",
@@ -324,6 +331,26 @@
 
       whoami: () => {
         print("guest");
+      },
+
+      whoareyou: () => {
+        print(
+          [
+            "Profile",
+            "-------",
+            "name     : Minato Hayashi",
+            "age      : 23+",
+            "location : Osaka, Japan",
+            "pronoun  : He / Him",
+            "study    : reinforcement learning",
+            "",
+            "About Me",
+            "大学で強化学習について研究しています。",
+            "コーヒーが好きです。猫が好きです。息抜きの達人です。",
+            "",
+            "Thanks for visiting my portfolio!",
+          ].join("\n")
+        );
       },
 
       date: () => {
