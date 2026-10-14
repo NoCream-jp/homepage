@@ -1,0 +1,449 @@
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Terminal</title>
+  </head>
+
+  <body>
+    <main id="terminal">
+      <div id="terminal-output" aria-live="polite"></div>
+
+      <form id="terminal-form" autocomplete="off" hidden>
+        <label for="terminal-input" class="prompt">
+          guest@portfolio:~$
+        </label>
+        <input
+          id="terminal-input"
+          type="text"
+          aria-label="Terminal command"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+        />
+      </form>
+
+      <div class="terminal-hint">
+        type "help" for commands · Ctrl+D to exit
+      </div>
+    </main>
+  </body>
+</html>
+
+<style>
+  :global(html),
+  :global(body) {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+  }
+
+  :global(body) {
+    overflow: hidden;
+  }
+
+  #terminal {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    padding: clamp(16px, 3vw, 40px);
+    background: #000;
+    color: #f5f5f5;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  #terminal-output {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      black 64px,
+      black 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      black 64px,
+      black 100%
+    );
+  }
+
+  #terminal-output::-webkit-scrollbar {
+    display: none;
+  }
+
+  #terminal-form {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-shrink: 0;
+    padding-top: 12px;
+  }
+
+  #terminal-form[hidden] {
+    display: none;
+  }
+
+  .prompt {
+    color: #f5f5f5;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  #terminal-input {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    caret-color: #f5f5f5;
+  }
+
+  .terminal-hint {
+    margin-top: 12px;
+    color: #71717a;
+    font-size: 11px;
+  }
+
+  @media (max-width: 480px) {
+    #terminal {
+      font-size: 12px;
+    }
+
+    #terminal-form {
+      gap: 6px;
+    }
+  }
+</style>
+
+<script>
+  const setupTerminal = () => {
+    const terminal = document.getElementById("terminal");
+    const output = document.getElementById("terminal-output");
+    const form = document.getElementById("terminal-form");
+    const input = document.getElementById("terminal-input");
+
+    if (
+      !(terminal instanceof HTMLElement) ||
+      !(output instanceof HTMLElement) ||
+      !(form instanceof HTMLFormElement) ||
+      !(input instanceof HTMLInputElement)
+    ) return;
+
+    if (terminal.dataset.initialized === "true") return;
+    terminal.dataset.initialized = "true";
+
+    const PROMPT = "guest@portfolio:~$";
+
+    const history: string[] = [];
+    let historyIndex = 0;
+    let streamTimer: number | null = null;
+
+    const files: Record<string, string> = {
+      "README.md":
+        "Welcome to the terminal.\nType 'help' to see available commands.",
+
+      "about.txt":
+        "This is a minimal, Linux-inspired interactive terminal.",
+
+      "art.txt": String.raw`
+   /\_/\
+  ( o.o )
+   > ^ <
+`.trim(),
+    };
+
+    // 文字列を末尾に追加する
+    const print = (text: string = "") => {
+      const line = document.createElement("div");
+      line.textContent = text;
+      output.appendChild(line);
+
+      requestAnimationFrame(() => {
+        output.scrollTop = output.scrollHeight;
+      });
+    };
+
+    // ログを消去する
+    const clear = () => {
+      output.replaceChildren();
+    };
+
+    // トップページに戻る
+    const exit = () => {
+      window.location.assign("/");
+    };
+
+    // 連続出力を中断する
+    const stopStream = () => {
+      if (streamTimer === null) return false;
+
+      window.clearInterval(streamTimer);
+      streamTimer = null;
+      input.readOnly = false;
+      return true;
+    };
+
+    // 大量のログを出力するデモ
+    const demo = () => {
+      let count = 0;
+      input.readOnly = true;
+
+      streamTimer = window.setInterval(() => {
+        count++;
+
+        print(
+          `[${String(count).padStart(3, "0")}] ` +
+          `Processing... ${Math.min(count * 2, 100)}%`
+        );
+
+        if (count >= 50) {
+          stopStream();
+          print("Process completed.");
+          input.focus();
+        }
+      }, 100);
+    };
+
+    // コマンド定義
+    const commands: Record<string, (args: string[]) => void> = {
+      help: () => {
+        print(
+          [
+            "Available commands:",
+            "",
+            "  help          Show available commands",
+            "  ls            List files",
+            "  cat <file>    Display file contents",
+            "  pwd           Print working directory",
+            "  whoami        Print current user",
+            "  date          Show current date and time",
+            "  echo <text>   Print text",
+            "  art           Display ASCII art",
+            "  demo          Run output demonstration",
+            "  history       Show command history",
+            "  clear         Clear the terminal",
+            "  home          Return to homepage",
+            "  exit          Exit the terminal",
+            "",
+            "Keyboard:",
+            "  Ctrl+C        Interrupt",
+            "  Ctrl+D        Exit (empty prompt)",
+            "  Ctrl+L        Clear screen",
+            "  Arrow Up/Down Command history",
+          ].join("\n")
+        );
+      },
+
+      ls: () => {
+        print(Object.keys(files).join("  "));
+      },
+
+      cat: (args) => {
+        if (args.length === 0) {
+          print("cat: missing file operand");
+          return;
+        }
+
+        for (const filename of args) {
+          if (Object.prototype.hasOwnProperty.call(files, filename)) {
+            print(files[filename]);
+          } else {
+            print(`cat: ${filename}: No such file or directory`);
+          }
+        }
+      },
+
+      pwd: () => {
+        print("/home/guest");
+      },
+
+      whoami: () => {
+        print("guest");
+      },
+
+      date: () => {
+        print(new Date().toString());
+      },
+
+      echo: (args) => {
+        print(args.join(" "));
+      },
+
+      art: () => {
+        print(files["art.txt"]);
+      },
+
+      demo: () => {
+        demo();
+      },
+
+      history: () => {
+        history.forEach((command, index) => {
+          print(`${String(index + 1).padStart(4)}  ${command}`);
+        });
+      },
+
+      clear: () => {
+        clear();
+      },
+
+      home: () => {
+        exit();
+      },
+
+      exit: () => {
+        exit();
+      },
+    };
+
+    // 入力されたコマンドを実行する
+    const execute = (raw: string) => {
+      print(`${PROMPT} ${raw}`);
+
+      const trimmed = raw.trim();
+      if (!trimmed) return;
+
+      history.push(raw);
+      historyIndex = history.length;
+
+      const [command, ...args] = trimmed.split(/\s+/);
+
+      if (Object.prototype.hasOwnProperty.call(commands, command)) {
+        commands[command](args);
+      } else {
+        print(`${command}: command not found`);
+        print("Type 'help' for available commands.");
+      }
+    };
+
+    // フォーム送信
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      if (input.readOnly) return;
+
+      const value = input.value;
+      input.value = "";
+
+      execute(value);
+    });
+
+    // キーボード操作
+    input.addEventListener("keydown", (event) => {
+      if (event.ctrlKey && event.key.toLowerCase() === "c") {
+        event.preventDefault();
+
+        const interrupted = stopStream();
+        print(`${PROMPT} ${input.value}^C`);
+
+        input.value = "";
+        historyIndex = history.length;
+
+        if (interrupted) input.focus();
+        return;
+      }
+
+      if (event.ctrlKey && event.key.toLowerCase() === "d") {
+        if (!input.value && streamTimer === null) {
+          event.preventDefault();
+          exit();
+        }
+        return;
+      }
+
+      if (event.ctrlKey && event.key.toLowerCase() === "l") {
+        event.preventDefault();
+        clear();
+        return;
+      }
+
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+
+        if (history.length === 0) return;
+
+        historyIndex = Math.max(0, historyIndex - 1);
+        input.value = history[historyIndex];
+        return;
+      }
+
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+
+        if (history.length === 0) return;
+
+        historyIndex = Math.min(
+          history.length,
+          historyIndex + 1
+        );
+
+        input.value = history[historyIndex] ?? "";
+        return;
+      }
+    });
+
+    // 画面をクリックしたら入力欄にフォーカス
+    terminal.addEventListener("click", () => {
+      input.focus();
+    });
+
+    // 起動時メッセージ
+    const bootMessages = [
+      "Initializing terminal...",
+      "Loading virtual filesystem...",
+      "Starting interactive session...",
+      "",
+      "Welcome to the terminal.",
+      "Type 'help' to get started.",
+      "",
+    ];
+
+    input.readOnly = true;
+
+    bootMessages.forEach((message, index) => {
+      window.setTimeout(() => {
+        if (!terminal.isConnected) return;
+
+        print(message);
+
+        if (index === bootMessages.length - 1) {
+          form.hidden = false;
+          input.readOnly = false;
+          input.focus();
+        }
+      }, 200 + index * 180);
+    });
+
+    // Astroのページ遷移時にタイマーを停止
+    document.addEventListener(
+      "astro:before-swap",
+      () => {
+        stopStream();
+      },
+      { once: true }
+    );
+  };
+
+  setupTerminal();
+  document.addEventListener("astro:page-load", setupTerminal);
+</script>
