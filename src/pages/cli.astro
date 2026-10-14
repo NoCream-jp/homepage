@@ -154,7 +154,8 @@ import "../styles/global.css";
       command.textContent = raw;
       command.className = "text-orange-200";
 
-      line.append(prompt, command);
+      line.appendChild(prompt);
+      line.appendChild(command);
       output.appendChild(line);
 
       requestAnimationFrame(() => {
