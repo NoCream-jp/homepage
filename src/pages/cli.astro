@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="ja">
   <head>
@@ -9,24 +8,43 @@
 
   <body>
     <main id="terminal">
-      <div id="terminal-output" aria-live="polite"></div>
+      <div id="terminal-scroll">
+        <header class="terminal-hero" aria-label="Minato Hayashi">
+          <pre
+            aria-hidden="true">
+ __  __ _             _
+|  \/  (_)_ __   __ _| |_ ___
+| |\/| | | '_ \ / _` | __/ _ \
+| |  | | | | | | (_| | || (_) |
+|_|  |_|_|_| |_|\__,_|\__\___/
 
-      <form id="terminal-form" autocomplete="off" hidden>
-        <label for="terminal-input" class="prompt">
-          guest@portfolio:~$
-        </label>
-        <input
-          id="terminal-input"
-          type="text"
-          aria-label="Terminal command"
-          autocomplete="off"
-          autocapitalize="off"
-          spellcheck="false"
-        />
-      </form>
+ _   _                       _     _
+| | | | __ _ _   _  __ _ ___| |__ (_)
+| |_| |/ _` | | | |/ _` / __| '_ \| |
+|  _  | (_| | |_| | (_| \__ \ | | | |
+|_| |_|\__,_|\__, |\__,_|___/_| |_|_|
+             |___/</pre>
+        </header>
 
-      <div class="terminal-hint">
-        type "help" for commands · Ctrl+D to exit
+        <div id="terminal-output" aria-live="polite"></div>
+
+        <form id="terminal-form" autocomplete="off">
+          <label for="terminal-input" class="prompt">
+            guest@portfolio:~$
+          </label>
+          <input
+            id="terminal-input"
+            type="text"
+            aria-label="Terminal command"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+          />
+        </form>
+
+        <div class="terminal-hint">
+          type "help" for commands · Ctrl+D to exit
+        </div>
       </div>
     </main>
   </body>
@@ -47,8 +65,6 @@
 
   #terminal {
     box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
     width: 100%;
     height: 100vh;
     height: 100dvh;
@@ -60,43 +76,45 @@
     line-height: 1.7;
   }
 
-  #terminal-output {
-    flex: 1;
-    min-height: 0;
+  #terminal-scroll {
+    height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
+    scroll-behavior: smooth;
     scrollbar-width: none;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      transparent 0,
-      black 64px,
-      black 100%
-    );
-    mask-image: linear-gradient(
-      to bottom,
-      transparent 0,
-      black 64px,
-      black 100%
-    );
+    scroll-padding-bottom: 24px;
   }
 
-  #terminal-output::-webkit-scrollbar {
+  #terminal-scroll::-webkit-scrollbar {
     display: none;
+  }
+
+  .terminal-hero {
+    margin-bottom: clamp(18px, 3vh, 32px);
+    color: #f5f5f5;
+    animation: terminal-enter 420ms ease-out both;
+  }
+
+  .terminal-hero pre {
+    margin: 0;
+    font: inherit;
+    font-size: clamp(7px, 1.45vw, 16px);
+    font-weight: 700;
+    line-height: 1.15;
+    white-space: pre;
+  }
+
+  #terminal-output {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
   }
 
   #terminal-form {
     display: flex;
     align-items: baseline;
     gap: 10px;
-    flex-shrink: 0;
-    padding-top: 12px;
-  }
-
-  #terminal-form[hidden] {
-    display: none;
+    padding-top: 4px;
+    animation: terminal-enter 420ms 100ms ease-out both;
   }
 
   .prompt {
@@ -119,9 +137,22 @@
   }
 
   .terminal-hint {
-    margin-top: 12px;
+    margin-top: 8px;
     color: #71717a;
     font-size: 11px;
+    animation: terminal-enter 420ms 160ms ease-out both;
+  }
+
+  @keyframes terminal-enter {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   @media (max-width: 480px) {
@@ -133,21 +164,36 @@
       gap: 6px;
     }
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    #terminal-scroll {
+      scroll-behavior: auto;
+    }
+
+    .terminal-hero,
+    #terminal-form,
+    .terminal-hint {
+      animation: none;
+    }
+  }
 </style>
 
 <script>
   const setupTerminal = () => {
     const terminal = document.getElementById("terminal");
+    const scroll = document.getElementById("terminal-scroll");
     const output = document.getElementById("terminal-output");
     const form = document.getElementById("terminal-form");
     const input = document.getElementById("terminal-input");
 
     if (
       !(terminal instanceof HTMLElement) ||
+      !(scroll instanceof HTMLElement) ||
       !(output instanceof HTMLElement) ||
       !(form instanceof HTMLFormElement) ||
       !(input instanceof HTMLInputElement)
-    ) return;
+    )
+      return;
 
     if (terminal.dataset.initialized === "true") return;
     terminal.dataset.initialized = "true";
@@ -162,8 +208,7 @@
       "README.md":
         "Welcome to the terminal.\nType 'help' to see available commands.",
 
-      "about.txt":
-        "This is a minimal, Linux-inspired interactive terminal.",
+      "about.txt": "This is a minimal, Linux-inspired interactive terminal.",
 
       "art.txt": String.raw`
    /\_/\
@@ -179,7 +224,7 @@
       output.appendChild(line);
 
       requestAnimationFrame(() => {
-        output.scrollTop = output.scrollHeight;
+        scroll.scrollTo({ top: scroll.scrollHeight, behavior: "smooth" });
       });
     };
 
@@ -213,7 +258,7 @@
 
         print(
           `[${String(count).padStart(3, "0")}] ` +
-          `Processing... ${Math.min(count * 2, 100)}%`
+            `Processing... ${Math.min(count * 2, 100)}%`
         );
 
         if (count >= 50) {
@@ -392,10 +437,7 @@
 
         if (history.length === 0) return;
 
-        historyIndex = Math.min(
-          history.length,
-          historyIndex + 1
-        );
+        historyIndex = Math.min(history.length, historyIndex + 1);
 
         input.value = history[historyIndex] ?? "";
         return;
@@ -408,31 +450,7 @@
     });
 
     // 起動時メッセージ
-    const bootMessages = [
-      "Initializing terminal...",
-      "Loading virtual filesystem...",
-      "Starting interactive session...",
-      "",
-      "Welcome to the terminal.",
-      "Type 'help' to get started.",
-      "",
-    ];
-
-    input.readOnly = true;
-
-    bootMessages.forEach((message, index) => {
-      window.setTimeout(() => {
-        if (!terminal.isConnected) return;
-
-        print(message);
-
-        if (index === bootMessages.length - 1) {
-          form.hidden = false;
-          input.readOnly = false;
-          input.focus();
-        }
-      }, 200 + index * 180);
-    });
+    input.focus();
 
     // Astroのページ遷移時にタイマーを停止
     document.addEventListener(
