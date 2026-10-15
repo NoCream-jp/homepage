@@ -13,6 +13,20 @@ interface Props {
 
 const { months } = Astro.props;
 
+const emojiSegmenter = new Intl.Segmenter("ja", { granularity: "grapheme" });
+
+function firstEmoji(emoji = "") {
+  return (
+    Array.from(emojiSegmenter.segment(emoji), ({ segment }) => segment)[0] ?? ""
+  );
+}
+
+function remainingEmojis(emoji = "") {
+  return Array.from(emojiSegmenter.segment(emoji), ({ segment }) => segment)
+    .slice(1)
+    .join("");
+}
+
 function daysInMonth(y: number, m: number) {
   return new Date(y, m, 0).getDate();
 }
@@ -166,8 +180,11 @@ const initialIndex = Math.max(labels.length - 1, 0);
                             class="pointer-events-none absolute inset-0 flex items-center justify-center"
                             aria-hidden="true"
                           >
-                            <span class="emoji-center block max-h-[90%] max-w-[90%] overflow-hidden pt-3 text-center text-[clamp(20px,4.5cqw,28px)] leading-none whitespace-nowrap antialiased">
-                              {cell.entry.emoji ?? ""}
+                            <span class="emoji-center block max-h-[90%] max-w-[90%] overflow-hidden pt-3 text-center text-[clamp(16px,4.5cqw,26px)] leading-none whitespace-nowrap antialiased lg:flex">
+                              {firstEmoji(cell.entry.emoji)}
+                              <div class="hidden lg:inline">
+                                {remainingEmojis(cell.entry.emoji)}
+                              </div>
                             </span>
                           </div>
                         </div>
