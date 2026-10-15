@@ -185,13 +185,14 @@ import "../styles/global.css";
       "about.txt": "This is a minimal, Linux-inspired interactive terminal.",
 
       "art.txt": String.raw`
-   /\_/\
-  ( o.o )
-   > ^ <
+) ) )
+( ( (
+████╗
+████╝ < hot
 `.trim(),
     };
 
-    const OUTPUT_LINE_DELAY = 45;
+    const OUTPUT_LINE_DELAY = 30; // (ms)
     const outputQueue: Array<{ line: HTMLElement; delay: number }> = [];
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
