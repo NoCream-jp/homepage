@@ -39,7 +39,7 @@ import "../styles/global.css";
 
         <form
           id="terminal-form"
-          class="flex animate-[terminal-enter_420ms_ease-out_both] items-baseline gap-1.5 pt-1 [animation-delay:100ms] motion-reduce:animate-none min-[481px]:gap-2.5"
+          class="flex animate-[terminal-enter_420ms_ease-out_both] items-baseline gap-1.5 pt-1 motion-reduce:animate-none min-[481px]:gap-2.5"
           autocomplete="off"
         >
           <label
@@ -60,7 +60,7 @@ import "../styles/global.css";
         </form>
 
         <div
-          class="mt-2 animate-[terminal-enter_420ms_ease-out_both] text-[11px] text-zinc-500 [animation-delay:160ms] motion-reduce:animate-none"
+          class="mt-2 animate-[terminal-enter_420ms_ease-out_both] text-[11px] text-zinc-500 motion-reduce:animate-none"
         >
           type "<span class="font-bold text-cyan-300">help</span>" for commands
           · Ctrl+D to exit
@@ -98,6 +98,7 @@ import "../styles/global.css";
     let historyIndex = 0;
     let streamTimer: number | null = null;
     let artTimer: number | null = null;
+    let outputTimer: number | null = null;
 
     const asciiGlyphs: Record<string, string[]> = {
       M: [
@@ -190,30 +191,57 @@ import "../styles/global.css";
 `.trim(),
     };
 
-    let outputLineIndex = 0;
+    const OUTPUT_LINE_DELAY = 45;
+    const outputQueue: Array<{ line: HTMLElement; delay: number }> = [];
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
 
-    const animateLine = (line: HTMLElement) => {
-      line.className =
-        "min-h-[1lh] animate-[terminal-line-in_180ms_ease-out_both] motion-reduce:animate-none";
-      line.style.animationDelay = `${Math.min(outputLineIndex * 28, 420)}ms`;
-      outputLineIndex++;
-    };
-
-    const appendLine = (text: string = "") => {
-      const line = document.createElement("div");
-      line.textContent = text;
-      animateLine(line);
-      output.appendChild(line);
-
+    const scrollToLatestOutput = () => {
       requestAnimationFrame(() => {
         scroll.scrollTo({ top: scroll.scrollHeight, behavior: "smooth" });
       });
     };
 
+    const renderNextOutput = () => {
+      outputTimer = null;
+
+      const item = outputQueue.shift();
+      if (!item) return;
+
+      output.appendChild(item.line);
+      scrollToLatestOutput();
+
+      const nextItem = outputQueue[0];
+      if (nextItem) {
+        outputTimer = window.setTimeout(renderNextOutput, nextItem.delay);
+      }
+    };
+
+    const enqueueOutput = (line: HTMLElement, delay = OUTPUT_LINE_DELAY) => {
+      outputQueue.push({
+        line,
+        delay: prefersReducedMotion ? 0 : delay,
+      });
+
+      if (outputTimer === null && outputQueue.length === 1) {
+        outputTimer = window.setTimeout(
+          renderNextOutput,
+          outputQueue[0]?.delay ?? 0
+        );
+      }
+    };
+
+    const appendLine = (text: string = "") => {
+      const line = document.createElement("div");
+      line.textContent = text;
+      line.className = "min-h-[1lh]";
+      enqueueOutput(line);
+    };
+
     const OUTPUT_WIDTH = 48;
 
     const beginOutput = (title: string = "") => {
-      outputLineIndex = 0;
       appendLine(
         `${title}${"-".repeat(Math.max(6, OUTPUT_WIDTH - title.length))}`
       );
@@ -236,18 +264,17 @@ import "../styles/global.css";
       command.textContent = raw;
       command.className = "text-orange-200";
 
-      animateLine(line);
+      line.className = "min-h-[1lh]";
       line.appendChild(prompt);
       line.appendChild(command);
-      output.appendChild(line);
-
-      requestAnimationFrame(() => {
-        scroll.scrollTo({ top: scroll.scrollHeight, behavior: "smooth" });
-      });
+      enqueueOutput(line, 0);
     };
 
     // ログを消去する
     const clear = () => {
+      if (outputTimer !== null) window.clearTimeout(outputTimer);
+      outputTimer = null;
+      outputQueue.length = 0;
       output.replaceChildren();
     };
 
@@ -510,6 +537,7 @@ import "../styles/global.css";
       () => {
         stopStream();
         if (artTimer !== null) window.clearInterval(artTimer);
+        if (outputTimer !== null) window.clearTimeout(outputTimer);
       },
       { once: true }
     );
