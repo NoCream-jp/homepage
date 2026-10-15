@@ -24,20 +24,10 @@ import "../styles/global.css";
           aria-label="Minato Hayashi"
         >
           <pre
-            class="m-0 text-[clamp(7px,1.45vw,16px)] leading-[1.15] font-bold whitespace-pre [font:inherit]"
+            id="terminal-hero-art"
+            class="m-0 min-h-[15em] text-[clamp(7px,1.45vw,16px)] leading-[1.15] font-bold whitespace-pre [font:inherit]"
             aria-hidden="true">
- __  __ _             _
-|  \/  (_)_ __   __ _| |_ ___
-| |\/| | | '_ \ / _` | __/ _ \
-| |  | | | | | | (_| | || (_) |
-|_|  |_|_|_| |_|\__,_|\__\___/
-
- _   _                       _     _
-| | | | __ _ _   _  __ _ ___| |__ (_)
-| |_| |/ _` | | | |/ _` / __| '_ \| |
-|  _  | (_| | |_| | (_| \__ \ | | | |
-|_| |_|\__,_|\__, |\__,_|___/_| |_|_|
-             |___/</pre>
+          </pre>
         </header>
 
         <div
@@ -83,6 +73,7 @@ import "../styles/global.css";
 <script>
   const setupTerminal = () => {
     const terminal = document.getElementById("terminal");
+    const heroArt = document.getElementById("terminal-hero-art");
     const scroll = document.getElementById("terminal-scroll");
     const output = document.getElementById("terminal-output");
     const form = document.getElementById("terminal-form");
@@ -90,6 +81,7 @@ import "../styles/global.css";
 
     if (
       !(terminal instanceof HTMLElement) ||
+      !(heroArt instanceof HTMLPreElement) ||
       !(scroll instanceof HTMLElement) ||
       !(output instanceof HTMLElement) ||
       !(form instanceof HTMLFormElement) ||
@@ -105,6 +97,85 @@ import "../styles/global.css";
     const history: string[] = [];
     let historyIndex = 0;
     let streamTimer: number | null = null;
+    let artTimer: number | null = null;
+
+    const asciiGlyphs: Record<string, string[]> = {
+      M: [
+        " __  __ ",
+        "|  \\/  |",
+        "| |\\/| |",
+        "| |  | |",
+        "|_|  |_|",
+        "        ",
+      ],
+      i: [" _ ", "(_)", "| |", "| |", "|_|", "   "],
+      n: ["       ", " _ __  ", "| '_ \\ ", "| | | |", "|_| |_|", "       "],
+      a: ["       ", "  __ _ ", " / _` |", "| (_| |", " \\__,_|", "       "],
+      t: [" _   ", "| |_ ", "| __|", "| |_ ", " \\__|", "     "],
+      o: ["       ", "  ___  ", " / _ \\ ", "| (_) |", " \\___/ ", "       "],
+      H: [" _   _ ", "| | | |", "| |_| |", "|  _  |", "|_| |_|", "       "],
+      y: ["       ", " _   _ ", "| | | |", "| |_| |", " \\__, |", " |___/ "],
+      s: ["      ", " ___  ", "/ __| ", "\\__ \\ ", "|___/ ", "      "],
+      h: [" _     ", "| |__  ", "| '_ \\ ", "| | | |", "|_| |_|", "       "],
+    };
+
+    const asciiWords = [Array.from("Minato"), Array.from("Hayashi")];
+
+    const renderAsciiWord = (letters: string[]) => {
+      return Array.from({ length: 6 }, (_, rowIndex) =>
+        letters
+          .map((letter) => {
+            const glyph = asciiGlyphs[letter] ?? [];
+            const width = Math.max(...glyph.map((row) => row.length), 0);
+            return (glyph[rowIndex] ?? "").padEnd(width);
+          })
+          .join(" ")
+          .trimEnd()
+      ).join("\n");
+    };
+
+    const renderAsciiArt = (visibleLetters: number) => {
+      let remainingLetters = visibleLetters;
+      const renderedWords: string[] = [];
+
+      for (const word of asciiWords) {
+        const visibleWord = word.slice(0, remainingLetters);
+        if (visibleWord.length > 0) {
+          renderedWords.push(renderAsciiWord(visibleWord));
+        }
+        remainingLetters -= visibleWord.length;
+        if (remainingLetters <= 0) break;
+      }
+
+      return renderedWords.join("\n\n");
+    };
+
+    const animateAsciiArt = () => {
+      const totalLetters = asciiWords.reduce(
+        (total, word) => total + word.length,
+        0
+      );
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        heroArt.textContent = renderAsciiArt(totalLetters);
+        return;
+      }
+
+      let visibleLetters = 0;
+
+      heroArt.textContent = "";
+      artTimer = window.setInterval(() => {
+        visibleLetters++;
+        heroArt.textContent = renderAsciiArt(visibleLetters);
+
+        if (visibleLetters >= totalLetters && artTimer !== null) {
+          window.clearInterval(artTimer);
+          artTimer = null;
+        }
+      }, 120);
+    };
+
+    animateAsciiArt();
 
     const files: Record<string, string> = {
       "README.md":
@@ -438,6 +509,7 @@ import "../styles/global.css";
       "astro:before-swap",
       () => {
         stopStream();
+        if (artTimer !== null) window.clearInterval(artTimer);
       },
       { once: true }
     );
