@@ -1,0 +1,448 @@
+---
+import "../styles/global.css";
+---
+
+<!doctype html>
+<html lang="ja" class="h-full bg-black">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Terminal</title>
+  </head>
+
+  <body class="m-0 h-full overflow-hidden bg-black">
+    <main
+      id="terminal"
+      class="box-border h-dvh w-full bg-black p-[clamp(16px,3vw,40px)] font-['SFMono-Regular',Consolas,'Liberation_Mono',monospace] text-xs leading-[1.7] text-zinc-100 min-[481px]:text-sm"
+    >
+      <div
+        id="terminal-scroll"
+        class="no-scrollbar h-full scroll-pb-6 overflow-x-hidden overflow-y-auto scroll-smooth motion-reduce:scroll-auto"
+      >
+        <header
+          class="mb-[clamp(18px,3vh,32px)] animate-[terminal-enter_420ms_ease-out_both] text-zinc-100 motion-reduce:animate-none"
+          aria-label="Minato Hayashi"
+        >
+          <pre
+            class="m-0 text-[clamp(7px,1.45vw,16px)] leading-[1.15] font-bold whitespace-pre [font:inherit]"
+            aria-hidden="true">
+ __  __ _             _
+|  \/  (_)_ __   __ _| |_ ___
+| |\/| | | '_ \ / _` | __/ _ \
+| |  | | | | | | (_| | || (_) |
+|_|  |_|_|_| |_|\__,_|\__\___/
+
+ _   _                       _     _
+| | | | __ _ _   _  __ _ ___| |__ (_)
+| |_| |/ _` | | | |/ _` / __| '_ \| |
+|  _  | (_| | |_| | (_| \__ \ | | | |
+|_| |_|\__,_|\__, |\__,_|___/_| |_|_|
+             |___/</pre>
+        </header>
+
+        <div
+          id="terminal-output"
+          class="wrap-anywhere whitespace-pre-wrap not-empty:mb-[0.5em]"
+          aria-live="polite"
+        >
+        </div>
+
+        <form
+          id="terminal-form"
+          class="flex animate-[terminal-enter_420ms_ease-out_both] items-baseline gap-1.5 pt-1 [animation-delay:100ms] motion-reduce:animate-none min-[481px]:gap-2.5"
+          autocomplete="off"
+        >
+          <label
+            for="terminal-input"
+            class="shrink-0 whitespace-nowrap text-zinc-100"
+          >
+            guest/homepage&gt;
+          </label>
+          <input
+            id="terminal-input"
+            type="text"
+            aria-label="Terminal command"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            class="min-w-0 flex-1 rounded-none border-0 bg-transparent p-0 text-orange-200 caret-zinc-100 outline-none [font:inherit]"
+          />
+        </form>
+
+        <div
+          class="mt-2 animate-[terminal-enter_420ms_ease-out_both] text-[11px] text-zinc-500 [animation-delay:160ms] motion-reduce:animate-none"
+        >
+          type "<span class="font-bold text-cyan-300">help</span>" for commands
+          · Ctrl+D to exit
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
+
+<script>
+  const setupTerminal = () => {
+    const terminal = document.getElementById("terminal");
+    const scroll = document.getElementById("terminal-scroll");
+    const output = document.getElementById("terminal-output");
+    const form = document.getElementById("terminal-form");
+    const input = document.getElementById("terminal-input");
+
+    if (
+      !(terminal instanceof HTMLElement) ||
+      !(scroll instanceof HTMLElement) ||
+      !(output instanceof HTMLElement) ||
+      !(form instanceof HTMLFormElement) ||
+      !(input instanceof HTMLInputElement)
+    )
+      return;
+
+    if (terminal.dataset.initialized === "true") return;
+    terminal.dataset.initialized = "true";
+
+    const PROMPT = "guest@portfolio:~$";
+
+    const history: string[] = [];
+    let historyIndex = 0;
+    let streamTimer: number | null = null;
+
+    const files: Record<string, string> = {
+      "README.md":
+        "Welcome to the terminal.\nType 'help' to see available commands.",
+
+      "about.txt": "This is a minimal, Linux-inspired interactive terminal.",
+
+      "art.txt": String.raw`
+   /\_/\
+  ( o.o )
+   > ^ <
+`.trim(),
+    };
+
+    let outputLineIndex = 0;
+
+    const animateLine = (line: HTMLElement) => {
+      line.className =
+        "min-h-[1lh] animate-[terminal-line-in_180ms_ease-out_both] motion-reduce:animate-none";
+      line.style.animationDelay = `${Math.min(outputLineIndex * 28, 420)}ms`;
+      outputLineIndex++;
+    };
+
+    const appendLine = (text: string = "") => {
+      const line = document.createElement("div");
+      line.textContent = text;
+      animateLine(line);
+      output.appendChild(line);
+
+      requestAnimationFrame(() => {
+        scroll.scrollTo({ top: scroll.scrollHeight, behavior: "smooth" });
+      });
+    };
+
+    const OUTPUT_WIDTH = 48;
+
+    const beginOutput = (title: string = "") => {
+      outputLineIndex = 0;
+      appendLine(
+        `${title}${"-".repeat(Math.max(6, OUTPUT_WIDTH - title.length))}`
+      );
+    };
+
+    const endOutput = () => {
+      appendLine(`${"-".repeat(OUTPUT_WIDTH - 2)}//`);
+    };
+
+    const print = (text: string = "") => {
+      text.split("\n").forEach((line) => appendLine(line));
+    };
+
+    const printCommand = (raw: string) => {
+      const line = document.createElement("div");
+      const prompt = document.createElement("span");
+      const command = document.createElement("span");
+
+      prompt.textContent = `${PROMPT} `;
+      command.textContent = raw;
+      command.className = "text-orange-200";
+
+      animateLine(line);
+      line.appendChild(prompt);
+      line.appendChild(command);
+      output.appendChild(line);
+
+      requestAnimationFrame(() => {
+        scroll.scrollTo({ top: scroll.scrollHeight, behavior: "smooth" });
+      });
+    };
+
+    // ログを消去する
+    const clear = () => {
+      output.replaceChildren();
+    };
+
+    // トップページに戻る
+    const exit = () => {
+      window.location.assign("/");
+    };
+
+    // 連続出力を中断する
+    const stopStream = () => {
+      if (streamTimer === null) return false;
+
+      window.clearInterval(streamTimer);
+      streamTimer = null;
+      input.readOnly = false;
+      return true;
+    };
+
+    // 大量のログを出力するデモ
+    const demo = () => {
+      let count = 0;
+      input.readOnly = true;
+
+      streamTimer = window.setInterval(() => {
+        count++;
+
+        print(
+          `[${String(count).padStart(3, "0")}] ` +
+            `Processing... ${Math.min(count * 2, 100)}%`
+        );
+
+        if (count >= 50) {
+          stopStream();
+          print("Process completed.");
+          endOutput();
+          input.focus();
+        }
+      }, 100);
+
+      return true;
+    };
+
+    // コマンド定義
+    const commands: Record<string, (args: string[]) => boolean | void> = {
+      help: () => {
+        print(
+          [
+            "  help          Show available commands",
+            "  ls            List files",
+            "  cat <file>    Display file contents",
+            "  pwd           Print working directory",
+            "  whoami        Print current user",
+            "  whoareyou     Show profile",
+            "  date          Show current date and time",
+            "  echo <text>   Print text",
+            "  art           Display ASCII art",
+            "  demo          Run output demonstration",
+            "  history       Show command history",
+            "  clear         Clear the terminal",
+            "  home          Return to homepage",
+            "  exit          Exit the terminal",
+            "",
+            "Keyboard:",
+            "  Ctrl+C        Interrupt",
+            "  Ctrl+D        Exit (empty prompt)",
+            "  Ctrl+L        Clear screen",
+            "  Arrow Up/Down Command history",
+          ].join("\n")
+        );
+      },
+
+      ls: () => {
+        print(Object.keys(files).join("  "));
+      },
+
+      cat: (args) => {
+        if (args.length === 0) {
+          print("cat: missing file operand");
+          return;
+        }
+
+        for (const filename of args) {
+          if (Object.prototype.hasOwnProperty.call(files, filename)) {
+            print(files[filename]);
+          } else {
+            print(`cat: ${filename}: No such file or directory`);
+          }
+        }
+      },
+
+      pwd: () => {
+        print("/home/guest");
+      },
+
+      whoami: () => {
+        print("guest");
+      },
+
+      whoareyou: () => {
+        print(
+          [
+            "name     : Minato Hayashi",
+            "age      : 23+",
+            "location : Osaka, Japan",
+            "pronoun  : He / Him",
+            "study    : reinforcement learning",
+            "",
+            "About Me",
+            "大学で強化学習について研究しています。",
+            "コーヒーが好きです。猫が好きです。息抜きの達人です。",
+            "",
+            "Thanks for visiting my portfolio!",
+          ].join("\n")
+        );
+      },
+
+      date: () => {
+        print(new Date().toString());
+      },
+
+      echo: (args) => {
+        print(args.join(" "));
+      },
+
+      art: () => {
+        print(files["art.txt"]);
+      },
+
+      demo: () => {
+        return demo();
+      },
+
+      history: () => {
+        history.forEach((command, index) => {
+          print(`${String(index + 1).padStart(4)}  ${command}`);
+        });
+      },
+
+      clear: () => {
+        clear();
+      },
+
+      home: () => {
+        exit();
+      },
+
+      exit: () => {
+        exit();
+      },
+    };
+
+    const commandTitles: Record<string, string> = {
+      help: "Available commands:",
+      whoareyou: "Profile",
+    };
+
+    const silentCommands = new Set(["clear", "home", "exit"]);
+
+    // 入力されたコマンドを実行する
+    const execute = (raw: string) => {
+      printCommand(raw);
+
+      const trimmed = raw.trim();
+      if (!trimmed) return;
+
+      history.push(raw);
+      historyIndex = history.length;
+
+      const [command, ...args] = trimmed.split(/\s+/);
+
+      if (Object.prototype.hasOwnProperty.call(commands, command)) {
+        const shouldFrame = !silentCommands.has(command);
+        if (shouldFrame) beginOutput(commandTitles[command]);
+
+        const isStreaming = commands[command](args) === true;
+        if (shouldFrame && !isStreaming) endOutput();
+      } else {
+        beginOutput();
+        print(`${command}: command not found`);
+        print("Type 'help' for available commands.");
+        endOutput();
+      }
+    };
+
+    // フォーム送信
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      if (input.readOnly) return;
+
+      const value = input.value;
+      input.value = "";
+
+      execute(value);
+    });
+
+    // キーボード操作
+    input.addEventListener("keydown", (event) => {
+      if (event.ctrlKey && event.key.toLowerCase() === "c") {
+        event.preventDefault();
+
+        const interrupted = stopStream();
+        if (interrupted) endOutput();
+        printCommand(`${input.value}^C`);
+
+        input.value = "";
+        historyIndex = history.length;
+
+        if (interrupted) input.focus();
+        return;
+      }
+
+      if (event.ctrlKey && event.key.toLowerCase() === "d") {
+        if (!input.value && streamTimer === null) {
+          event.preventDefault();
+          exit();
+        }
+        return;
+      }
+
+      if (event.ctrlKey && event.key.toLowerCase() === "l") {
+        event.preventDefault();
+        clear();
+        return;
+      }
+
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+
+        if (history.length === 0) return;
+
+        historyIndex = Math.max(0, historyIndex - 1);
+        input.value = history[historyIndex];
+        return;
+      }
+
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+
+        if (history.length === 0) return;
+
+        historyIndex = Math.min(history.length, historyIndex + 1);
+
+        input.value = history[historyIndex] ?? "";
+        return;
+      }
+    });
+
+    // 画面をクリックしたら入力欄にフォーカス
+    terminal.addEventListener("click", () => {
+      input.focus();
+    });
+
+    // 起動時メッセージ
+    input.focus();
+
+    // Astroのページ遷移時にタイマーを停止
+    document.addEventListener(
+      "astro:before-swap",
+      () => {
+        stopStream();
+      },
+      { once: true }
+    );
+  };
+
+  setupTerminal();
+  document.addEventListener("astro:page-load", setupTerminal);
+</script>
