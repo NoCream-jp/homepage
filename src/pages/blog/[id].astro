@@ -71,7 +71,10 @@ const formattedDate = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2,
         </div>
 
         <!-- フッター-->
-        <div class="mt-2 flex w-full items-center justify-between">
+        <div
+          transition:animate="fade"
+          class="mt-2 flex w-full translate-y-0 items-center justify-between opacity-100 transition-all duration-300 ease-out"
+        >
           <BackButton href="/blog" />
           <LikeButton articleId={post.id} />
         </div>
