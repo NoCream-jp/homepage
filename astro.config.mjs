@@ -15,7 +15,7 @@ export default defineConfig({
     }),
   },
   prefetch: {
-    // リンク先プリロードして高速化
+    // 記事などのリンク先をプリロードして高速化
     prefetchAll: true,
     defaultStrategy: "hover",
   },
