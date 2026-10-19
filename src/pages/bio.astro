@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import LeftNav from "../components/LeftNav.astro";
 import ImageStack from "../components/ImageStack.astro";
 import LearningCard from "../components/LearningCard.astro";
+import ActionTimeline from "../components/ActionTimeline.astro";
 import { getCollection } from "astro:content";
 
 const title = "Minato Hayashi";
@@ -16,6 +17,8 @@ const sampleImages = [
 ];
 
 const learning = await getCollection("learning");
+const actions = await getCollection("action-log");
+actions.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 
 <Layout title={title} description={description}>
@@ -35,7 +38,9 @@ const learning = await getCollection("learning");
         <h1 class="mb-4 text-2xl font-semibold text-zinc-800">bio</h1>
 
         <div class="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto">
-          <div class="w-full">
+          <div
+            class="grid w-full gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)] lg:items-start"
+          >
             <section class="mt-5 flex w-full flex-col gap-4">
               <h2>Who I am</h2>
 
@@ -76,6 +81,10 @@ const learning = await getCollection("learning");
 
               </div> -->
             </section>
+
+            <div class="mt-5 lg:sticky lg:top-6">
+              <ActionTimeline items={actions} />
+            </div>
           </div>
         </div>
       </main>

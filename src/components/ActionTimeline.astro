@@ -1,0 +1,71 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  items: CollectionEntry<"action-log">[];
+}
+
+const { items } = Astro.props as Props;
+const formatDate = (date: Date) =>
+  new Intl.DateTimeFormat("ja-JP", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(date);
+---
+
+<section class="flex min-h-0 flex-col gap-4" aria-labelledby="action-title">
+  <div class="flex items-end justify-between gap-4">
+    <div>
+      <p
+        class="mb-1 text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase"
+      >
+        Activity log
+      </p>
+      <h2 id="action-title" class="text-xl font-semibold text-zinc-800">
+        What I’ve done
+      </h2>
+    </div>
+    <span
+      class="rounded-full bg-zinc-100 px-2.5 py-1 text-xs text-zinc-500 tabular-nums"
+    >
+      {items.length} entries
+    </span>
+  </div>
+
+  <div class="relative rounded-md border bg-white p-5">
+    <div
+      class="absolute top-6 bottom-6 left-[1.7rem] w-px bg-zinc-200"
+      aria-hidden="true"
+    >
+    </div>
+    <ol class="relative space-y-6">
+      {
+        items.map((item) => (
+          <li class="relative grid grid-cols-[1.25rem_minmax(0,1fr)] gap-3">
+            <span
+              class="mt-1.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-zinc-400 ring-1 ring-zinc-300"
+              aria-hidden="true"
+            />
+            <div class="min-w-0">
+              <time
+                class="text-xs font-medium text-zinc-400"
+                datetime={item.data.date.toISOString()}
+              >
+                {formatDate(item.data.date)}
+              </time>
+              <h3 class="mt-1 text-sm leading-6 font-medium text-zinc-900">
+                {item.data.title}
+              </h3>
+              {item.data.description && (
+                <p class="mt-1 text-sm leading-6 text-zinc-500">
+                  {item.data.description}
+                </p>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
