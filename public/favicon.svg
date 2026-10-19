@@ -1,1 +1,5 @@
-C:\Users\johnn\Works\homepage\public\favicon.svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Minato Hayashi</title>
+  <rect width="64" height="64" rx="14" fill="#18181b" />
+  <path d="M17 17h8l7 19 7-19h8v30h-7V28l-6 16h-5l-6-16v19h-6V17Z" fill="#fafafa" />
+</svg>
