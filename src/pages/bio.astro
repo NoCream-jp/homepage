@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import LeftNav from "../components/LeftNav.astro";
 import ImageStack from "../components/ImageStack.astro";
 import LearningCard from "../components/LearningCard.astro";
+import ActionTimeline from "../components/ActionTimeline.astro";
 import { getCollection } from "astro:content";
 
 const title = "Minato Hayashi";
@@ -16,6 +17,8 @@ const sampleImages = [
 ];
 
 const learning = await getCollection("learning");
+const actions = await getCollection("action-log");
+actions.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 
 <Layout title={title} description={description}>
@@ -34,9 +37,15 @@ const learning = await getCollection("learning");
       >
         <h1 class="mb-4 text-2xl font-semibold text-zinc-800">bio</h1>
 
-        <div class="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto">
-          <div class="w-full">
-            <section class="mt-5 flex w-full flex-col gap-4">
+        <div
+          class="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto lg:overflow-hidden"
+        >
+          <div
+            class="grid w-full gap-8 lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)] lg:items-stretch"
+          >
+            <section
+              class="no-scrollbar mt-5 flex w-full flex-col gap-4 overflow-y-auto lg:min-h-0"
+            >
               <h2>Who I am</h2>
 
               <div class="rounded-md border p-5">
@@ -49,11 +58,10 @@ const learning = await getCollection("learning");
 
               <h2>What I saw</h2>
 
-              <div class="rounded-md border p-5">
-                <div class="flex items-center gap-10">
+              <div class="w-full rounded-md border p-5">
+                <div class="flex items-center justify-around gap-5">
                   <ImageStack images={sampleImages} />
-
-                  <div>
+                  <div class="max-w-1/2">
                     各種SNSには、猫の画像や外出時に撮影した写真、その他趣味関連のお気に入りの画像を投稿しています。
                     外食時には、後から見返せるように食べた料理を記録しています。
                   </div>
@@ -75,6 +83,11 @@ const learning = await getCollection("learning");
               <div class="rounded-md border p-5 bg-red-50">
 
               </div> -->
+            </section>
+
+            <section class="no-scrollbar mt-5 overflow-y-auto lg:min-h-0">
+              <h2 id="action-title" class="mb-4">What I've done</h2>
+              <ActionTimeline items={actions} />
             </section>
           </div>
         </div>
