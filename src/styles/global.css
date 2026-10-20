@@ -153,14 +153,6 @@
   );
 }
 
-@layer base {
-  *,
-  ::before,
-  ::after {
-    border-color: var(--site-border);
-  }
-}
-
 /* Existing hover classes keep their role while their color follows the theme. */
 @layer utilities {
   .hover\:text-zinc-600:hover,
