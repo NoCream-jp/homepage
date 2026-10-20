@@ -48,8 +48,3 @@ Feel free to check [our documentation](https://docs.astro.build) or jump into ou
 ---
 
 - lg以上の画面幅では2カラムとする
-
-リファクタリング：
-カラーパレットを作成し、色の指定の仕方を統一する。
-プロジェクト全体について色を指定している部分を走査し、色をカスタムcssで指定できるようにする。保守拡張性の観点から。
-例えば多用しているhover:text-zinc-600はhover-colorなどとする。命名規則は一任する。
