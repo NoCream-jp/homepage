@@ -132,10 +132,10 @@ const formattedDate = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2,
   :global(.blog-content th) {
     width: 100%;
     font-weight: 500;
-    color: #27272a;
+    color: var(--color-text-primary);
     padding: 0.8rem 1rem;
     text-align: left;
-    background-color: white;
+    background-color: var(--color-canvas);
   }
 
   :global(.blog-content td) {
@@ -148,7 +148,7 @@ const formattedDate = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2,
     height: 8px;
   }
   :global(.no-scrollbar::-webkit-scrollbar-thumb) {
-    background: rgba(0, 0, 0, 0.08);
+    background: color-mix(in srgb, var(--color-ink-black) 8%, transparent);
     border-radius: 999px;
   }
 </style>

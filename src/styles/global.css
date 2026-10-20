@@ -27,6 +27,7 @@
   --color-data-cyan: #0e7490;
   --color-status-red-surface: #fef2f2;
   --color-highlight-yellow: #fef08a;
+  --color-overlay-subtle: rgb(0 0 0 / 6%);
 }
 
 @theme {
@@ -56,6 +57,7 @@
   --color-data-cyan: var(--color-data-cyan);
   --color-status-red-surface: var(--color-status-red-surface);
   --color-highlight-yellow: var(--color-highlight-yellow);
+  --color-overlay-subtle: var(--color-overlay-subtle);
 
   /* Existing Tailwind color names resolve through the palette. */
   --color-black: var(--color-ink-black);
@@ -138,12 +140,12 @@ table {
 
 th,
 td {
-  border: 1px solid #d1d5db; /* 薄いグレーの枠線 */
+  border: 1px solid var(--color-border);
   padding: 0.75rem;
 }
 
 th {
-  background-color: #f3f4f6; /* ヘッダーの背景色 */
+  background-color: var(--color-surface-muted);
   font-weight: bold;
 }
 

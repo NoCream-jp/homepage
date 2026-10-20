@@ -39,7 +39,7 @@ const bannerItem = {
                   >
                     {isBanner ? (
                       <div
-                        class="notif-banner notification-stripe inline-flex h-10 items-center justify-center border-r bg-[var(--color-theme-green-100)] px-4 text-black"
+                        class="notif-banner notification-stripe bg-theme-green-100 inline-flex h-10 items-center justify-center border-r px-4 text-black"
                         aria-hidden="false"
                       >
                         <span class="notif-banner-title text-xs font-semibold tracking-wide">
@@ -169,7 +169,7 @@ const bannerItem = {
 
   /* Make keyboard focus visible (ID変数展開の代わりにクラスを使用) */
   .notif-scroll:focus {
-    outline: 2px solid rgba(0, 0, 0, 0.06);
+    outline: 2px solid var(--color-overlay-subtle);
     outline-offset: 2px;
   }
 
