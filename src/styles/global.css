@@ -2,7 +2,8 @@
 
 /* Change this single RGB color to regenerate the complete theme scale. */
 :root {
-  --color-theme: rgb(34 197 94);
+  /* --color-theme: rgb(34 197 94); */
+  --color-theme: black;
   --theme-50: color-mix(in oklch, var(--color-theme) 5%, white);
   --theme-100: color-mix(in oklch, var(--color-theme) 12%, white);
   --theme-200: color-mix(in oklch, var(--color-theme) 24%, white);
@@ -148,8 +149,8 @@
     135deg,
     transparent 0,
     transparent 6px,
-    var(--site-accent) 6px,
-    var(--site-accent) 7px
+    var(--color-theme-100) 6px,
+    var(--color-theme-400) 7px
   );
 }
 
