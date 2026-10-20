@@ -1,7 +1,91 @@
 @import "tailwindcss";
 
+/* UI palette: keep visual roles stable while allowing the actual colors to evolve. */
+:root {
+  --color-canvas: #ffffff;
+  --color-surface-muted: #f4f4f5;
+  --color-surface-subtle: #fafafa;
+  --color-text-primary: #27272a;
+  --color-ink-black: #000000;
+  --color-text-secondary: #52525b;
+  --color-text-muted: #a1a1aa;
+  --color-text-inverse: #ffffff;
+  --color-border: #d4d4d8;
+  --color-border-strong: #52525b;
+  --color-focus: #d4d4d8;
+  --color-terminal-canvas: #000000;
+  --color-terminal-text: #f4f4f5;
+  --color-terminal-muted: #71717a;
+  --color-terminal-command: #fed7aa;
+  --color-terminal-help: #a5f3fc;
+  --color-theme-green-500: #22c55e;
+  --color-theme-green-600: #16a34a;
+  --color-theme-green-700: #15803d;
+}
+
 @theme {
   --font-sans: "Schibsted Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --color-canvas: var(--color-canvas);
+  --color-surface-muted: var(--color-surface-muted);
+  --color-surface-subtle: var(--color-surface-subtle);
+  --color-text-primary: var(--color-text-primary);
+  --color-ink-black: var(--color-ink-black);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+  --color-text-inverse: var(--color-text-inverse);
+  --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
+  --color-focus: var(--color-focus);
+  --color-terminal-canvas: var(--color-terminal-canvas);
+  --color-terminal-text: var(--color-terminal-text);
+  --color-terminal-muted: var(--color-terminal-muted);
+  --color-terminal-command: var(--color-terminal-command);
+  --color-terminal-help: var(--color-terminal-help);
+  --color-theme-green-500: var(--color-theme-green-500);
+  --color-theme-green-600: var(--color-theme-green-600);
+  --color-theme-green-700: var(--color-theme-green-700);
+
+  /* Existing Tailwind color names resolve through the palette. */
+  --color-black: var(--color-ink-black);
+  --color-white: var(--color-canvas);
+  --color-zinc-50: var(--color-surface-subtle);
+  --color-zinc-100: var(--color-surface-muted);
+  --color-zinc-200: var(--color-border);
+  --color-zinc-300: var(--color-focus);
+  --color-zinc-400: var(--color-text-muted);
+  --color-zinc-500: var(--color-text-secondary);
+  --color-zinc-600: var(--color-text-secondary);
+  --color-zinc-700: var(--color-text-secondary);
+  --color-zinc-800: var(--color-text-primary);
+  --color-zinc-900: var(--color-text-primary);
+  --color-green-500: var(--color-theme-green-500);
+  --color-green-600: var(--color-theme-green-600);
+  --color-green-700: var(--color-theme-green-700);
+}
+
+@utility hover-color {
+  &:hover {
+    color: var(--color-theme-green-700);
+  }
+}
+
+@utility group-hover-color {
+  .group:hover & {
+    color: var(--color-theme-green-700);
+  }
+}
+
+/* Keep legacy utility names visually consistent until component markup is migrated. */
+@layer utilities {
+  .hover\:text-zinc-600:hover,
+  .group:hover .group-hover\:text-zinc-600 {
+    color: var(--color-theme-green-700);
+  }
+
+  .hover\:border-zinc-600:hover,
+  .group:hover .group-hover\:border-zinc-600 {
+    border-color: var(--color-theme-green-700);
+  }
 }
 
 @keyframes terminal-enter {
