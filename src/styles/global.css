@@ -22,6 +22,11 @@
   --color-theme-green-500: #22c55e;
   --color-theme-green-600: #16a34a;
   --color-theme-green-700: #15803d;
+  --color-data-blue: #1d4ed8;
+  --color-data-red: #dc2626;
+  --color-data-cyan: #0e7490;
+  --color-status-red-surface: #fef2f2;
+  --color-highlight-yellow: #fef08a;
 }
 
 @theme {
@@ -46,6 +51,11 @@
   --color-theme-green-600: var(--color-theme-green-600);
   --color-theme-green-700: var(--color-theme-green-700);
   --color-theme-green-100: var(--color-theme-green-100);
+  --color-data-blue: var(--color-data-blue);
+  --color-data-red: var(--color-data-red);
+  --color-data-cyan: var(--color-data-cyan);
+  --color-status-red-surface: var(--color-status-red-surface);
+  --color-highlight-yellow: var(--color-highlight-yellow);
 
   /* Existing Tailwind color names resolve through the palette. */
   --color-black: var(--color-ink-black);
@@ -63,6 +73,12 @@
   --color-green-500: var(--color-theme-green-500);
   --color-green-600: var(--color-theme-green-600);
   --color-green-700: var(--color-theme-green-700);
+  --color-blue-700: var(--color-data-blue);
+  --color-red-500: var(--color-data-red);
+  --color-red-600: var(--color-data-red);
+  --color-red-50: var(--color-status-red-surface);
+  --color-cyan-700: var(--color-data-cyan);
+  --color-yellow-300: var(--color-highlight-yellow);
 }
 
 @utility hover-color {
@@ -77,13 +93,14 @@
   }
 }
 
+/* 通知帯 */
 @utility notification-stripe {
   background-image: repeating-linear-gradient(
     135deg,
     transparent 0,
     transparent 6px,
-    var(--color-theme-green-700) 6px,
-    var(--color-theme-green-700) 7px
+    var(--color-border) 6px,
+    var(--color-border) 7px
   );
 }
 
