@@ -75,6 +75,16 @@
   }
 }
 
+@utility notification-stripe {
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0,
+    transparent 6px,
+    var(--color-theme-green-700) 6px,
+    var(--color-theme-green-700) 7px
+  );
+}
+
 /* Keep legacy utility names visually consistent until component markup is migrated. */
 @layer utilities {
   .hover\:text-zinc-600:hover,
