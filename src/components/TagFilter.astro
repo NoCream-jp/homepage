@@ -70,17 +70,17 @@ const { tags = [], selector = ".post-item", initial = null } = Astro.props;
         btn.dataset.active = pressed ? "true" : "false";
 
         if (pressed) {
-          btn.classList.add("bg-zinc-800", "text-white", "border-transparent");
+          btn.classList.add("bg-primary", "text-inverse", "border-transparent");
 
-          btn.classList.remove("bg-white", "text-zinc-700", "border");
+          btn.classList.remove("bg-surface", "text-secondary", "border");
         } else {
           btn.classList.remove(
-            "bg-zinc-800",
-            "text-white",
+            "bg-primary",
+            "text-inverse",
             "border-transparent"
           );
 
-          btn.classList.add("bg-white", "text-zinc-700", "border");
+          btn.classList.add("bg-surface", "text-secondary", "border");
         }
       });
     }

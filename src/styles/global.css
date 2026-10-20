@@ -1,7 +1,185 @@
 @import "tailwindcss";
 
-@theme {
+/* Change this single RGB color to regenerate the complete theme scale. */
+:root {
+  --color-theme: rgb(34 197 94);
+  --theme-50: color-mix(in oklch, var(--color-theme) 5%, white);
+  --theme-100: color-mix(in oklch, var(--color-theme) 12%, white);
+  --theme-200: color-mix(in oklch, var(--color-theme) 24%, white);
+  --theme-300: color-mix(in oklch, var(--color-theme) 40%, white);
+  --theme-400: color-mix(in oklch, var(--color-theme) 68%, white);
+  --theme-500: var(--color-theme);
+  --theme-600: color-mix(in oklch, var(--color-theme) 88%, black);
+  --theme-700: color-mix(in oklch, var(--color-theme) 72%, black);
+  --theme-800: color-mix(in oklch, var(--color-theme) 54%, black);
+  --theme-900: color-mix(in oklch, var(--color-theme) 38%, black);
+
+  color-scheme: light;
+  --site-canvas: #ffffff;
+  --site-surface: #ffffff;
+  --site-surface-muted: #f4f4f5;
+  --site-surface-subtle: #fafafa;
+  --site-text-primary: #27272a;
+  --site-text-secondary: #52525b;
+  --site-text-muted: #a1a1aa;
+  --site-text-inverse: #ffffff;
+  --site-border: #d4d4d8;
+  --site-border-strong: #71717a;
+  --site-focus: var(--theme-500);
+  --site-accent: var(--theme-700);
+  --site-accent-hover: var(--theme-600);
+  --site-accent-soft: var(--theme-100);
+  --site-accent-contrast: var(--theme-900);
+  --site-data-blue: #1d4ed8;
+  --site-data-red: #dc2626;
+  --site-data-green: #15803d;
+  --site-data-cyan: #0e7490;
+  --site-status-red-surface: #fef2f2;
+  --site-highlight: #fef08a;
+  --site-overlay-subtle: rgb(0 0 0 / 8%);
+  --terminal-canvas: #000000;
+  --terminal-text: #f4f4f5;
+  --terminal-muted: #71717a;
+  --terminal-command: #fed7aa;
+  --terminal-help: #a5f3fc;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --site-canvas: #18181b;
+  --site-surface: #27272a;
+  --site-surface-muted: #3f3f46;
+  --site-surface-subtle: #202023;
+  --site-text-primary: #f4f4f5;
+  --site-text-secondary: #d4d4d8;
+  --site-text-muted: #a1a1aa;
+  --site-text-inverse: #18181b;
+  --site-border: #52525b;
+  --site-border-strong: #a1a1aa;
+  --site-focus: var(--theme-400);
+  --site-accent: var(--theme-300);
+  --site-accent-hover: var(--theme-200);
+  --site-accent-soft: var(--theme-900);
+  --site-accent-contrast: var(--theme-50);
+  --site-data-blue: #93c5fd;
+  --site-data-red: #fca5a5;
+  --site-data-green: #86efac;
+  --site-data-cyan: #67e8f9;
+  --site-status-red-surface: #450a0a;
+  --site-highlight: #854d0e;
+  --site-overlay-subtle: rgb(255 255 255 / 10%);
+}
+
+@theme inline {
   --font-sans: "Schibsted Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --color-theme-50: var(--theme-50);
+  --color-theme-100: var(--theme-100);
+  --color-theme-200: var(--theme-200);
+  --color-theme-300: var(--theme-300);
+  --color-theme-400: var(--theme-400);
+  --color-theme-500: var(--theme-500);
+  --color-theme-600: var(--theme-600);
+  --color-theme-700: var(--theme-700);
+  --color-theme-800: var(--theme-800);
+  --color-theme-900: var(--theme-900);
+  --color-canvas: var(--site-canvas);
+  --color-surface: var(--site-surface);
+  --color-surface-muted: var(--site-surface-muted);
+  --color-surface-subtle: var(--site-surface-subtle);
+  --color-primary: var(--site-text-primary);
+  --color-secondary: var(--site-text-secondary);
+  --color-muted: var(--site-text-muted);
+  --color-inverse: var(--site-text-inverse);
+  --color-border: var(--site-border);
+  --color-border-strong: var(--site-border-strong);
+  --color-focus: var(--site-focus);
+  --color-accent: var(--site-accent);
+  --color-accent-hover: var(--site-accent-hover);
+  --color-accent-soft: var(--site-accent-soft);
+  --color-accent-contrast: var(--site-accent-contrast);
+  --color-data-blue: var(--site-data-blue);
+  --color-data-red: var(--site-data-red);
+  --color-data-green: var(--site-data-green);
+  --color-data-cyan: var(--site-data-cyan);
+  --color-status-red-surface: var(--site-status-red-surface);
+  --color-highlight: var(--site-highlight);
+  --color-overlay-subtle: var(--site-overlay-subtle);
+  --color-terminal-canvas: var(--terminal-canvas);
+  --color-terminal-text: var(--terminal-text);
+  --color-terminal-muted: var(--terminal-muted);
+  --color-terminal-command: var(--terminal-command);
+  --color-terminal-help: var(--terminal-help);
+
+  /* Existing content colors resolve through light/dark-aware tokens. */
+  --color-zinc-50: var(--site-surface-subtle);
+  --color-zinc-100: var(--site-surface-muted);
+  --color-zinc-200: var(--site-border);
+  --color-zinc-300: var(--site-border-strong);
+  --color-zinc-400: var(--site-text-muted);
+  --color-zinc-500: var(--site-text-secondary);
+  --color-zinc-600: var(--site-text-secondary);
+  --color-zinc-700: var(--site-text-secondary);
+  --color-zinc-800: var(--site-text-primary);
+  --color-zinc-900: var(--site-text-primary);
+  --color-blue-700: var(--site-data-blue);
+  --color-red-50: var(--site-status-red-surface);
+  --color-red-500: var(--site-data-red);
+  --color-red-600: var(--site-data-red);
+  --color-green-700: var(--site-data-green);
+  --color-cyan-700: var(--site-data-cyan);
+  --color-yellow-300: var(--site-highlight);
+}
+
+@utility hover-color {
+  &:hover {
+    color: var(--site-accent);
+  }
+}
+
+@utility group-hover-color {
+  .group:hover & {
+    color: var(--site-accent);
+  }
+}
+
+@utility notification-stripe {
+  background-color: var(--site-accent-soft);
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0,
+    transparent 6px,
+    var(--site-accent) 6px,
+    var(--site-accent) 7px
+  );
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--site-border);
+  }
+}
+
+/* Existing hover classes keep their role while their color follows the theme. */
+@layer utilities {
+  .hover\:text-zinc-600:hover,
+  .group:hover .group-hover\:text-zinc-600 {
+    color: var(--site-accent);
+  }
+
+  .hover\:border-zinc-600:hover,
+  .group:hover .group-hover\:border-zinc-600 {
+    border-color: var(--site-accent);
+  }
+}
+
+body {
+  background-color: var(--site-canvas);
+  color: var(--site-text-primary);
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
 }
 
 @keyframes terminal-enter {
@@ -25,12 +203,12 @@ table {
 
 th,
 td {
-  border: 1px solid #d1d5db; /* 薄いグレーの枠線 */
+  border: 1px solid var(--site-border);
   padding: 0.75rem;
 }
 
 th {
-  background-color: #f3f4f6; /* ヘッダーの背景色 */
+  background-color: var(--site-surface-muted);
   font-weight: bold;
 }
 
@@ -45,6 +223,7 @@ th {
 
 /* ページ全体のスクロールバーを非表示 */
 html {
+  background-color: var(--site-canvas);
   scrollbar-width: none;
 }
 

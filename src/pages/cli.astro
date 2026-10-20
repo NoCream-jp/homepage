@@ -3,24 +3,24 @@ import "../styles/global.css";
 ---
 
 <!doctype html>
-<html lang="ja" class="h-full bg-black">
+<html lang="ja" class="bg-terminal-canvas h-full">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Terminal</title>
   </head>
 
-  <body class="m-0 h-full overflow-hidden bg-black">
+  <body class="bg-terminal-canvas m-0 h-full overflow-hidden">
     <main
       id="terminal"
-      class="box-border h-dvh w-full bg-black p-[clamp(16px,3vw,40px)] font-['SFMono-Regular',Consolas,'Liberation_Mono',monospace] text-xs leading-[1.7] text-zinc-100 min-[481px]:text-sm"
+      class="bg-terminal-canvas text-terminal-text box-border h-dvh w-full p-[clamp(16px,3vw,40px)] font-['SFMono-Regular',Consolas,'Liberation_Mono',monospace] text-xs leading-[1.7] min-[481px]:text-sm"
     >
       <div
         id="terminal-scroll"
         class="no-scrollbar h-full scroll-pb-6 overflow-x-hidden overflow-y-auto scroll-smooth motion-reduce:scroll-auto"
       >
         <header
-          class="mb-[clamp(18px,3vh,32px)] animate-[terminal-enter_420ms_ease-out_both] text-zinc-100 motion-reduce:animate-none"
+          class="text-terminal-text mb-[clamp(18px,3vh,32px)] animate-[terminal-enter_420ms_ease-out_both] motion-reduce:animate-none"
           aria-label="Minato Hayashi"
         >
           <pre
@@ -44,7 +44,7 @@ import "../styles/global.css";
         >
           <label
             for="terminal-input"
-            class="shrink-0 whitespace-nowrap text-zinc-100"
+            class="text-terminal-text shrink-0 whitespace-nowrap"
           >
             guest/homepage&gt;
           </label>
@@ -55,15 +55,15 @@ import "../styles/global.css";
             autocomplete="off"
             autocapitalize="off"
             spellcheck="false"
-            class="min-w-0 flex-1 rounded-none border-0 bg-transparent p-0 text-orange-200 caret-zinc-100 outline-none [font:inherit]"
+            class="text-terminal-command caret-terminal-text min-w-0 flex-1 rounded-none border-0 bg-transparent p-0 outline-none [font:inherit]"
           />
         </form>
 
         <div
-          class="mt-2 animate-[terminal-enter_420ms_ease-out_both] text-[11px] text-zinc-500 motion-reduce:animate-none"
+          class="text-terminal-muted mt-2 animate-[terminal-enter_420ms_ease-out_both] text-[11px] motion-reduce:animate-none"
         >
-          type "<span class="font-bold text-cyan-300">help</span>" for commands
-          · Ctrl+D to exit
+          type "<span class="text-terminal-help font-bold">help</span>" for
+          commands · Ctrl+D to exit
         </div>
       </div>
     </main>
@@ -263,7 +263,7 @@ import "../styles/global.css";
 
       prompt.textContent = `${PROMPT} `;
       command.textContent = raw;
-      command.className = "text-orange-200";
+      command.className = "text-terminal-command";
 
       line.className = "min-h-[1lh]";
       line.appendChild(prompt);
