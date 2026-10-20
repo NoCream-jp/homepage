@@ -18,6 +18,7 @@
   --color-terminal-muted: #71717a;
   --color-terminal-command: #fed7aa;
   --color-terminal-help: #a5f3fc;
+  --color-theme-green-100: #d6fae3;
   --color-theme-green-500: #22c55e;
   --color-theme-green-600: #16a34a;
   --color-theme-green-700: #15803d;
@@ -44,6 +45,7 @@
   --color-theme-green-500: var(--color-theme-green-500);
   --color-theme-green-600: var(--color-theme-green-600);
   --color-theme-green-700: var(--color-theme-green-700);
+  --color-theme-green-100: var(--color-theme-green-100);
 
   /* Existing Tailwind color names resolve through the palette. */
   --color-black: var(--color-ink-black);
