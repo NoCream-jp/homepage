@@ -3,6 +3,7 @@
 /* Change this single RGB color to regenerate the complete theme scale. */
 :root {
   /* --color-theme: rgb(34 197 94); */
+  /* --color-theme: rgb(0 0 250); */
   --color-theme: black;
   --theme-50: color-mix(in oklch, var(--color-theme) 5%, white);
   --theme-100: color-mix(in oklch, var(--color-theme) 12%, white);
