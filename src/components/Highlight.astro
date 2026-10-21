@@ -5,7 +5,7 @@ interface Props {
 }
 
 // デフォルトの色を元の黄色（#fef08a）に設定
-const { color = "#fef08a" } = Astro.props;
+const { color = "var(--site-highlight)" } = Astro.props;
 ---
 
 <span

@@ -27,7 +27,6 @@ const notificationItems = [
     href: "/bio",
     banner: false,
   },
-
 ];
 ---
 
@@ -39,6 +38,25 @@ const notificationItems = [
 
     <title>{title}</title>
     <meta name="description" content={description} />
+
+    <script is:inline data-astro-rerun>
+      (() => {
+        const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+          .matches
+          ? "dark"
+          : "light";
+
+        try {
+          const savedTheme = localStorage.getItem("theme");
+          document.documentElement.dataset.theme =
+            savedTheme === "light" || savedTheme === "dark"
+              ? savedTheme
+              : systemTheme;
+        } catch {
+          document.documentElement.dataset.theme = systemTheme;
+        }
+      })();
+    </script>
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 

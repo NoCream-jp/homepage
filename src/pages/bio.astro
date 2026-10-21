@@ -59,9 +59,11 @@ actions.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
               <h2>What I saw</h2>
 
               <div class="w-full rounded-md border p-5">
-                <div class="flex flex-col w-full items-center justify-around gap-5">
-                  <div class="w-full flex items-center justify-center">
-                    <ImageStack images={sampleImages} maxWidth="150px"/>
+                <div
+                  class="flex w-full flex-col items-center justify-around gap-5"
+                >
+                  <div class="flex w-full items-center justify-center">
+                    <ImageStack images={sampleImages} maxWidth="150px" />
                   </div>
                   <div class="w-full">
                     各種SNSには、猫の画像や外出時に撮影した写真、その他趣味関連のお気に入りの画像を投稿しています。

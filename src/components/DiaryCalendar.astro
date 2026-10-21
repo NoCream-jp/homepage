@@ -84,16 +84,16 @@ const initialIndex = Math.max(labels.length - 1, 0);
 ---
 
 <div
-  class="@container flex h-auto w-full flex-col bg-white lg:h-full lg:min-h-0"
+  class="bg-canvas @container flex h-auto w-full flex-col lg:h-full lg:min-h-0"
   id="calendar-widget"
   data-initial-index={initialIndex}
 >
-  <div class="z-10 shrink-0 bg-white pb-2">
+  <div class="bg-canvas z-10 shrink-0 pb-2">
     <div class="flex items-center justify-between pb-3">
       <ChevronButton
         id="cal-prev"
         direction="left"
-        class="h-10 w-10 cursor-pointer rounded-full border p-1 text-black transition-colors hover:border-zinc-600 disabled:pointer-events-none disabled:opacity-0"
+        class="text-primary h-10 w-10 cursor-pointer rounded-full border p-1 transition-colors hover:border-zinc-600 disabled:pointer-events-none disabled:opacity-0"
         aria-label="前の月"
       />
 
@@ -108,7 +108,7 @@ const initialIndex = Math.max(labels.length - 1, 0);
       <ChevronButton
         id="cal-next"
         direction="right"
-        class="h-10 w-10 cursor-pointer rounded-full border p-1 text-black transition-colors hover:border-zinc-600 disabled:pointer-events-none disabled:opacity-0"
+        class="text-primary h-10 w-10 cursor-pointer rounded-full border p-1 transition-colors hover:border-zinc-600 disabled:pointer-events-none disabled:opacity-0"
         aria-label="次の月"
       />
     </div>
