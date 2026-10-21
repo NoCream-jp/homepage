@@ -150,7 +150,7 @@
     transparent 0,
     transparent 6px,
     var(--color-theme-100) 6px,
-    var(--color-theme-400) 7px
+    var(--color-theme-200) 7px
   );
 }
 
