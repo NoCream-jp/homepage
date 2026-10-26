@@ -1,7 +1,7 @@
 ---
 interface Props {
   name: string;
-  age: string | number;
+  birthYear: string | number;
   location: string;
   pronoun: string;
   study: string;
@@ -10,7 +10,7 @@ interface Props {
 
 const {
   name,
-  age,
+  birthYear,
   location,
   pronoun,
   study,
@@ -66,8 +66,8 @@ const {
         </div>
 
         <div class="flex gap-[2cqw] whitespace-nowrap">
-          <span class="w-[20cqw] text-right text-zinc-500"> age : </span>
-          <span>{age}</span>
+          <span class="w-[20cqw] text-right text-zinc-500"> birth year : </span>
+          <span>{birthYear}</span>
         </div>
 
         <div class="flex gap-[2cqw] whitespace-nowrap">
