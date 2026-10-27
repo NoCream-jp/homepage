@@ -150,8 +150,8 @@
     135deg,
     transparent 0,
     transparent 6px,
-    var(--color-theme-100) 6px,
-    var(--color-theme-200) 7px
+    var(--site-border) 6px,
+    var(--site-border) 7px
   );
 }
 
