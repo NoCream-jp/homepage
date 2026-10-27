@@ -93,7 +93,7 @@ const initialIndex = Math.max(labels.length - 1, 0);
       <ChevronButton
         id="cal-prev"
         direction="left"
-        class="text-primary h-10 w-10 cursor-pointer rounded-full border border-[var(--site-border)] p-1 transition-colors hover:border-[var(--site-border-strong)] disabled:pointer-events-none disabled:opacity-0"
+        class="text-primary h-10 w-10 cursor-pointer rounded-full border border-(--site-border) p-1 transition-colors hover:border-(--site-border-strong) disabled:pointer-events-none disabled:opacity-0"
         aria-label="前の月"
       />
 
@@ -108,7 +108,7 @@ const initialIndex = Math.max(labels.length - 1, 0);
       <ChevronButton
         id="cal-next"
         direction="right"
-        class="text-primary h-10 w-10 cursor-pointer rounded-full border border-[var(--site-border)] p-1 transition-colors hover:border-[var(--site-border-strong)] disabled:pointer-events-none disabled:opacity-0"
+        class="text-primary h-10 w-10 cursor-pointer rounded-full border border-(--site-border) p-1 transition-colors hover:border-(--site-border-strong) disabled:pointer-events-none disabled:opacity-0"
         aria-label="次の月"
       />
     </div>
@@ -146,7 +146,7 @@ const initialIndex = Math.max(labels.length - 1, 0);
                   <div class="aspect-3/4 rounded bg-zinc-50 md:aspect-square" />
                 ) : (
                   <div
-                    class="relative flex aspect-3/4 flex-col overflow-hidden rounded border border-[var(--site-border)] p-1 md:aspect-square"
+                    class="relative flex aspect-3/4 flex-col overflow-hidden rounded border border-(--site-border) p-1 md:aspect-square"
                     data-date={cell.key}
                   >
                     <div class="flex shrink-0 justify-start">
@@ -261,8 +261,8 @@ const initialIndex = Math.max(labels.length - 1, 0);
       const todayCell = todayCellGeneric as HTMLElement;
       todayCell.dataset.today = "true";
 
-      todayCell.classList.remove("border", "border-[var(--site-border)]");
-      todayCell.classList.add("border-3", "border-[var(--site-border-strong)]");
+      todayCell.classList.remove("border", "border-(--site-border)");
+      todayCell.classList.add("border-3", "border-(--site-border-strong)");
     }
 
     const initialIndexAttr = parseInt(widget.dataset.initialIndex || "0", 10);

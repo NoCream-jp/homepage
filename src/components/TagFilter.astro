@@ -21,7 +21,7 @@ const { tags = [], selector = ".post-item", initial = null } = Astro.props;
     data-tag="all"
     data-active="false"
     aria-pressed="false"
-    class="tag-btn cursor-pointer rounded-full border border-[var(--site-border)] px-3 py-1 text-xs transition"
+    class="tag-btn cursor-pointer rounded-full border border-(--site-border) px-3 py-1 text-xs transition"
     type="button"
   >
     All
@@ -33,7 +33,7 @@ const { tags = [], selector = ".post-item", initial = null } = Astro.props;
         data-tag={tag}
         data-active="false"
         aria-pressed="false"
-        class="tag-btn cursor-pointer rounded-full border border-[var(--site-border)] px-3 py-1 text-xs transition"
+        class="tag-btn cursor-pointer rounded-full border border-(--site-border) px-3 py-1 text-xs transition"
         type="button"
       >
         {tag}

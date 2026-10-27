@@ -25,10 +25,10 @@ const Tag = disabled ? "div" : "a";
     rel: "noopener noreferrer",
   }}
   class:list={[
-    "group h-full max-h-15 w-auto self-stretch rounded-md border border-[var(--site-border)] px-3 py-2",
+    "group h-full max-h-15 w-auto self-stretch rounded-md border border-(--site-border) px-3 py-2",
     disabled
       ? "cursor-default bg-zinc-100"
-      : `${bg} hover:border-[var(--site-border-strong)]`,
+      : `${bg} hover:border-(--site-border-strong)`,
   ]}
 >
   <div

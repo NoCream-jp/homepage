@@ -13,13 +13,13 @@ const safeImages = images
 ---
 
 <div
-  class="illustration-viewer relative my-3 flex aspect-4/3 w-full flex-col overflow-hidden rounded-xl border border-[var(--site-border)] bg-black md:aspect-video"
+  class="illustration-viewer relative my-3 flex aspect-4/3 w-full flex-col overflow-hidden rounded-xl border border-(--site-border) bg-black md:aspect-video"
   style={maxHeight ? `max-height: ${maxHeight};` : undefined}
   data-total={safeImages.length}
 >
   {
     safeImages.length === 0 ? (
-      <div class="flex h-full w-full flex-col items-center justify-center rounded-xl border border-[var(--site-border)] bg-black text-zinc-500">
+      <div class="flex h-full w-full flex-col items-center justify-center rounded-xl border border-(--site-border) bg-black text-zinc-500">
         <span class="text-xs font-medium tracking-wider uppercase">
           No Illustration
         </span>
