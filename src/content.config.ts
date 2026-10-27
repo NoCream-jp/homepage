@@ -1,67 +1,58 @@
-import { defineCollection, z } from "astro:content";
+import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
+import { z } from "astro/zod";
 
-const blogCollection = defineCollection({
-  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/blog" }),
+// ブログ記事
+const blog = defineCollection({
+  loader: glob({
+    pattern: "**/*.{md,mdx}",
+    base: "./src/content/blog",
+  }),
+
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      date: z.coerce.date(),
+      draft: z.boolean().optional().default(false),
+      description: z.string().optional(),
+      image: z.string().optional(),
+      images: z.array(image()).optional(),
+      tags: z.array(z.string()).default([]),
+    }),
+});
+
+// 活動履歴
+const action = defineCollection({
+  loader: glob({
+    pattern: "**/*.{md,mdx}",
+    base: "./src/content/action",
+  }),
 
   schema: z.object({
     title: z.string(),
-    date: z.date(),
-    draft: z.boolean().optional(),
-    description: z.string().optional(),
-
-    image: z.string().optional(),
-
-    images: z.array(z.string()).optional(),
-
-    tags: z.array(z.string()).default([]),
-  }),
-});
-
-// const newsCollection = defineCollection({
-//   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/news" }),
-//   schema: z.object({
-//     title: z.string(),
-//     date: z.date(),
-//     href: z.string().optional(),
-//   }),
-// });
-
-const actionCollection = defineCollection({
-  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/action" }),
-  schema: z.object({
-    title: z.string(),
-    date: z.date(),
+    date: z.coerce.date(),
     description: z.string().optional(),
   }),
 });
 
-// const achievementCollection = defineCollection({
-//   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/achievement" }),
-//   schema: z.object({
-//     title: z.string(),
-//     date: z.date(),
-//   }),
-// });
-
-const learningCollection = defineCollection({
+// 学習履歴
+const learning = defineCollection({
   loader: glob({
     pattern: "**/*.{md,mdx}",
     base: "./src/content/learning",
   }),
+
   schema: z.object({
     title: z.string().optional(),
     logo: z.string().optional(),
-    date: z.union([z.string(), z.date()]).optional(),
+    date: z.union([z.string(), z.coerce.date()]).optional(),
     tags: z.array(z.string()).optional(),
     order: z.number().optional(),
   }),
 });
 
 export const collections = {
-  blog: blogCollection,
-  // news: newsCollection,
-  "action-log": actionCollection,
-  // achievement: achievementCollection,
-  learning: learningCollection,
+  blog,
+  action,
+  learning,
 };
