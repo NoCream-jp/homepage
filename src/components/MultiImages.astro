@@ -39,7 +39,12 @@ const baseAngle = -maxAngle / 2;
       <div />
     ) : (
       displayImages.map((img, i) => {
-        const src = typeof img === "object" && img?.src ? img.src : img;
+        const src =
+          typeof img === "string"
+            ? img
+            : typeof img?.src === "string"
+              ? img.src
+              : "";
 
         const angle = count > 1 ? baseAngle + step * i : 0;
 
