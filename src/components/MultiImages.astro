@@ -17,7 +17,7 @@ const baseAngle = -maxAngle / 2;
 <div class="relative flex h-full w-full items-center justify-center">
   {
     displayImages.length === 0 ? (
-      // <div class="flex flex-col items-center justify-center gap-1 rounded-md border border-zinc-800 bg-zinc-50 px-2 py-2 text-zinc-400">
+      // <div class="flex flex-col items-center justify-center gap-1 rounded-md border border-[var(--site-border-strong)] bg-zinc-50 px-2 py-2 text-zinc-400">
       //   <svg
       //     xmlns="http://www.w3.org/2000/svg"
       //     fill="none"
@@ -50,7 +50,7 @@ const baseAngle = -maxAngle / 2;
           <img
             src={src}
             alt=""
-            class="bg-surface absolute h-10 w-10 rounded-md border border-zinc-500 object-cover shadow-sm transition-transform"
+            class="bg-surface absolute h-10 w-10 rounded-md border border-[var(--site-border-strong)] object-cover shadow-sm transition-transform"
             style={`
               transform:
                 rotate(${angle}deg)

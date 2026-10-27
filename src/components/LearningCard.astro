@@ -46,7 +46,7 @@ const initials = initialsOf(String(title));
 ---
 
 <article
-  class="cert-card group bg-surface relative flex w-full min-w-0 items-center gap-4 overflow-hidden rounded-md border px-4 py-3 transition-colors duration-150 ease-out focus-within:outline-none"
+  class="cert-card group bg-surface relative flex w-full min-w-0 items-center gap-4 overflow-hidden rounded-md border border-[var(--site-border)] px-4 py-3 transition-colors duration-150 ease-out focus-within:outline-none"
   role="article"
   aria-labelledby={`learning-title-${item.id}`}
   data-logo={String(logoSrc ?? rawLogo ?? "")}
@@ -65,7 +65,7 @@ const initials = initialsOf(String(title));
           />
           <div
             style="display:none"
-            class="bg-surface-muted flex h-10 w-10 items-center justify-center rounded-md border text-sm font-medium text-zinc-900"
+            class="bg-surface-muted flex h-10 w-10 items-center justify-center rounded-md border border-[var(--site-border)] text-sm font-medium text-zinc-900"
             aria-hidden="true"
           >
             {initials}
@@ -73,7 +73,7 @@ const initials = initialsOf(String(title));
         </>
       ) : (
         <div
-          class="bg-surface-muted flex h-10 w-10 items-center justify-center rounded-md border text-sm font-medium text-zinc-900"
+          class="bg-surface-muted flex h-10 w-10 items-center justify-center rounded-md border border-[var(--site-border)] text-sm font-medium text-zinc-900"
           aria-hidden="true"
         >
           {initials}

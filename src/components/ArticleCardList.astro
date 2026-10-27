@@ -14,8 +14,8 @@ const { posts } = Astro.props;
     posts.map((post, i) => (
       <div
         class:list={[
-          "post-item border-t",
-          i === posts.length - 1 ? "border-b" : "",
+          "post-item border-t border-[var(--site-border)]",
+          i === posts.length - 1 ? "border-b border-[var(--site-border)]" : "",
         ]}
         data-tags={(post.data.tags ?? []).join(",")}
       >
