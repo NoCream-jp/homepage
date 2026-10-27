@@ -2,7 +2,7 @@ import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
-// ブログ記事
+// ブログ
 const blog = defineCollection({
   loader: glob({
     pattern: "**/*.{md,mdx}",
@@ -13,7 +13,7 @@ const blog = defineCollection({
     z.object({
       title: z.string(),
       date: z.coerce.date(),
-      draft: z.boolean().optional().default(false),
+      draft: z.boolean().optional(),
       description: z.string().optional(),
       image: z.string().optional(),
       images: z.array(image()).optional(),
@@ -22,7 +22,7 @@ const blog = defineCollection({
 });
 
 // 活動履歴
-const action = defineCollection({
+const actionLog = defineCollection({
   loader: glob({
     pattern: "**/*.{md,mdx}",
     base: "./src/content/action",
@@ -51,8 +51,9 @@ const learning = defineCollection({
   }),
 });
 
+// コレクション登録名は既存コードに合わせる
 export const collections = {
   blog,
-  action,
+  "action-log": actionLog,
   learning,
 };
