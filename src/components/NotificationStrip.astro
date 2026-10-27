@@ -13,7 +13,10 @@ const bannerItem = {
 
 {
   shouldRender && (
-    <nav aria-label="site notifications" class="bg-surface w-full border-y">
+    <nav
+      aria-label="site notifications"
+      class="bg-surface w-full border-y border-(--site-border)"
+    >
       <div class="mx-auto">
         <div
           class="notif-scroll no-scrollbar relative overflow-x-auto"
@@ -39,7 +42,7 @@ const bannerItem = {
                   >
                     {isBanner ? (
                       <div
-                        class="notif-banner notification-stripe text-accent-contrast inline-flex h-10 items-center justify-center border-r px-4"
+                        class="notif-banner notification-stripe text-accent-contrast inline-flex h-10 items-center justify-center border-r border-(--site-border) px-4"
                         aria-hidden="false"
                       >
                         <span class="notif-banner-title text-xs font-semibold tracking-wide">
@@ -60,7 +63,7 @@ const bannerItem = {
                     isLink ? (
                       <a
                         href={it.href}
-                        class="notif-link group bg-surface inline-flex h-10 items-center gap-4 border-r px-4 py-2"
+                        class="notif-link group bg-surface inline-flex h-10 items-center gap-4 border-r border-(--site-border) px-4 py-2"
                         aria-label={`${it.section ?? ""} ${it.title ?? ""}`}
                       >
                         <span class="notif-section block text-xs tracking-wide text-zinc-400">
@@ -94,7 +97,7 @@ const bannerItem = {
                       </a>
                     ) : (
                       <div
-                        class="notif-link group bg-surface inline-flex h-10 items-center gap-4 border-r px-4 py-2"
+                        class="notif-link group bg-surface inline-flex h-10 items-center gap-4 border-r border-(--site-border) px-4 py-2"
                         role="group"
                         tabindex="0"
                         aria-label={`${it.section ?? ""} ${it.title ?? ""}`}

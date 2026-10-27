@@ -20,7 +20,7 @@ const uid = `taglist-${Math.random().toString(36).slice(2, 9)}`;
     <div class="flex items-center gap-1">
       {" "}
       {tags.map((tag: unknown) => (
-        <span class="bg-surface rounded-full border px-2 py-0.5 text-[10px]">
+        <span class="bg-surface rounded-full border border-(--site-border) px-2 py-0.5 text-[10px]">
           {" "}
           {tag}{" "}
         </span>
@@ -32,11 +32,11 @@ const uid = `taglist-${Math.random().toString(36).slice(2, 9)}`;
 <!-- {tags.length > 0 && (
   <div id={uid} class="taglist-root inline-block">
     <div class="taglist-compact flex items-center gap-1 sm:hidden">
-      <span class="inline-flex items-center whitespace-nowrap rounded-full border bg-white px-2 py-0.5 text-[10px]">
+      <span class="inline-flex items-center whitespace-nowrap rounded-full border border-(--site-border) bg-white px-2 py-0.5 text-[10px]">
         {tags[0]}
       </span>
       {overflowTotal > 0 && (
-        <span class="inline-flex items-center border-white whitespace-nowrap rounded-full bg-white px-2 py-0.5 text-[10px]">
+      <span class="inline-flex items-center border-(--site-border) whitespace-nowrap rounded-full bg-white px-2 py-0.5 text-[10px]">
           + {overflowTotal}
         </span>
       )}
@@ -44,7 +44,7 @@ const uid = `taglist-${Math.random().toString(36).slice(2, 9)}`;
 
     <div class="taglist-full hidden sm:flex items-center gap-1">
       {tags.map((tag) => (
-        <span class="inline-flex items-center whitespace-nowrap rounded-full border bg-white px-2 py-0.5 text-[10px]" title={String(tag)}>
+      <span class="inline-flex items-center whitespace-nowrap rounded-full border border-(--site-border) bg-white px-2 py-0.5 text-[10px]" title={String(tag)}>
           {tag}
         </span>
       ))}

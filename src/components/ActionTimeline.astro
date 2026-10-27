@@ -21,7 +21,7 @@ const formatDate = (date: Date) =>
     </span>
   </div> -->
 
-  <div class="relative rounded-md border p-5">
+  <div class="relative rounded-md border border-(--site-border) p-5">
     <div
       class="absolute top-8 bottom-6 left-6 w-px bg-zinc-200"
       aria-hidden="true"
@@ -32,7 +32,7 @@ const formatDate = (date: Date) =>
         items.map((item) => (
           <li class="relative grid grid-cols-[1.25rem_minmax(0,1fr)] gap-3">
             <span
-              class="border-surface mt-1.5 h-2.5 w-2.5 rounded-full border-2 bg-zinc-400 ring-1 ring-zinc-300"
+              class="mt-1.5 h-2.5 w-2.5 rounded-full border-2 border-(--site-border-strong) bg-zinc-400 ring-1 ring-zinc-300"
               aria-hidden="true"
             />
             <div class="min-w-0">
