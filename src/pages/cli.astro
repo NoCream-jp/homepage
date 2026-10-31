@@ -92,7 +92,7 @@ import "../styles/global.css";
     if (terminal.dataset.initialized === "true") return;
     terminal.dataset.initialized = "true";
 
-    const PROMPT = "guest@portfolio:~$";
+    const PROMPT = "guest/homepage>";
 
     const history: string[] = [];
     let historyIndex = 0;
@@ -324,7 +324,7 @@ import "../styles/global.css";
         print(
           [
             "  help          Show available commands",
-            "  ls            List files",
+            "  ls            what are in this site",
             "  cat <file>    Display file contents",
             "  pwd           Print working directory",
             "  whoami        Print current user",
@@ -348,7 +348,9 @@ import "../styles/global.css";
       },
 
       ls: () => {
-        print(Object.keys(files).join("  "));
+        print(
+          ["top/", "blog/", "bio/", "work/", "cli/  <- you are here"].join("\n")
+        );
       },
 
       cat: (args) => {
