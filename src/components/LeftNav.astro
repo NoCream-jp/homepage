@@ -46,7 +46,7 @@ const isActive = (href: string) => {
     }
     <div class="flex items-center lg:hidden">
       <button
-        id="theme-toggle"
+        data-theme-toggle
         type="button"
         class="bg-surface text-secondary hover:border-accent hover:text-accent flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-(--site-border) transition-colors"
         aria-label="Switch to dark theme"
@@ -133,7 +133,7 @@ const isActive = (href: string) => {
         </svg>
       </a>
       <button
-        id="theme-toggle"
+        data-theme-toggle
         type="button"
         class="bg-surface text-secondary hover:border-accent hover:text-accent flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-(--site-border) transition-colors"
         aria-label="Switch to dark theme"
@@ -170,36 +170,45 @@ const isActive = (href: string) => {
 
 <script>
   const setupThemeToggle = () => {
-    const button = document.getElementById("theme-toggle");
-    if (!(button instanceof HTMLButtonElement)) return;
-
+    const buttons = document.querySelectorAll<HTMLButtonElement>(
+      "[data-theme-toggle]"
+    );
     const root = document.documentElement;
-    const sunIcon = button.querySelector<SVGElement>("[data-theme-sun]");
-    const moonIcon = button.querySelector<SVGElement>("[data-theme-moon]");
 
     const renderTheme = () => {
       const isDark = root.dataset.theme === "dark";
-      button.setAttribute("aria-pressed", String(isDark));
-      button.setAttribute(
-        "aria-label",
-        isDark ? "Switch to light theme" : "Switch to dark theme"
-      );
-      sunIcon?.classList.toggle("hidden", isDark);
-      moonIcon?.classList.toggle("hidden", !isDark);
+
+      buttons.forEach((button) => {
+        button.setAttribute("aria-pressed", String(isDark));
+        button.setAttribute(
+          "aria-label",
+          isDark ? "Switch to light theme" : "Switch to dark theme"
+        );
+
+        const sunIcon = button.querySelector("[data-theme-sun]");
+        const moonIcon = button.querySelector("[data-theme-moon]");
+        sunIcon?.classList.toggle("hidden", isDark);
+        moonIcon?.classList.toggle("hidden", !isDark);
+      });
     };
 
-    renderTheme();
+    buttons.forEach((button) => {
+      if (button.dataset.themeToggleBound === "true") return;
+      button.dataset.themeToggleBound = "true";
 
-    if (button.dataset.themeToggleBound === "true") return;
-    button.dataset.themeToggleBound = "true";
-    button.addEventListener("click", () => {
-      const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
-      root.dataset.theme = nextTheme;
-      try {
-        localStorage.setItem("theme", nextTheme);
-      } catch {}
-      renderTheme();
+      button.addEventListener("click", () => {
+        const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
+        root.dataset.theme = nextTheme;
+
+        try {
+          localStorage.setItem("theme", nextTheme);
+        } catch {}
+
+        renderTheme();
+      });
     });
+
+    renderTheme();
   };
 
   setupThemeToggle();
