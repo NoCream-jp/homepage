@@ -324,7 +324,8 @@ import "../styles/global.css";
         print(
           [
             "  help          Show available commands",
-            "  ls            what are in this site",
+            "  ls            What are in this site",
+            "  cd            Navigate to a specific page",
             "  cat <file>    Display file contents",
             "  pwd           Print working directory",
             "  whoami        Print current user",
@@ -353,6 +354,33 @@ import "../styles/global.css";
         );
       },
 
+      cd: (args) => {
+        const routes: Record<string, string> = {
+          top: "/",
+          blog: "/blog",
+          bio: "/bio",
+          work: "/work",
+          cli: "/cli",
+          "..": "/",
+          "~": "/",
+        };
+
+        if (args.length === 0) {
+          window.location.assign("/");
+          return;
+        }
+
+        const directory = args[0].replace(/^\/+|\/+$/g, "");
+        const destination = routes[directory];
+
+        if (destination === undefined) {
+          print(`cd: ${args[0]}: No such directory`);
+          return;
+        }
+
+        window.location.assign(destination);
+      },
+
       cat: (args) => {
         if (args.length === 0) {
           print("cat: missing file operand");
@@ -369,7 +397,7 @@ import "../styles/global.css";
       },
 
       pwd: () => {
-        print("/home/guest");
+        print("/home/cli");
       },
 
       whoami: () => {
@@ -434,7 +462,7 @@ import "../styles/global.css";
       whoareyou: "Profile",
     };
 
-    const silentCommands = new Set(["clear", "home", "exit"]);
+    const silentCommands = new Set(["clear", "home", "exit", "cd"]);
 
     // 入力されたコマンドを実行する
     const execute = (raw: string) => {
