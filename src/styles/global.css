@@ -39,6 +39,8 @@
   --site-status-red-surface: #fef2f2;
   --site-highlight: #fef08a;
   --site-overlay-subtle: rgb(0 0 0 / 8%);
+  --site-notification-stripe-line: var(--site-text-muted);
+
   --terminal-canvas: #000000;
   --terminal-text: #f4f4f5;
   --terminal-muted: #71717a;
@@ -70,6 +72,7 @@
   --site-status-red-surface: #450a0a;
   --site-highlight: #854d0e;
   --site-overlay-subtle: rgb(255 255 255 / 10%);
+  --site-notification-stripe-line: var(--site-border);
 }
 
 @theme inline {
@@ -150,8 +153,8 @@
     135deg,
     transparent 0,
     transparent 6px,
-    var(--site-border) 6px,
-    var(--site-border) 7px
+    var(--site-notification-stripe-line) 6px,
+    var(--site-notification-stripe-line) 7px
   );
 }
 
