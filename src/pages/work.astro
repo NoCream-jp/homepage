@@ -10,7 +10,14 @@ import IllustGallery from "../components/IllustGallery.astro";
 const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
 
-const items = [
+// 記事用画像
+const ArticleItems = [
+  "/images/gallery/wcpc_site.png",
+  "/images/gallery/wcpc_article.png",
+];
+
+// AIイラストギャラリー展示用画像
+const AIItems = [
   "/images/gallery/orange.png",
   "/images/gallery/green.png",
   "/images/gallery/purple.png",
@@ -36,13 +43,15 @@ const items = [
         <h1 class="mb-4 text-2xl font-semibold text-zinc-800">work</h1>
 
         <div class="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto">
-          <div class="w-full">
-            <section class="mt-5 flex h-full w-full flex-col gap-4">
-              <h2>gallery (AI illusts)</h2>
-              <!-- <ImageStack images={items} maxWidth="400px" /> -->
-              <IllustGallery images={items} maxHeight="350px" />
-            </section>
-          </div>
+          <section class="mt-5 mb-2 flex h-full w-full flex-col gap-4">
+            <h2>Article</h2>
+            <IllustGallery images={ArticleItems} maxHeight="350px" />
+          </section>
+          <section class="mt-5 mb-2 flex h-full w-full flex-col gap-4">
+            <h2>gallery (AI illusts)</h2>
+            <!-- <ImageStack images={items} maxWidth="400px" /> -->
+            <IllustGallery images={AIItems} maxHeight="350px" />
+          </section>
         </div>
       </main>
     </div>
