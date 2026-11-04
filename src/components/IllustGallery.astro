@@ -4,12 +4,22 @@ interface Props {
   maxHeight?: string;
 }
 
+interface GalleryImage {
+  src: string;
+  href?: string;
+}
+
 const { images = [], maxHeight } = Astro.props;
 
 // 空データを除外し、パス文字列を抽出した配列を作成
 const safeImages = images
   .filter(Boolean)
-  .map((img) => (typeof img === "object" && img.src ? img.src : img));
+  .map(
+    (img): GalleryImage =>
+      typeof img === "object" && img.src
+        ? { src: img.src, href: img.href }
+        : { src: img }
+  );
 ---
 
 <div
@@ -61,7 +71,7 @@ const safeImages = images
 
         {/* 画像コンテナ */}
         <div class="relative h-full w-full">
-          {safeImages.map((src, index) => (
+          {safeImages.map(({ src, href }, index) => (
             <div
               class={`slide absolute inset-0 h-full w-full transition-opacity duration-700 ease-in-out ${
                 index === 0
@@ -85,38 +95,94 @@ const safeImages = images
               />
 
               {/* 中央のメインイラスト */}
-              <img
-                src={src}
-                alt={`Illustration ${index + 1}`}
-                class="relative z-10 h-full w-full object-contain p-4 drop-shadow-2xl transition-transform duration-700 ease-out md:p-8"
-                loading={index === 0 ? "eager" : "lazy"}
-              />
+              {href ? (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  class="group relative z-10 block h-full w-full cursor-pointer"
+                  aria-label={`Open illustration ${index + 1} link`}
+                >
+                  <img
+                    src={src}
+                    alt={`Illustration ${index + 1}`}
+                    class="relative h-full w-full object-contain p-4 drop-shadow-2xl transition-transform duration-700 ease-out md:p-8"
+                    loading={index === 0 ? "eager" : "lazy"}
+                  />
+                  <span class="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/10 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                      class="h-12 w-12 drop-shadow-lg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M13.5 6H18m0 0v4.5M18 6l-6.75 6.75M19.5 13.5V18a1.5 1.5 0 0 1-1.5 1.5H6A1.5 1.5 0 0 1 4.5 18V6A1.5 1.5 0 0 1 6 4.5h4.5"
+                      />
+                    </svg>
+                  </span>
+                </a>
+              ) : (
+                <img
+                  src={src}
+                  alt={`Illustration ${index + 1}`}
+                  class="relative z-10 h-full w-full object-contain p-4 drop-shadow-2xl transition-transform duration-700 ease-out md:p-8"
+                  loading={index === 0 ? "eager" : "lazy"}
+                />
+              )}
             </div>
           ))}
         </div>
 
         {/* 複数枚ある場合のみ、Nextボタンを下部に表示 */}
         {1 < safeImages.length && (
-          <button
-            class="next-btn absolute right-4 bottom-4 z-20 flex h-10 cursor-pointer items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-medium text-black transition-all hover:text-zinc-600"
-            aria-label="次の画像を見る"
-          >
-            Next
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="2"
-              stroke="currentColor"
-              class="h-4 w-4"
+          <>
+            <button
+              class="previous-btn absolute bottom-4 left-4 z-20 flex h-10 cursor-pointer items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-medium text-black transition-all hover:text-zinc-600"
+              aria-label="Previous illustration"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m8.25 4.5 7.5 7.5-7.5 7.5"
-              />
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                class="h-4 w-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m15.75 4.5-7.5 7.5 7.5 7.5"
+                />
+              </svg>
+              Previous
+            </button>
+            <button
+              class="next-btn absolute right-4 bottom-4 z-20 flex h-10 cursor-pointer items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-medium text-black transition-all hover:text-zinc-600"
+              aria-label="次の画像を見る"
+            >
+              Next
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                class="h-4 w-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+              </svg>
+            </button>
+          </>
         )}
 
         {/* ライトボックス */}
@@ -172,7 +238,28 @@ const safeImages = images
 
       // スライダー操作要素
       const nextBtn = viewer.querySelector(".next-btn");
+      const previousBtn = viewer.querySelector(".previous-btn");
       const counter = viewer.querySelector(".current-index");
+
+      const showSlide = (nextIndex: number) => {
+        slides[currentIndex].classList.remove("z-10", "opacity-100");
+        slides[currentIndex].classList.add(
+          "pointer-events-none",
+          "z-0",
+          "opacity-0"
+        );
+
+        currentIndex = nextIndex;
+
+        slides[currentIndex].classList.remove(
+          "pointer-events-none",
+          "z-0",
+          "opacity-0"
+        );
+        slides[currentIndex].classList.add("z-10", "opacity-100");
+
+        if (counter) counter.textContent = String(currentIndex + 1);
+      };
 
       // ライトボックス操作要素
       const expandBtn = viewer.querySelector(".expand-btn");
@@ -184,27 +271,15 @@ const safeImages = images
 
       // Nextボタンの処理 (複数枚ある時のみ)
       if (nextBtn && total > 1) {
-        nextBtn.addEventListener("click", () => {
-          slides[currentIndex].classList.remove("z-10", "opacity-100");
-          slides[currentIndex].classList.add(
-            "pointer-events-none",
-            "z-0",
-            "opacity-0"
-          );
+        nextBtn.addEventListener("click", () =>
+          showSlide((currentIndex + 1) % total)
+        );
+      }
 
-          currentIndex = (currentIndex + 1) % total;
-
-          slides[currentIndex].classList.remove(
-            "pointer-events-none",
-            "z-0",
-            "opacity-0"
-          );
-          slides[currentIndex].classList.add("z-10", "opacity-100");
-
-          if (counter) {
-            counter.textContent = String(currentIndex + 1);
-          }
-        });
+      if (previousBtn && total > 1) {
+        previousBtn.addEventListener("click", () =>
+          showSlide((currentIndex - 1 + total) % total)
+        );
       }
 
       // 拡大ボタン（ライトボックス）の処理
