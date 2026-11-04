@@ -13,11 +13,21 @@ export async function GET(context) {
     title: "mi-nato.com",
     description: "Minato Hayashi's individual website",
     site: context.site,
-    items: posts.map((post) => ({
-      title: post.data.title,
-      pubDate: new Date(post.data.date),
-      description: post.data.description ?? "",
-      link: `/blog/${post.id}/`,
-    })),
+    items: posts.map((post) => {
+      const firstImage = post.data.images?.[0];
+      const imageSrc =
+        typeof firstImage === "string" ? firstImage : firstImage?.src;
+      const imageUrl = imageSrc
+        ? new URL(imageSrc, context.site).href
+        : undefined;
+
+      return {
+        title: post.data.title,
+        pubDate: new Date(post.data.date),
+        description: post.data.description ?? "",
+        link: `/blog/${post.id}/`,
+        content: imageUrl ? `<p><img src="${imageUrl}" /></p>` : undefined,
+      };
+    }),
   });
 }
