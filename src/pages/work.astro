@@ -10,19 +10,22 @@ import IllustGallery from "../components/IllustGallery.astro";
 const title = "Minato Hayashi";
 const description = "Minato Hayashi's portfolio and blog";
 
-// 記事用画像
+// 記事ページのギャラリー展示用画像
 const ArticleItems = [
-  "/images/gallery/wcpc_site.png",
-  "/images/gallery/wcpc_article.png",
+  { src: "/images/gallery/wcpc_site.png", href: "https://wcpc.pages.dev" },
+  {
+    src: "/images/gallery/wcpc_article.png",
+    href: "https://wcpc.pages.dev/activities/abc467-log/",
+  },
 ];
 
-// AIイラストギャラリー展示用画像
+// AIイラストのギャラリー展示用画像
 const AIItems = [
-  "/images/gallery/orange.png",
-  "/images/gallery/green.png",
-  "/images/gallery/purple.png",
-  "/images/gallery/pink.png",
-  "/images/gallery/white.png",
+  { src: "/images/gallery/orange.png" },
+  { src: "/images/gallery/green.png" },
+  { src: "/images/gallery/purple.png" },
+  { src: "/images/gallery/pink.png" },
+  { src: "/images/gallery/white.png" },
 ];
 ---
 
