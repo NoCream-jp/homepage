@@ -61,10 +61,12 @@ const ogImage = imageOverride ?? (await getOgImage(href));
   href={href}
   target="_blank"
   rel="noopener noreferrer"
-  class="group mb-2 flex items-center gap-3 rounded-lg border border-(--site-border) px-4 py-4 transition-colors hover:border-(--site-border-strong)"
+  class="group mb-2 flex items-center gap-3 rounded-md border border-(--site-border) px-4 py-4 transition-colors hover:border-(--site-border-strong)"
 >
   <!-- アイコン部分 -->
-  <span class="bg-canvas aspect-5/3 w-24 flex-none overflow-hidden rounded-lg">
+  <span
+    class="bg-canvas flex aspect-5/3 w-24 flex-none items-center justify-center overflow-hidden"
+  >
     <!-- {
       showFavicon && faviconUrl ? (
         <img
@@ -101,7 +103,7 @@ const ogImage = imageOverride ?? (await getOgImage(href));
         <img
           src={ogImage}
           alt=""
-          class="h-full w-full object-contain"
+          class="h-full object-contain"
           loading="lazy"
         />
       ) : (
