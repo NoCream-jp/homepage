@@ -90,14 +90,14 @@ const formattedDate = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2,
   :global(.blog-content h2) {
     font-size: 1.1rem;
     font-weight: 500;
-    margin-top: 1.2rem;
+    margin-top: 1.3rem;
     margin-bottom: 0.5rem;
   }
   :global(.blog-content h3) {
     font-size: 1rem;
     font-weight: 500;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    margin-top: 1.2rem;
+    margin-bottom: 0.5rem;
   }
   :global(.blog-content ul) {
     list-style-type: disc;
@@ -150,5 +150,11 @@ const formattedDate = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2,
   :global(.no-scrollbar::-webkit-scrollbar-thumb) {
     background: var(--site-overlay-subtle);
     border-radius: 999px;
+  }
+  :global(.blog-content pre) {
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    margin-top: 0px;
   }
 </style>
