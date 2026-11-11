@@ -55,7 +55,7 @@ const isActive = (href: string) => {
       <button
         data-leftnav-collapse
         type="button"
-        class="bg-site-canvas text-secondary hover:text-accent focus-visible:outline-focus hidden shrink-0 cursor-pointer items-center justify-center rounded-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+        class="bg-site-canvas text-secondary hover:text-accent focus-visible:outline-focus hidden size-9 shrink-0 cursor-pointer items-center justify-center rounded-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
         aria-label="Collapse navigation"
         aria-controls="leftnav"
         aria-expanded="true"
@@ -204,14 +204,14 @@ const isActive = (href: string) => {
 <button
   data-leftnav-expand
   type="button"
-  class="bg-site-canvas text-secondary hover:text-accent rouded-sm focus-visible:outline-focus hidden size-11 shrink-0 cursor-pointer items-center justify-center transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+  class="bg-site-canvas text-secondary hover:text-accent focus-visible:outline-focus absolute top-1/2 left-0 z-20 hidden size-9 shrink-0 -translate-y-1/2 cursor-pointer items-center justify-center rounded-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
   aria-label="Expand navigation"
   aria-controls="leftnav"
   aria-expanded="false"
 >
   <svg
     aria-hidden="true"
-    class="size-5"
+    class="size-9"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -255,7 +255,7 @@ const isActive = (href: string) => {
       const shouldCollapse = desktopQuery.matches && collapsed;
 
       aside.classList.toggle("lg:w-110", !shouldCollapse);
-      aside.classList.toggle("lg:w-11", shouldCollapse);
+      aside.classList.toggle("lg:w-0", shouldCollapse);
       aside.classList.toggle("lg:px-5", !shouldCollapse);
       aside.classList.toggle("lg:p-0", shouldCollapse);
       aside.classList.toggle("lg:gap-5", !shouldCollapse);
