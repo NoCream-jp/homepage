@@ -36,47 +36,50 @@ const formattedDate = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2,
     <div class="flex flex-col lg:min-h-0 lg:flex-1 lg:flex-row">
       <!-- 左 -->
       <aside
-        class="flex w-full shrink-0 flex-col gap-4 p-4 lg:w-110 lg:justify-around lg:gap-5 lg:px-5"
+        data-leftnav-aside
+        class="relative flex w-full shrink-0 flex-col gap-4 overflow-visible p-4 transition-all duration-300 ease-in-out motion-reduce:transition-none lg:w-110 lg:justify-around lg:gap-5 lg:px-5"
       >
         <LeftNav />
       </aside>
 
       <!-- 右 -->
       <main
-      class="flex w-full min-w-0 flex-col px-4 py-3 lg:min-h-0 lg:flex-1 lg:px-7 lg:py-10"
+        class="flex w-full min-w-0 flex-col px-4 py-3 lg:min-h-0 lg:flex-1 lg:px-7 lg:py-10"
       >
-      <div class="mt-1 flex items-baseline justify-between pr-1 pb-3">
-          <h1 class="text-[1.0rem] font-normal text-zinc-800 lg:text-xl">
-            {post.data.title}
-          </h1>
+        <div class="mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col">
+          <div class="mt-1 flex items-baseline justify-between pr-1 pb-3">
+            <h1 class="text-[1.0rem] font-normal text-zinc-800 lg:text-xl">
+              {post.data.title}
+            </h1>
 
-          <span class="text-xs text-zinc-500"
-            >Published on: {formattedDate}</span
-          >
-        </div>
-
-        <!-- 本文のみスクロール -->
-        <div
-          class="no-scrollbar flex min-h-0 flex-1 overflow-y-auto border-y border-(--site-border) px-1 pt-2 lg:px-3"
-        >
-          <div class="w-full">
-            <section class="w-full pb-5">
-              <article
-                class="blog-content text-[15px] leading-normal tracking-wide text-zinc-800 md:text-base"
-              >
-                <Content components={{ Highlight, ExternalLink }} />
-              </article>
-            </section>
+            <span class="text-xs text-zinc-500"
+              >Published on: {formattedDate}</span
+            >
           </div>
-        </div>
 
-        <!-- フッター-->
-        <div
-          transition:animate="fade"
-          class="mt-2 mb-1 flex w-full translate-y-0 items-center justify-between opacity-100 transition-all duration-100"
-        >
-          <BackButton href="/blog" />
-          <LikeButton articleId={post.id} />
+          <!-- 本文のみスクロール -->
+          <div
+            class="no-scrollbar flex min-h-0 flex-1 overflow-y-auto border-y border-(--site-border) px-1 pt-2 lg:px-3"
+          >
+            <div class="flex w-full flex-col items-center">
+              <section class="w-full pb-5">
+                <article
+                  class="blog-content text-[15px] leading-normal tracking-wide text-zinc-800 md:text-base"
+                >
+                  <Content components={{ Highlight, ExternalLink }} />
+                </article>
+              </section>
+            </div>
+          </div>
+
+          <!-- フッター-->
+          <div
+            transition:animate="fade"
+            class="mt-2 mb-1 flex w-full translate-y-0 items-center justify-between opacity-100 transition-all duration-100"
+          >
+            <BackButton href="/blog" />
+            <LikeButton articleId={post.id} />
+          </div>
         </div>
       </main>
     </div>

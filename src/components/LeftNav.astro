@@ -18,11 +18,15 @@ const isActive = (href: string) => {
 ---
 
 <!-- 全体 -->
-<div id="leftnav" class="flex h-full flex-col justify-center gap-4">
+<div
+  id="leftnav"
+  data-leftnav-panel
+  class="flex h-full flex-col justify-center gap-4"
+>
   <div class="flex items-center justify-between gap-5">
     <!-- ナビゲーション部分 -->
     <nav
-      class="flex w-full max-w-100 items-center gap-1"
+      class="flex min-w-0 flex-1 items-center gap-1"
       aria-label="page navigation"
     >
       {
@@ -45,12 +49,38 @@ const isActive = (href: string) => {
         })
       }
     </nav>
-    <!-- テーマ切り替えボタン -->
-    <div class="flex items-center lg:hidden">
+
+    <!-- 折りたたみボタン -->
+    <div class="flex shrink-0 items-center gap-1">
+      <button
+        data-leftnav-collapse
+        type="button"
+        class="bg-site-canvas text-secondary hover:text-accent focus-visible:outline-focus hidden size-9 shrink-0 cursor-pointer items-center justify-center rounded-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+        aria-label="Collapse navigation"
+        aria-controls="leftnav"
+        aria-expanded="true"
+      >
+        <svg
+          aria-hidden="true"
+          class="size-9"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+          <path d="M9 3v18"></path>
+        </svg>
+        <span class="sr-only">Collapse navigation</span>
+      </button>
+
+      <!-- テーマ切り替えボタン -->
       <button
         data-theme-toggle
         type="button"
-        class="bg-surface text-secondary hover:border-accent hover:text-accent flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-(--site-border) transition-colors"
+        class="bg-surface text-secondary hover:text-accent hover:border-accent flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-(--site-border) transition-colors lg:hidden"
         aria-label="Switch to dark theme"
         aria-pressed="false"
       >
@@ -169,6 +199,115 @@ const isActive = (href: string) => {
     </div>
   </div>
 </div>
+
+<!-- 展開ボタン -->
+<button
+  data-leftnav-expand
+  type="button"
+  class="bg-site-canvas text-secondary hover:text-accent focus-visible:outline-focus absolute top-1/2 left-0 z-20 hidden size-9 shrink-0 -translate-y-1/2 cursor-pointer items-center justify-center rounded-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+  aria-label="Expand navigation"
+  aria-controls="leftnav"
+  aria-expanded="false"
+>
+  <svg
+    aria-hidden="true"
+    class="size-9"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+    <path d="M9 3v18"></path>
+  </svg>
+  <span class="sr-only">Expand navigation</span>
+</button>
+
+<!-- ナビ折りたたみボタン -->
+<script>
+  const LEFTNAV_COLLAPSED_KEY = "leftnav-collapsed";
+  let cleanupLeftNav: (() => void) | undefined;
+
+  const setupLeftNav = () => {
+    cleanupLeftNav?.();
+
+    const panel = document.querySelector<HTMLElement>("[data-leftnav-panel]");
+    const aside = panel?.closest<HTMLElement>("[data-leftnav-aside]");
+    const collapseButton = panel?.querySelector<HTMLButtonElement>(
+      "[data-leftnav-collapse]"
+    );
+    const expandButton = aside?.querySelector<HTMLButtonElement>(
+      "[data-leftnav-expand]"
+    );
+
+    if (!panel || !aside || !collapseButton || !expandButton) return;
+
+    const desktopQuery = window.matchMedia("(min-width: 64rem)");
+    let collapsed = false;
+
+    try {
+      collapsed = sessionStorage.getItem(LEFTNAV_COLLAPSED_KEY) === "true";
+    } catch {}
+
+    const render = () => {
+      const shouldCollapse = desktopQuery.matches && collapsed;
+
+      aside.classList.toggle("lg:w-110", !shouldCollapse);
+      aside.classList.toggle("lg:w-0", shouldCollapse);
+      aside.classList.toggle("lg:px-5", !shouldCollapse);
+      aside.classList.toggle("lg:p-0", shouldCollapse);
+      aside.classList.toggle("lg:gap-5", !shouldCollapse);
+      aside.classList.toggle("lg:gap-0", shouldCollapse);
+
+      panel.classList.toggle("hidden", shouldCollapse);
+      panel.setAttribute("aria-hidden", String(shouldCollapse));
+      panel.toggleAttribute("inert", shouldCollapse);
+
+      collapseButton.classList.toggle("hidden", !desktopQuery.matches);
+      collapseButton.classList.toggle("flex", desktopQuery.matches);
+      expandButton.classList.toggle("hidden", !shouldCollapse);
+      expandButton.classList.toggle("flex", shouldCollapse);
+      collapseButton.setAttribute("aria-expanded", String(!shouldCollapse));
+      expandButton.setAttribute("aria-expanded", String(!shouldCollapse));
+    };
+
+    const setCollapsed = (next: boolean, restoreFocus = false) => {
+      collapsed = next;
+
+      try {
+        sessionStorage.setItem(LEFTNAV_COLLAPSED_KEY, String(next));
+      } catch {}
+
+      render();
+
+      if (restoreFocus) {
+        (next ? expandButton : collapseButton).focus();
+      }
+    };
+
+    const handleCollapse = () => setCollapsed(true, true);
+    const handleExpand = () => setCollapsed(false, true);
+    const handleViewportChange = () => render();
+
+    collapseButton.addEventListener("click", handleCollapse);
+    expandButton.addEventListener("click", handleExpand);
+    desktopQuery.addEventListener("change", handleViewportChange);
+
+    render();
+
+    cleanupLeftNav = () => {
+      collapseButton.removeEventListener("click", handleCollapse);
+      expandButton.removeEventListener("click", handleExpand);
+      desktopQuery.removeEventListener("change", handleViewportChange);
+      cleanupLeftNav = undefined;
+    };
+  };
+
+  setupLeftNav();
+  document.addEventListener("astro:page-load", setupLeftNav);
+</script>
 
 <!-- テーマ切り替えボタン -->
 <script>
