@@ -170,6 +170,7 @@ const isActive = (href: string) => {
   </div>
 </div>
 
+<!-- テーマ切り替えボタン -->
 <script>
   const setupThemeToggle = () => {
     const buttons = document.querySelectorAll<HTMLButtonElement>(
@@ -217,6 +218,7 @@ const isActive = (href: string) => {
   document.addEventListener("astro:page-load", setupThemeToggle);
 </script>
 
+<!-- hoverに応じて傾ける -->
 <script>
   (function () {
     if (typeof document === "undefined") return;
