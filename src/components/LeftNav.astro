@@ -49,19 +49,20 @@ const isActive = (href: string) => {
         })
       }
     </nav>
-    <!-- テーマ切り替えボタン -->
+
+    <!-- 折りたたみボタン -->
     <div class="flex shrink-0 items-center gap-1">
       <button
         data-leftnav-collapse
         type="button"
-        class="bg-surface text-secondary hover:border-accent hover:text-accent hidden size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-(--site-border) transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--site-focus)"
+        class="bg-surface text-secondary hover:border-accent hover:text-accent focus-visible:outline-focus hidden shrink-0 cursor-pointer items-center justify-center rounded-sm border border-(--site-border) transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
         aria-label="Collapse navigation"
         aria-controls="leftnav"
         aria-expanded="true"
       >
         <svg
           aria-hidden="true"
-          class="size-5"
+          class="size-9"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -201,7 +202,7 @@ const isActive = (href: string) => {
 <button
   data-leftnav-expand
   type="button"
-  class="bg-surface text-secondary hover:border-accent hover:text-accent hidden size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-(--site-border) transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--site-focus)"
+  class="bg-surface text-secondary hover:border-accent hover:text-accent rouded-sm focus-visible:outline-focus hidden size-11 shrink-0 cursor-pointer items-center justify-center border border-(--site-border) transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
   aria-label="Expand navigation"
   aria-controls="leftnav"
   aria-expanded="false"
@@ -222,6 +223,7 @@ const isActive = (href: string) => {
   <span class="sr-only">Expand navigation</span>
 </button>
 
+<!-- ナビ折りたたみボタン -->
 <script>
   const LEFTNAV_COLLAPSED_KEY = "leftnav-collapsed";
   let cleanupLeftNav: (() => void) | undefined;
@@ -305,6 +307,7 @@ const isActive = (href: string) => {
   document.addEventListener("astro:page-load", setupLeftNav);
 </script>
 
+<!-- テーマ切り替えボタン -->
 <script>
   const setupThemeToggle = () => {
     const buttons = document.querySelectorAll<HTMLButtonElement>(
