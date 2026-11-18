@@ -46,7 +46,7 @@ const initials = initialsOf(String(title));
 ---
 
 <article
-  class="group bg-surface-subtle relative flex w-full min-w-0 flex-col justify-between overflow-hidden rounded-sm border border-l-4 border-(--site-border) p-4"
+  class="group bg-surface-subtle relative flex w-full min-w-0 flex-col justify-between overflow-hidden rounded-sm border border-(--site-border) p-4"
   role="article"
   aria-labelledby={`learning-title-${item.id}`}
   data-logo={String(logoSrc ?? rawLogo ?? "")}
@@ -54,7 +54,7 @@ const initials = initialsOf(String(title));
 >
   <div class="flex items-start gap-3">
     <div
-      class="flex size-12 shrink-0 items-center justify-center rounded-xl border border-(--site-border) p-2.5"
+      class="bg-surface-muted flex size-12 shrink-0 items-center justify-center rounded-xl border border-(--site-border) p-2.5"
     >
       {
         logoSrc ? (
@@ -86,11 +86,6 @@ const initials = initialsOf(String(title));
     </div>
 
     <div class="min-w-0 flex-1 pt-0.5">
-      <p
-        class="text-muted mb-1 text-[0.65rem] font-semibold tracking-[0.16em] uppercase"
-      >
-        Learning
-      </p>
       <h3
         id={`learning-title-${item.id}`}
         class="text-primary line-clamp-2 text-base leading-5 font-semibold"
