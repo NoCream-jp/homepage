@@ -46,49 +46,53 @@ const initials = initialsOf(String(title));
 ---
 
 <article
-  class="cert-card group bg-theme-50 relative flex w-full min-w-0 items-center gap-4 overflow-hidden rounded-md border border-(--site-border) px-4 py-3 transition-colors duration-150 ease-out focus-within:outline-none"
+  class="group bg-surface-subtle relative flex w-full min-w-0 flex-col justify-between overflow-hidden rounded-sm border border-(--site-border) p-4"
   role="article"
   aria-labelledby={`learning-title-${item.id}`}
   data-logo={String(logoSrc ?? rawLogo ?? "")}
   data-id={item.id}
 >
-  <div class="shrink-0">
-    {
-      logoSrc ? (
-        <>
-          <img
-            src={logoSrc}
-            alt={`${title} logo`}
-            class="h-10 w-10 rounded-md object-contain"
-            loading="lazy"
-            onerror="this.style.display='none'; const fb=this.nextElementSibling; if(fb) fb.style.display='flex';"
-          />
+  <div class="flex items-start gap-3">
+    <div
+      class="bg-surface-muted flex size-12 shrink-0 items-center justify-center rounded-xl border border-(--site-border) p-2.5"
+    >
+      {
+        logoSrc ? (
+          <>
+            <img
+              src={logoSrc}
+              alt={`${title} logo`}
+              class="h-full w-full object-contain"
+              loading="lazy"
+              onerror="this.style.display='none'; const fb=this.nextElementSibling; if(fb) fb.style.display='flex';"
+            />
+            <div
+              style="display:none"
+              class="bg-surface-muted text-primary flex h-full w-full items-center justify-center rounded-md text-sm font-semibold"
+              aria-hidden="true"
+            >
+              {initials}
+            </div>
+          </>
+        ) : (
           <div
-            style="display:none"
-            class="bg-surface-muted flex h-10 w-10 items-center justify-center rounded-md border border-(--site-border) text-sm font-medium text-zinc-900"
+            class="bg-surface-muted text-primary flex h-full w-full items-center justify-center rounded-md text-sm font-semibold"
             aria-hidden="true"
           >
             {initials}
           </div>
-        </>
-      ) : (
-        <div
-          class="bg-surface-muted flex h-10 w-10 items-center justify-center rounded-md border border-(--site-border) text-sm font-medium text-zinc-900"
-          aria-hidden="true"
-        >
-          {initials}
-        </div>
-      )
-    }
-  </div>
+        )
+      }
+    </div>
 
-  <div class="min-w-0">
-    <h3
-      id={`learning-title-${item.id}`}
-      class="truncate text-sm font-medium text-black"
-      title={String(title)}
-    >
-      {title}
-    </h3>
+    <div class="min-w-0 flex-1 pt-0.5">
+      <h3
+        id={`learning-title-${item.id}`}
+        class="text-primary line-clamp-2 text-base leading-5 font-semibold"
+        title={String(title)}
+      >
+        {title}
+      </h3>
+    </div>
   </div>
 </article>
