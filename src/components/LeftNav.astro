@@ -255,7 +255,7 @@ const isActive = (href: string) => {
       const shouldCollapse = desktopQuery.matches && collapsed;
 
       aside.classList.toggle("lg:w-110", !shouldCollapse);
-      aside.classList.toggle("lg:w-0", shouldCollapse);
+      aside.classList.toggle("lg:w-9", shouldCollapse);
       aside.classList.toggle("lg:px-5", !shouldCollapse);
       aside.classList.toggle("lg:p-0", shouldCollapse);
       aside.classList.toggle("lg:gap-5", !shouldCollapse);
